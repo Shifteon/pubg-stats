@@ -16,11 +16,11 @@ export async function GET(request: NextRequest) {
   }
 
   const averageKillsArray: AverageKillsArray = averagesArray.map(averages => ({ 
-    isaac_kills: averages.isaac_kills,
-    cody_kills: averages.cody_kills,
-    trenton_kills: averages.trenton_kills,
-    ben_kills: averages.ben_kills,
-    team_kills: averages.team_kills,
+    isaac_kills: Number(averages.isaac_kills),
+    cody_kills: Number(averages.cody_kills),
+    trenton_kills: Number(averages.trenton_kills),
+    ben_kills: Number(averages.ben_kills),
+    team_kills: Number(averages.team_kills),
   }));
 
   return NextResponse.json({ averageKillsArray, status: 200 });

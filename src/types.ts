@@ -31,11 +31,11 @@ export interface Averages {
 export type AveragesArray = Averages[];
 
 export interface AverageKills {
-  isaac_kills: string;
-  cody_kills: string;
-  trenton_kills: string;
-  ben_kills: string;
-  team_kills: string;
+  isaac_kills: number;
+  cody_kills: number;
+  trenton_kills: number;
+  ben_kills: number;
+  team_kills: number;
 };
 export type AverageKillsArray = AverageKills[];
 
