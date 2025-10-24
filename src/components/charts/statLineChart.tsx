@@ -39,9 +39,11 @@ export default function StatLineChart(props: StatLineChartProps) {
     const max = Math.max(...values);
     const bufferPercent = 0.05; // 5%
 
-    // If all values are the same (e.g., all 5), use a fixed buffer of 1
+    // Handle case where all values are the same
     if (min === max) {
-      return [Math.max(0, min - 1), 'auto'];
+      const safeMin = Math.max(0, min - 1);
+      const safeMax = max + 1;
+      return [safeMin, safeMax];
     }
 
     // Calculate the range (difference between max and min)
@@ -50,12 +52,13 @@ export default function StatLineChart(props: StatLineChartProps) {
     // Calculate the buffer amount (e.g., 5% of the range)
     const bufferAmount = range * bufferPercent;
 
-    // The new minimum is the actual minimum minus the buffer
-    let newMin = min - bufferAmount;
+    // New Minimum: actual minimum minus the buffer (ensures no negative minimum for counts)
+    const newYMin = Math.max(0, min - bufferAmount);
 
-    // Ensure the minimum doesn't go below zero if the actual minimum is positive
-    // This is usually desired for counts/kills/damage.
-    return [Math.max(0, newMin), 'auto'];
+    // New Maximum: actual maximum PLUS the buffer
+    const newYMax = max + bufferAmount;
+
+    return [newYMin, newYMax];
   };
 
   return (
