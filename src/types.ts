@@ -8,7 +8,8 @@ import {
   TEAM_NO_BEN, 
   TEAM_NO_ISAAC, 
   TEAM_ALL, 
-  TEST_TEAM
+  TEST_TEAM,
+  GAME_INDEX_KEY
 } from "./constants";
 
 export type StatName = typeof AVERAGE_KILLS_STAT_NAME | typeof AVERAGE_DAMAGE_STAT_NAME | typeof KILLS_STAT_NAME | typeof DAMAGE_STAT_NAME;
@@ -36,6 +37,7 @@ export interface AverageKills {
   trenton_kills: number;
   ben_kills: number;
   team_kills: number;
+  [GAME_INDEX_KEY]: number;
 };
 export type AverageKillsArray = AverageKills[];
 

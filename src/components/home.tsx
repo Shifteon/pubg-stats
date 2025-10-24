@@ -22,7 +22,7 @@ export default function HomeComponent() {
   };
 
   return (
-    <div className="p-10">
+    <div className="p-2 xl:p-10 lg:p-5 md:p-3">
       <Select 
         label="Select a team"
         selectionMode="single"

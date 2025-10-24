@@ -1,4 +1,4 @@
-import { VALID_TEAM_NAMES, AVERAGE_KILLS_STAT_NAME } from "@/constants";
+import { VALID_TEAM_NAMES, AVERAGE_KILLS_STAT_NAME, GAME_INDEX_KEY, PERCENTAGE_OF_DATA_TO_REMOVE } from "@/constants";
 import { AverageKillsArray, TeamName } from "@/types";
 import { getStatArray } from "@/utils/getStatArray";
 import { NextRequest, NextResponse } from "next/server";
@@ -15,17 +15,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: "Error getting Average Kills stats", status: 500 });
   }
 
-  const averageKillsArray: AverageKillsArray = averagesArray.map(averages => ({ 
+  const averageKillsArray: AverageKillsArray = averagesArray.map((averages, index) => ({ 
     isaac_kills: Number(averages.isaac_kills),
     cody_kills: Number(averages.cody_kills),
     trenton_kills: Number(averages.trenton_kills),
     ben_kills: Number(averages.ben_kills),
     team_kills: Number(averages.team_kills),
+    [GAME_INDEX_KEY]: index,
   }));
-  if (averageKillsArray.length > 40) {
-    // remove first 10 so the graph is cleaner
-    averageKillsArray.splice(0, 20);
-  }
+  // remove some of the data to nomralize it
+  const startIndex = Math.ceil(averageKillsArray.length * PERCENTAGE_OF_DATA_TO_REMOVE);
+  const filteredArray = averageKillsArray.slice(startIndex);
 
-  return NextResponse.json({ averageKillsArray, status: 200 });
+  return NextResponse.json({ averageKillsArray: filteredArray, status: 200 });
 }

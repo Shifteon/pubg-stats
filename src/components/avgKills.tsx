@@ -41,7 +41,7 @@ export default function AvgKills(props: AvgKillsProps) {
   }, [props.team]);
 
   return (
-    <div>
+    <div style={{ marginTop: 5 }}>
       <h2>Average Kills</h2>
       {loading ? (
         // When loading is TRUE

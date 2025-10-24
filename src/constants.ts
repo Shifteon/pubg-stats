@@ -45,3 +45,15 @@ export const CODY_LOWERCASE = "cody";
 export const BEN_LOWERCASE = "ben";
 export const TRENTON_LOWERCASE = "trenton";
 export const TEAM_LOWERCASE = "team";
+
+// line names
+export const ISAAC_LINE_NAME = "Isaac";
+export const CODY_LINE_NAME = "Cody";
+export const BEN_LINE_NAME = "Ben";
+export const TRENTON_LINE_NAME = "Trenton";
+export const TEAM_LINE_NAME = "Team";
+
+export const GAME_INDEX_KEY = "game_index";
+
+// we cut off 10% of game data to normalize it
+export const PERCENTAGE_OF_DATA_TO_REMOVE = 0.10;
