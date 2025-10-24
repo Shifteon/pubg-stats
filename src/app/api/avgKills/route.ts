@@ -22,6 +22,8 @@ export async function GET(request: NextRequest) {
     ben_kills: Number(averages.ben_kills),
     team_kills: Number(averages.team_kills),
   }));
+  // remove first 10 so the graph is cleaner
+  averageKillsArray.splice(0, 20);
 
   return NextResponse.json({ averageKillsArray, status: 200 });
 }

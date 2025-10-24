@@ -1,0 +1,40 @@
+"use client";
+
+import { Select, SelectItem } from "@heroui/react";
+import AvgKills from "./avgKills";
+import { TEAM_ALL, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON } from "@/constants";
+import { ChangeEvent, useState } from "react";
+import { TeamName } from "@/types";
+
+const teamOptions = [
+  {key: TEAM_ALL, label: TEAM_ALL},
+  {key: TEAM_NO_BEN, label: 'Isaac, Cody, Trenton'},
+  {key: TEAM_NO_TRENTON, label: 'Isaac, Cody, Ben'},
+  {key: TEAM_NO_CODY, label: 'Isaac, Ben, Trenton'},
+  {key: TEAM_NO_ISAAC, label: 'Cody, Ben, Trenton'},
+];
+
+export default function HomeComponent() {
+  const [selectedTeam, setSelectedTeam] = useState<TeamName>(TEAM_ALL);
+
+  const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedTeam(e.target.value as TeamName);
+  };
+
+  return (
+    <div className="p-10">
+      <Select 
+        label="Select a team"
+        selectionMode="single"
+        onChange={handleChange}
+        selectedKeys={[selectedTeam]}
+      >
+        {teamOptions.map((team) => (
+          <SelectItem key={team.key}>{team.label}</SelectItem>
+        ))
+        }
+      </Select>
+      <AvgKills team={selectedTeam}></AvgKills>
+    </div>
+  );
+}

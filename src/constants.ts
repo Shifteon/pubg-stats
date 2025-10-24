@@ -31,3 +31,17 @@ export const STATS_FILE_MAP: {[key in StatName]: string} = {
   [KILLS_STAT_NAME]: KILLS_STAT_FILE,
   [DAMAGE_STAT_NAME]: DAMAGE_STAT_FILE,
 };
+
+// stroke colors
+export const ISAAC_STROKE_COLOR = "#023E8A";
+export const CODY_STROKE_COLOR = "#E27249";
+export const BEN_STROKE_COLOR = "#D71515";
+export const TRENTON_STROKE_COLOR = "#276221";
+export const TEAM_STROKE_COLOR = "#6C3BAA";
+
+// lowercase names
+export const ISAAC_LOWERCASE = "isaac";
+export const CODY_LOWERCASE = "cody";
+export const BEN_LOWERCASE = "ben";
+export const TRENTON_LOWERCASE = "trenton";
+export const TEAM_LOWERCASE = "team";

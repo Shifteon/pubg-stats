@@ -1,10 +1,21 @@
+"use client";
+
+import { FrontendStatArray } from '@/types';
+import { getStrokeColor, removeEmptyKeys } from '@/utils/chartUtils';
+import React, { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 interface StatLineChartProps {
-  data: [];
+  data: FrontendStatArray;
 }
 
 export default function StatLineChart(props: StatLineChartProps) {
+  const [dataKeys, setDataKeys] = useState<string[]>([]);
+
+  useEffect(() => {
+    const keys = removeEmptyKeys(props.data);
+    setDataKeys(keys);
+  }, [props]);
 
   return (
     <LineChart
@@ -17,11 +28,12 @@ export default function StatLineChart(props: StatLineChartProps) {
       <YAxis width="auto" />
       <Tooltip />
       <Legend />
-      <Line type="monotone" dot={false} dataKey="isaac_kills" stroke="#023E8A" strokeWidth={2} />
-      <Line type="monotone" dot={false} dataKey="cody_kills" stroke="#E27249" strokeWidth={2} />
-      <Line type="monotone" dot={false} dataKey="ben_kills" stroke="#D71515" strokeWidth={2} />
-      <Line type="monotone" dot={false} dataKey="trenton_kills" stroke="#276221" strokeWidth={2} />
-      <Line type="monotone" dot={false} dataKey="team_kills" stroke="#6C3BAA" strokeWidth={2} />
+
+      {dataKeys.map(key => (
+        <React.Fragment key={key}>
+          <Line type="monotone" dot={false} dataKey={key} stroke={getStrokeColor(key)} strokeWidth={2} />
+        </React.Fragment>
+      ))}
     </LineChart>
   )
 }

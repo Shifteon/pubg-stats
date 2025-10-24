@@ -1,11 +1,8 @@
-import Image from "next/image";
-import styles from "./page.module.css";
 import AvgKills from "@/components/avgKills";
+import HomeComponent from "@/components/home";
 
 export default function Home() {
   return (
-    <div className="p-10">
-      <AvgKills team="All"></AvgKills>
-    </div>
+    <HomeComponent></HomeComponent>
   );
 }

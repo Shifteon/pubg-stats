@@ -39,4 +39,13 @@ export interface AverageKills {
 };
 export type AverageKillsArray = AverageKills[];
 
-export type StatArray = AveragesArray;
+export type StatArray = AveragesArray | AverageKillsArray;
+
+// these are array that will be used on the frontend
+export type FrontendStatArray = AverageKillsArray;
+
+export interface ChartData {
+  dataKey: string;
+  strokeColor: string;
+
+}
