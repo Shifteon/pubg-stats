@@ -1,29 +1,30 @@
 "use client";
 
-import { AverageKillsArray, TeamName } from "@/types";
+import { FrontendStatArray, TeamName, StatName } from "@/types";
 import { useEffect, useState } from "react";
-import StatLineChart from "./charts/statLineChart";
+import StatLineChart from "../charts/statLineChart";
+import { STAT_DISPLAY_NAME_MAP } from "@/constants";
 
 export interface AvgKillsProps {
-  team: TeamName
+  team: TeamName;
+  stat: StatName;
 }
 
-export default function AvgKills(props: AvgKillsProps) {
-  const [stats, setStats] = useState([] as AverageKillsArray);
+export default function GamePerformanceStat(props: AvgKillsProps) {
+  const [stats, setStats] = useState([] as FrontendStatArray);
   const [loading, setLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
 
   // fetch stats from api
   const fetchStats = async () => {
     try {
-      const results = await fetch(`/api/avgKills?team=${props.team}`);
+      const results = await fetch(`/api/stats?team=${props.team}&stat=${props.stat}`);
       if (!results.ok) {
         setLoadingError(true);
       }
 
       const json = await results.json();
-      console.log("average kills json: ", json);
-      setStats(json.averageKillsArray as AverageKillsArray);
+      setStats(json.frontendStatArray as FrontendStatArray);
     } catch (error) {
       setLoadingError(true);
     } finally {
@@ -42,7 +43,7 @@ export default function AvgKills(props: AvgKillsProps) {
 
   return (
     <div style={{ marginTop: 5 }}>
-      <h2>Average Kills</h2>
+      <h2>{STAT_DISPLAY_NAME_MAP[props.stat]}</h2>
       {loading ? (
         // When loading is TRUE
         <p>⏳ Loading...</p>

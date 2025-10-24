@@ -1,10 +1,11 @@
 "use client";
 
 import { Select, SelectItem } from "@heroui/react";
-import AvgKills from "./avgKills";
-import { TEAM_ALL, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON } from "@/constants";
+import GamePerformanceStat from "./stats/gamePerformance";
+import { AVERAGE_DAMAGE_STAT_NAME, AVERAGE_KILLS_STAT_NAME, SUPPORTED_STATS, TEAM_ALL, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON } from "@/constants";
 import { ChangeEvent, useState } from "react";
 import { TeamName } from "@/types";
+import React from "react";
 
 const teamOptions = [
   {key: TEAM_ALL, label: TEAM_ALL},
@@ -34,7 +35,12 @@ export default function HomeComponent() {
         ))
         }
       </Select>
-      <AvgKills team={selectedTeam}></AvgKills>
+      {SUPPORTED_STATS.map((statName, index) => (
+        <React.Fragment key={index}>
+          <GamePerformanceStat team={selectedTeam} stat={statName}></GamePerformanceStat>
+        </React.Fragment>
+      ))
+      }
     </div>
   );
 }

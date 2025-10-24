@@ -41,9 +41,8 @@ export async function getStatArray(stat: StatName, team: TeamName): Promise<Stat
 
   // this result is always an array because we store json arrays
   const jsonArray = await fetchBlob(blobUrl);
-  // we only support average kills rn lol
-  if (jsonArray && stat === AVERAGE_KILLS_STAT_NAME) {
-    return jsonArray as AveragesArray;
+  if (jsonArray) {
+    return jsonArray as StatArray;
   }
   return null;
 }

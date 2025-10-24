@@ -1,4 +1,4 @@
-import { StatName } from "@/types";
+import { IndividualName, StatFile, StatName } from "@/types";
 
 export const TEAM_NO_TRENTON = "T";
 export const TEAM_NO_CODY = "C";
@@ -25,11 +25,61 @@ export const AVERAGE_KILLS_STAT_FILE = "avgs.json";
 export const KILLS_STAT_FILE = "";
 export const DAMAGE_STAT_FILE = "";
 
+// lowercase names
+export const ISAAC_LOWERCASE = "isaac";
+export const CODY_LOWERCASE = "cody";
+export const BEN_LOWERCASE = "ben";
+export const TRENTON_LOWERCASE = "trenton";
+export const TEAM_LOWERCASE = "team";
+
 export const STATS_FILE_MAP: {[key in StatName]: string} = {
   [AVERAGE_DAMAGE_STAT_NAME]: AVERAGE_DAMAGE_STAT_FILE,
   [AVERAGE_KILLS_STAT_NAME]: AVERAGE_KILLS_STAT_FILE,
   [KILLS_STAT_NAME]: KILLS_STAT_FILE,
   [DAMAGE_STAT_NAME]: DAMAGE_STAT_FILE,
+};
+
+export const SUPPORTED_STATS: StatName[] = [
+  AVERAGE_KILLS_STAT_NAME,
+  AVERAGE_DAMAGE_STAT_NAME,
+];
+
+export const STAT_KEY_MAP: {[key in StatName]: {[key in IndividualName]: keyof StatFile}} = {
+  [AVERAGE_DAMAGE_STAT_NAME]: {
+    [ISAAC_LOWERCASE]: 'isaac_damage',
+    [CODY_LOWERCASE]: 'cody_damage',
+    [BEN_LOWERCASE]: 'ben_damage',
+    [TRENTON_LOWERCASE]: 'trenton_damage',
+    [TEAM_LOWERCASE]: 'team_damage',
+  },
+  [AVERAGE_KILLS_STAT_NAME]: {
+    [ISAAC_LOWERCASE]: 'isaac_kills',
+    [CODY_LOWERCASE]: 'cody_kills',
+    [BEN_LOWERCASE]: 'ben_kills',
+    [TRENTON_LOWERCASE]: 'trenton_kills',
+    [TEAM_LOWERCASE]: 'team_kills',
+  },
+  [KILLS_STAT_NAME]: {
+    [ISAAC_LOWERCASE]: 'isaac_kills',
+    [CODY_LOWERCASE]: 'cody_kills',
+    [BEN_LOWERCASE]: 'ben_kills',
+    [TRENTON_LOWERCASE]: 'trenton_kills',
+    [TEAM_LOWERCASE]: 'team_kills',
+  },
+  [DAMAGE_STAT_NAME]: {
+    [ISAAC_LOWERCASE]: 'isaac_damage',
+    [CODY_LOWERCASE]: 'cody_damage',
+    [BEN_LOWERCASE]: 'ben_damage',
+    [TRENTON_LOWERCASE]: 'trenton_damage',
+    [TEAM_LOWERCASE]: 'team_damage',
+  },
+};
+
+export const STAT_DISPLAY_NAME_MAP: {[key in StatName]: string} = {
+  [AVERAGE_DAMAGE_STAT_NAME]: "Average Damage",
+  [AVERAGE_KILLS_STAT_NAME]: "Average Kills",
+  [KILLS_STAT_NAME]: "Kills",
+  [DAMAGE_STAT_NAME]: "Damage",
 };
 
 // stroke colors
@@ -38,13 +88,6 @@ export const CODY_STROKE_COLOR = "#E27249";
 export const BEN_STROKE_COLOR = "#D71515";
 export const TRENTON_STROKE_COLOR = "#276221";
 export const TEAM_STROKE_COLOR = "#6C3BAA";
-
-// lowercase names
-export const ISAAC_LOWERCASE = "isaac";
-export const CODY_LOWERCASE = "cody";
-export const BEN_LOWERCASE = "ben";
-export const TRENTON_LOWERCASE = "trenton";
-export const TEAM_LOWERCASE = "team";
 
 // line names
 export const ISAAC_LINE_NAME = "Isaac";
