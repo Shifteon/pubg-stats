@@ -15,27 +15,28 @@ export interface AvgKillsProps {
 export default function GamePerformanceStat(props: AvgKillsProps) {
   const [stats, setStats] = useState([] as FrontendStatArray);
   const [loading, setLoading] = useState(true);
-  const [reloading, setReloading] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
 
   // fetch stats from api
   const fetchStats = async () => {
     try {
       if (!loading) {
-        setReloading(true);
+        setLoading(true);
       }
       const results = await fetch(`/api/stats?team=${props.team}&stat=${props.statName}`);
+      console.log(results.ok);
       if (!results.ok) {
         setLoadingError(true);
+        return;
       }
 
       const json = await results.json();
       setStats(json.frontendStatArray as FrontendStatArray);
+      setLoadingError(false);
     } catch (error) {
       setLoadingError(true);
     } finally {
       setLoading(false);
-      setReloading(false);
     }
   };
 
@@ -63,20 +64,22 @@ export default function GamePerformanceStat(props: AvgKillsProps) {
   };
 
   return (
-    <div  className="relative" style={{ marginTop: 5 }}>
-      <h2 className="p-2">{STAT_DISPLAY_NAME_MAP[props.statName]}</h2>
-      {reloading &&
+    <div className="relative flex flex-col items-center" style={{ marginTop: 5 }}>
+      {loading &&
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/10 w-full h-full rounded-lg p-5">
           <Spinner size="lg" label="Loading" labelColor="primary"></Spinner>
         </div>
       }
-      {loading ? (
-        // When loading is TRUE
-        <Spinner></Spinner>
-      ) : (
-        // When loading is FALSE
-        getChart()
-      )}
+      {loadingError &&
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/10 w-full h-full rounded-lg p-5">
+          <h2 className="text-red-950 text-4xl text-shadow-md">Error loading stats</h2>
+        </div>
+      }
+      <div className="w-full flex flex-col items-center">
+        <h2 className="p-2 self-start">{STAT_DISPLAY_NAME_MAP[props.statName]}</h2>
+        
+        {getChart()}
+      </div>
     </div>
   );
 }

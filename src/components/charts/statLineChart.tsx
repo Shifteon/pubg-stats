@@ -13,13 +13,15 @@ interface StatLineChartProps {
 }
 
 export default function StatLineChart(props: StatLineChartProps) {
-  const data = props.data;
+  const data = props.data || [];
 
   const [dataKeys, setDataKeys] = useState<string[]>([]);
 
   useEffect(() => {
-    const keys = removeEmptyKeys(data, props.statName);
-    setDataKeys(keys);
+    if (data.length) {
+      const keys = removeEmptyKeys(data, props.statName);
+      setDataKeys(keys);
+    }
   }, [props]);
 
   const getXAxisInterval = (): number => {
@@ -33,6 +35,9 @@ export default function StatLineChart(props: StatLineChartProps) {
   };
 
   const getYAxisDomain = (): AxisDomain => {
+    if (!data.length) {
+      return ['auto', 'auto'];
+    }
     const values = data.flatMap(game => {
       const basicObject: {[key: string]: number} = {...game};
       return dataKeys.map(key => basicObject[key])
@@ -72,7 +77,7 @@ export default function StatLineChart(props: StatLineChartProps) {
       <CartesianGrid strokeDasharray="3 3" />
       <XAxis interval={getXAxisInterval()} domain={[20, 'auto']} dataKey={GAME_INDEX_KEY} />
       <YAxis interval="preserveEnd" allowDecimals={false} domain={getYAxisDomain()} startOffset={3} scale="linear" width="auto" type='number' />
-      <Tooltip />
+      <Tooltip formatter={value => Number(value.valueOf()).toFixed(2)} />
       <Legend />
 
       {dataKeys.map(key => (

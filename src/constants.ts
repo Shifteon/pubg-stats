@@ -90,16 +90,17 @@ export const STAT_CHART_MAP: {[key in StatName]: string} = {
 export const STAT_DISPLAY_NAME_MAP: {[key in StatName]: string} = {
   [AVERAGE_DAMAGE_STAT_NAME]: "Average Damage",
   [AVERAGE_KILLS_STAT_NAME]: "Average Kills",
-  [KILLS_STAT_NAME]: "Kills",
-  [DAMAGE_STAT_NAME]: "Damage",
+  [KILLS_STAT_NAME]: "Total Kills",
+  [DAMAGE_STAT_NAME]: "Total Damage",
 };
 
 // stroke colors
-export const ISAAC_STROKE_COLOR = "#277CE0";
-export const CODY_STROKE_COLOR = "#E27249";
-export const BEN_STROKE_COLOR = "#D71515";
-export const TRENTON_STROKE_COLOR = "#276221";
+export const ISAAC_STROKE_COLOR = "#c4ba34";
+export const CODY_STROKE_COLOR = "#277CE0";
+export const BEN_STROKE_COLOR = "#5a9e37";
+export const TRENTON_STROKE_COLOR = "#b06635";
 export const TEAM_STROKE_COLOR = "#6C3BAA";
+// #52414C
 
 // line names
 export const ISAAC_LINE_NAME = "Isaac";

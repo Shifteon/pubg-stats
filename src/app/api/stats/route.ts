@@ -19,10 +19,11 @@ export async function GET(request: NextRequest) {
   const team = params.get('team');
   const stat = params.get('stat');
   if (!team || !VALID_TEAM_NAMES.includes(team)) {
-    return NextResponse.json({ message: `${team} is not a valid team name.`, status: 400 });
+    return NextResponse.json({ message: `${team} is not a valid team name.` }, { status: 400 });
   }
   if (!stat || !SUPPORTED_STATS.includes(stat as StatName)) {
-    return NextResponse.json({ message: "Not a valid stat.", status: 400 });
+    console.log("There was an error!");
+    return NextResponse.json({ message: "Not a valid stat." }, { status: 400 });
   }
   const statName = stat as StatName;
 
@@ -43,5 +44,5 @@ export async function GET(request: NextRequest) {
   const startIndex = Math.ceil(frontendStatArray.length * PERCENTAGE_OF_DATA_TO_REMOVE);
   const filteredArray = frontendStatArray.slice(startIndex);
 
-  return NextResponse.json({ frontendStatArray: filteredArray, status: 200 });
+  return NextResponse.json({ frontendStatArray: filteredArray }, { status: 200 });
 }
