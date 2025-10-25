@@ -37,7 +37,7 @@ export default function HomeComponent() {
       </Select>
       {SUPPORTED_STATS.map((statName, index) => (
         <React.Fragment key={index}>
-          <GamePerformanceStat team={selectedTeam} stat={statName}></GamePerformanceStat>
+          <GamePerformanceStat team={selectedTeam} statName={statName}></GamePerformanceStat>
         </React.Fragment>
       ))
       }

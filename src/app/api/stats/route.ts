@@ -1,5 +1,16 @@
-import { VALID_TEAM_NAMES, AVERAGE_KILLS_STAT_NAME, GAME_INDEX_KEY, PERCENTAGE_OF_DATA_TO_REMOVE, SUPPORTED_STATS, ISAAC_LOWERCASE, CODY_LOWERCASE, TRENTON_LOWERCASE, BEN_LOWERCASE, TEAM_LOWERCASE, STAT_KEY_MAP } from "@/constants";
-import { AverageKillsArray, FrontendStatArray, StatName, TeamName } from "@/types";
+import { 
+  VALID_TEAM_NAMES,
+  GAME_INDEX_KEY,
+  PERCENTAGE_OF_DATA_TO_REMOVE, 
+  SUPPORTED_STATS, 
+  ISAAC_LOWERCASE, 
+  CODY_LOWERCASE, 
+  TRENTON_LOWERCASE, 
+  BEN_LOWERCASE, 
+  TEAM_LOWERCASE, 
+  STAT_KEY_MAP 
+} from "@/constants";
+import { FrontendStatArray, StatName, TeamName } from "@/types";
 import { getStatArray } from "@/utils/getStatArray";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -20,7 +31,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: `Error getting ${stat} stats`, status: 500 });
   }
 
-  const frontendStatArray: FrontendStatArray = statArray.map((stats, index) => ({ 
+  const frontendStatArray: FrontendStatArray = statArray.map((stats, index) => ({
     [ISAAC_LOWERCASE]: Number(stats[STAT_KEY_MAP[statName][ISAAC_LOWERCASE]]),
     [CODY_LOWERCASE]: Number(stats[STAT_KEY_MAP[statName][CODY_LOWERCASE]]),
     [TRENTON_LOWERCASE]: Number(stats[STAT_KEY_MAP[statName][TRENTON_LOWERCASE]]),

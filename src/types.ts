@@ -63,11 +63,15 @@ export interface IndividualStats {
   [TEAM_LOWERCASE]: number;
   [GAME_INDEX_KEY]: number;
 }
+export interface WinRate {
+  winrate: number;
+}
 export type AverageKillsArray = AverageKills[];
 export type AverageDamageArray = AverageDamage[];
 export type IndividualStatsArray = IndividualStats[];
+export type WinRateArray = WinRate[];
 
 export type StatArray = AveragesArray;
 
 // these are array that will be used on the frontend
-export type FrontendStatArray = IndividualStatsArray;
+export type FrontendStatArray = IndividualStatsArray | WinRateArray;

@@ -1,5 +1,5 @@
 import { BEN_LINE_NAME, BEN_LOWERCASE, BEN_STROKE_COLOR, CODY_LINE_NAME, CODY_LOWERCASE, CODY_STROKE_COLOR, GAME_INDEX_KEY, ISAAC_LINE_NAME, ISAAC_LOWERCASE, ISAAC_STROKE_COLOR, TEAM_LINE_NAME, TEAM_LOWERCASE, TEAM_STROKE_COLOR, TRENTON_LINE_NAME, TRENTON_LOWERCASE, TRENTON_STROKE_COLOR } from "@/constants";
-import { AverageKills, FrontendStatArray, IndividualStats } from "@/types";
+import { AverageKills, FrontendStatArray, IndividualStats, StatName } from "@/types";
 
 export function getStrokeColor(key: string) {
   const lowercaseKey = key.toLowerCase();
@@ -23,7 +23,7 @@ export function getStrokeColor(key: string) {
 }
 
 // some stat files have empty data
-export function removeEmptyKeys(data: FrontendStatArray) {
+export function removeEmptyKeys(data: FrontendStatArray, statName: StatName) {
   const stat = data[0];
   const keys = Object.keys(stat).filter(key => key !== GAME_INDEX_KEY);
 

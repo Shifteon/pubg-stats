@@ -1,7 +1,7 @@
 "use client";
 
 import { GAME_INDEX_KEY } from '@/constants';
-import { FrontendStatArray, IndividualStats } from '@/types';
+import { FrontendStatArray, StatName } from '@/types';
 import { getLineName, getStrokeColor, removeEmptyKeys } from '@/utils/chartUtils';
 import React, { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
@@ -9,6 +9,7 @@ import { AxisDomain } from 'recharts/types/util/types';
 
 interface StatLineChartProps {
   data: FrontendStatArray;
+  statName: StatName;
 }
 
 export default function StatLineChart(props: StatLineChartProps) {
@@ -17,7 +18,7 @@ export default function StatLineChart(props: StatLineChartProps) {
   const [dataKeys, setDataKeys] = useState<string[]>([]);
 
   useEffect(() => {
-    const keys = removeEmptyKeys(data);
+    const keys = removeEmptyKeys(data, props.statName);
     setDataKeys(keys);
   }, [props]);
 
@@ -33,7 +34,8 @@ export default function StatLineChart(props: StatLineChartProps) {
 
   const getYAxisDomain = (): AxisDomain => {
     const values = data.flatMap(game => {
-      return dataKeys.map(key => game[key as keyof IndividualStats])
+      const basicObject: {[key: string]: number} = {...game};
+      return dataKeys.map(key => basicObject[key])
     });
     const min = Math.min(...values);
     const max = Math.max(...values);

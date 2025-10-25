@@ -22,8 +22,8 @@ export const DAMAGE_STAT_NAME = "damage";
 
 export const AVERAGE_DAMAGE_STAT_FILE = "avgs.json";
 export const AVERAGE_KILLS_STAT_FILE = "avgs.json";
-export const KILLS_STAT_FILE = "";
-export const DAMAGE_STAT_FILE = "";
+export const KILLS_STAT_FILE = "sums.json";
+export const DAMAGE_STAT_FILE = "sums.json";
 
 // lowercase names
 export const ISAAC_LOWERCASE = "isaac";
@@ -42,6 +42,8 @@ export const STATS_FILE_MAP: {[key in StatName]: string} = {
 export const SUPPORTED_STATS: StatName[] = [
   AVERAGE_KILLS_STAT_NAME,
   AVERAGE_DAMAGE_STAT_NAME,
+  KILLS_STAT_NAME,
+  DAMAGE_STAT_NAME,
 ];
 
 export const STAT_KEY_MAP: {[key in StatName]: {[key in IndividualName]: keyof StatFile}} = {
@@ -75,6 +77,16 @@ export const STAT_KEY_MAP: {[key in StatName]: {[key in IndividualName]: keyof S
   },
 };
 
+export const LINE_CHART = "line";
+export const BAR_CHART = "bar";
+
+export const STAT_CHART_MAP: {[key in StatName]: string} = {
+  [AVERAGE_DAMAGE_STAT_NAME]: LINE_CHART,
+  [AVERAGE_KILLS_STAT_NAME]: LINE_CHART,
+  [KILLS_STAT_NAME]: BAR_CHART,
+  [DAMAGE_STAT_NAME]: BAR_CHART,
+}
+
 export const STAT_DISPLAY_NAME_MAP: {[key in StatName]: string} = {
   [AVERAGE_DAMAGE_STAT_NAME]: "Average Damage",
   [AVERAGE_KILLS_STAT_NAME]: "Average Kills",
@@ -83,7 +95,7 @@ export const STAT_DISPLAY_NAME_MAP: {[key in StatName]: string} = {
 };
 
 // stroke colors
-export const ISAAC_STROKE_COLOR = "#023E8A";
+export const ISAAC_STROKE_COLOR = "#277CE0";
 export const CODY_STROKE_COLOR = "#E27249";
 export const BEN_STROKE_COLOR = "#D71515";
 export const TRENTON_STROKE_COLOR = "#276221";
