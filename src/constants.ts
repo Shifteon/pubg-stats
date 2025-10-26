@@ -40,9 +40,11 @@ export const STATS_FILE_MAP: {[key in StatName]: string} = {
   [AVERAGE_KILLS_STAT_NAME]: AVERAGE_KILLS_STAT_FILE,
   [KILLS_STAT_NAME]: KILLS_STAT_FILE,
   [DAMAGE_STAT_NAME]: DAMAGE_STAT_FILE,
+  [WIN_RATE_STAT_NAME]: WIN_RATE_STAT_FILE,
 };
 
 export const SUPPORTED_STATS: StatName[] = [
+  WIN_RATE_STAT_NAME,
   AVERAGE_KILLS_STAT_NAME,
   AVERAGE_DAMAGE_STAT_NAME,
   KILLS_STAT_NAME,
@@ -69,38 +71,27 @@ export const STAT_KEY_MAP: {[key in StatName]: string[]} = {
     'cody_kills',
     'ben_kills',
     'trenton_kills',
-    'team_kills',
   ],
   [DAMAGE_STAT_NAME]: [
     'isaac_damage',
     'cody_damage',
     'ben_damage',
     'trenton_damage',
-    'team_damage',
+  ],
+  [WIN_RATE_STAT_NAME]: [
+    'win_rate',
   ],
 };
 
 export const LINE_CHART = "line";
 export const BAR_CHART = "bar";
 
-export const STAT_CHART_MAP: {[key in StatName]: string} = {
-  [AVERAGE_DAMAGE_STAT_NAME]: LINE_CHART,
-  [AVERAGE_KILLS_STAT_NAME]: LINE_CHART,
-  [KILLS_STAT_NAME]: BAR_CHART,
-  [DAMAGE_STAT_NAME]: BAR_CHART,
-}
-
 export const AVERAGE_DAMAGE_DISPLAY_NAME = "Average Damage";
 export const AVERAGE_KILLS_DISPLAY_NAME = "Average Kills";
 export const KILLS_DISPLAY_NAME = "Total Kills";
 export const DAMAGE_DISPLAY_NAME = "Total Damage";
+export const WIN_RATE_DISPLAY_NAME = "Win Rate";
 
-export const STAT_DISPLAY_NAME_MAP: {[key in StatName]: string} = {
-  [AVERAGE_DAMAGE_STAT_NAME]: "Average Damage",
-  [AVERAGE_KILLS_STAT_NAME]: "Average Kills",
-  [KILLS_STAT_NAME]: "Total Kills",
-  [DAMAGE_STAT_NAME]: "Total Damage",
-};
 
 // stroke colors
 export const ISAAC_STROKE_COLOR = "#c4ba34";

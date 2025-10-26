@@ -3,7 +3,7 @@
 import { FrontendStatArray, TeamName, StatName } from "@/types";
 import { useEffect, useMemo, useState } from "react";
 import StatLineChart from "../charts/statLineChart";
-import { AVERAGE_DAMAGE_STAT_NAME, AVERAGE_KILLS_STAT_NAME, BAR_CHART, DAMAGE_STAT_NAME, KILLS_STAT_NAME, LINE_CHART, STAT_CHART_MAP, STAT_DISPLAY_NAME_MAP } from "@/constants";
+import { AVERAGE_DAMAGE_STAT_NAME, AVERAGE_KILLS_STAT_NAME, BAR_CHART, DAMAGE_STAT_NAME, KILLS_STAT_NAME, LINE_CHART, WIN_RATE_STAT_NAME } from "@/constants";
 import { Spinner } from "@heroui/react";
 import StatBarChart from "../charts/statBarChart";
 import { StatBase, StatData } from "@/stats/statBase";
@@ -11,6 +11,7 @@ import { AverageKillsStat } from "@/stats/averageKillsStat";
 import { AverageDamageStat } from "@/stats/averageDamageStat";
 import { TotalKillsStat } from "@/stats/totalKillsStat";
 import { TotalDamageStat } from "@/stats/totalDamageStat";
+import { WinRateStat } from "@/stats/winrateStat";
 
 export interface AvgKillsProps {
   team: TeamName;
@@ -32,6 +33,8 @@ export default function GamePerformanceStat(props: AvgKillsProps) {
         return new TotalKillsStat();
       case DAMAGE_STAT_NAME:
         return new TotalDamageStat();
+      case WIN_RATE_STAT_NAME:
+        return new WinRateStat();
       default:
         return null;
     }
@@ -81,7 +84,7 @@ export default function GamePerformanceStat(props: AvgKillsProps) {
         </div>
       }
       <div className="w-full flex flex-col items-center">
-        <h2 className="p-2 self-start">{STAT_DISPLAY_NAME_MAP[props.statName]}</h2>
+        <h2 className="p-2 self-start">{statClass?.statDisplayName}</h2>
         
         {getChart()}
       </div>

@@ -143,10 +143,9 @@ export abstract class StatBase {
         }
         rawObject[key] = Number(stat[key]);
       }
-      rawData.push(rawObject);
+      rawData.push({...rawObject, gameIndex});
       gameIndex++;
     }
-    console.log("Raw Data: ", rawData);
 
     // remove some of the data to nomralize it
     const startIndex = Math.ceil(rawData.length * PERCENTAGE_OF_DATA_TO_REMOVE);
