@@ -2,7 +2,7 @@
 
 import { Select, SelectItem } from "@heroui/react";
 import GamePerformanceStat from "./stats/gamePerformance";
-import { AVERAGE_DAMAGE_STAT_NAME, AVERAGE_KILLS_STAT_NAME, SUPPORTED_STATS, TEAM_ALL, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON } from "@/constants";
+import { SUPPORTED_STATS, TEAM_ALL, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON } from "@/constants";
 import { ChangeEvent, useState } from "react";
 import { TeamName } from "@/types";
 import React from "react";

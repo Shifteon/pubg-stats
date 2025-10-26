@@ -9,6 +9,7 @@ import {
   ISAAC_LINE_NAME, 
   ISAAC_LOWERCASE, 
   ISAAC_STROKE_COLOR, 
+  PERCENTAGE_OF_DATA_TO_REMOVE, 
   TEAM_LINE_NAME, 
   TEAM_LOWERCASE, 
   TEAM_STROKE_COLOR, 
@@ -17,58 +18,63 @@ import {
   TRENTON_STROKE_COLOR
 } from "@/constants";
 
-export interface StatData {
-  value: string;
+export interface ChartOptions {
   color: string;
   key: string;
   displayName: string;
-  gameIndex: number;
-};
-
-
-export interface Stat {
-  data: StatData[];
-  displayName: string;
 }
 
+export interface StatData {
+  chartOptions: ChartOptions[];
+  data: Record<string, number>[];
+};
+
 export abstract class StatBase {
-  protected statData: Stat;
-  protected team: string;
+  public statDisplayName: string;
+  public chartType: string;
   protected statName: string;
-  protected chartType: string;
+  protected statsByTeam: Map<string, StatData>;
 
 
-  constructor(team: string, statName: string, displayName: string, chartType: string) {
-    this.team = team;
+  constructor(statName: string, displayName: string, chartType: string) {
     this.statName = statName;
-    this.statData = {
-      data: [],
-      displayName,
-    };
+    this.statsByTeam = new Map<string, StatData>();
+    this.statDisplayName = displayName;
     this.chartType = chartType;
   }
   
-  public async getData(): Promise<Stat> {
-    if (this.statData.data.length === 0) {
-      await this.fetchData();
-    }
-    return this.statData;
-  }
+  public abstract getStats(team: string): Promise<StatData | null>;
 
-  protected async fetchData() {
+  protected async fetchData(team: string): Promise<{ statArray: Record<string, string>[] } | null> {
     try {
-      const results = await fetch(`/api/stats?team=${this.team}&stat=${this.statName}`);
+      const results = await fetch(`/api/stats?team=${team}&stat=${this.statName}`);
       if (!results.ok) {
         return null;
       }
 
-      const json = await results.json();
-      this.prepareData(json.frontendStatArray);
-      return this.statData;
+      const json: { statArray: Record<string, string>[] } = await results.json();
+      
+      return json;
   } catch (error) {
       console.log(error);
       return null;
     }
+  }
+
+  protected async getStatData(team: string, keysToKeep: string[]) {
+    const teamData = this.statsByTeam.get(team);
+    if (!teamData || teamData.data.length === 0) {
+      const json = await this.fetchData(team);
+      if (!json) {
+        return null;
+      }
+      const preparedData = this.prepareData(json.statArray, keysToKeep);
+      if (preparedData) {
+        this.statsByTeam.set(team, preparedData);
+      }
+      return preparedData;
+    }
+    return teamData;
   }
 
   protected getStrokeColor(key: string) {
@@ -111,23 +117,44 @@ export abstract class StatBase {
     return "unkown";
   }
 
-  protected prepareData(statArray: Record<string, string>[]) {
+  protected prepareData(statArray: Record<string, string>[], keysToKeep: string[]): StatData {
+    const keys = Object.keys(statArray[0]);
+    const chartOptions: ChartOptions[] = [];
+    for (const key of keys) {
+      if (!statArray[0][key] || statArray[0][key] === "nan" || !keysToKeep.includes(key)) {
+        continue;
+      }
+      chartOptions.push({
+        color: this.getStrokeColor(key),
+        key,
+        displayName: this.getDisplayName(key),
+      });
+    }
+
+    const rawData: Record<string, number>[] = [];
+
+    let gameIndex = 1;
     for (const stat of statArray) {
       const keys = Object.keys(stat);
-      let gameIndex = 1;
+      const rawObject: Record<string, number> = {};
       for (const key of keys) {
-        if (!stat[key] || stat[key] === "nan") {
+        if (!stat[key] || stat[key] === "nan" || !keysToKeep.includes(key)) {
           continue;
         }
-        this.statData.data.push({
-          value: Number(stat[key]).toFixed(2),
-          color: this.getStrokeColor(key),
-          displayName: this.getDisplayName(key),
-          key,
-          gameIndex,
-        });
+        rawObject[key] = Number(stat[key]);
       }
+      rawData.push(rawObject);
       gameIndex++;
     }
+    console.log("Raw Data: ", rawData);
+
+    // remove some of the data to nomralize it
+    const startIndex = Math.ceil(rawData.length * PERCENTAGE_OF_DATA_TO_REMOVE);
+    const filteredData = rawData.slice(startIndex);
+
+    return {
+      chartOptions,
+      data: filteredData,
+    };
   }
 }

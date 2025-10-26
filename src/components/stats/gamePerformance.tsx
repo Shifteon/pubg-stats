@@ -1,11 +1,16 @@
 "use client";
 
 import { FrontendStatArray, TeamName, StatName } from "@/types";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import StatLineChart from "../charts/statLineChart";
-import { BAR_CHART, LINE_CHART, STAT_CHART_MAP, STAT_DISPLAY_NAME_MAP } from "@/constants";
-import { Skeleton, Spinner } from "@heroui/react";
+import { AVERAGE_DAMAGE_STAT_NAME, AVERAGE_KILLS_STAT_NAME, BAR_CHART, DAMAGE_STAT_NAME, KILLS_STAT_NAME, LINE_CHART, STAT_CHART_MAP, STAT_DISPLAY_NAME_MAP } from "@/constants";
+import { Spinner } from "@heroui/react";
 import StatBarChart from "../charts/statBarChart";
+import { StatBase, StatData } from "@/stats/statBase";
+import { AverageKillsStat } from "@/stats/averageKillsStat";
+import { AverageDamageStat } from "@/stats/averageDamageStat";
+import { TotalKillsStat } from "@/stats/totalKillsStat";
+import { TotalDamageStat } from "@/stats/totalDamageStat";
 
 export interface AvgKillsProps {
   team: TeamName;
@@ -13,53 +18,53 @@ export interface AvgKillsProps {
 }
 
 export default function GamePerformanceStat(props: AvgKillsProps) {
-  const [stats, setStats] = useState([] as FrontendStatArray);
+  const [statData, setStatData] = useState<StatData>({ data: [], chartOptions: [] });
   const [loading, setLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
 
-  // fetch stats from api
-  const fetchStats = async () => {
-    try {
-      if (!loading) {
-        setLoading(true);
-      }
-      const results = await fetch(`/api/stats?team=${props.team}&stat=${props.statName}`);
-      console.log(results.ok);
-      if (!results.ok) {
-        setLoadingError(true);
-        return;
-      }
-
-      const json = await results.json();
-      setStats(json.frontendStatArray as FrontendStatArray);
-      setLoadingError(false);
-    } catch (error) {
-      setLoadingError(true);
-    } finally {
-      setLoading(false);
+  const statClass = useMemo(() => {
+    switch (props.statName) {
+      case AVERAGE_KILLS_STAT_NAME:
+        return new AverageKillsStat();
+      case AVERAGE_DAMAGE_STAT_NAME:
+        return new AverageDamageStat();
+      case KILLS_STAT_NAME:
+        return new TotalKillsStat();
+      case DAMAGE_STAT_NAME:
+        return new TotalDamageStat();
+      default:
+        return null;
     }
-  };
+  }, [props.statName]);
+
+  const loadStats = async () => {
+    setLoading(true);
+    setLoadingError(false);
+    if (!statClass) return;
+
+    const stats = await statClass.getStats(props.team);
+    if (!stats) {
+      setLoadingError(true);
+      setLoading(false);
+      return;
+    }
+    setStatData(stats);
+    setLoading(false);
+  }
 
   // fetch stats from api on load
   useEffect(() => {
-    fetchStats();
-  }, []);
-
-  useEffect(() => {
-    fetchStats();
-  }, [props.team]);
+    loadStats();
+  }, [props.team, statClass]);
 
   const getChart = () => {
-    switch (STAT_CHART_MAP[props.statName]) {
+    switch (statClass?.chartType || LINE_CHART) {
       case LINE_CHART:
-        return <StatLineChart data={stats} statName={props.statName} />;
-        break;
+        return <StatLineChart data={statData} />;
       case BAR_CHART:
-        return <StatBarChart data={stats} statName={props.statName} />;
-        break;
+        return <StatBarChart data={statData} />;
       default:
-        <div>View Not Found</div>;
-        break;
+        return <div>View Not Found</div>;
     }
   };
 

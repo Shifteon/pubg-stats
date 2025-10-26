@@ -1,27 +1,22 @@
 "use client";
 
 import { GAME_INDEX_KEY } from '@/constants';
-import { FrontendStatArray, StatName } from '@/types';
-import { getLineName, getStrokeColor, removeEmptyKeys } from '@/utils/chartUtils';
+import { StatData } from '@/stats/statBase';
 import React, { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { AxisDomain } from 'recharts/types/util/types';
 
 interface StatLineChartProps {
-  data: FrontendStatArray;
-  statName: StatName;
+  data: StatData;
 }
 
 export default function StatLineChart(props: StatLineChartProps) {
-  const data = props.data || [];
-
-  const [dataKeys, setDataKeys] = useState<string[]>([]);
+  const [data, setData] = useState<Record<string, number>[]>(props.data.data || []);
+  const [chartOptions, setChartOptions] = useState(props.data.chartOptions || []);
 
   useEffect(() => {
-    if (data.length) {
-      const keys = removeEmptyKeys(data, props.statName);
-      setDataKeys(keys);
-    }
+    setData(props.data.data || []);
+    setChartOptions(props.data.chartOptions || []);
   }, [props]);
 
   const getXAxisInterval = (): number => {
@@ -38,10 +33,7 @@ export default function StatLineChart(props: StatLineChartProps) {
     if (!data.length) {
       return ['auto', 'auto'];
     }
-    const values = data.flatMap(game => {
-      const basicObject: {[key: string]: number} = {...game};
-      return dataKeys.map(key => basicObject[key])
-    });
+    const values = data.flatMap(stat => stat.value);
     const min = Math.min(...values);
     const max = Math.max(...values);
     const bufferPercent = 0.05; // 5%
@@ -80,9 +72,9 @@ export default function StatLineChart(props: StatLineChartProps) {
       <Tooltip formatter={value => Number(value.valueOf()).toFixed(2)} />
       <Legend />
 
-      {dataKeys.map(key => (
-        <React.Fragment key={key}>
-          <Line type="monotone" dot={false} dataKey={key} stroke={getStrokeColor(key)} name={getLineName(key)} strokeWidth={2} />
+      {chartOptions.map(options => (
+        <React.Fragment key={options.key}>
+          <Line type="monotone" dot={false} dataKey={options.key} stroke={options.color} name={options.displayName} strokeWidth={2} />
         </React.Fragment>
       ))}
     </LineChart>

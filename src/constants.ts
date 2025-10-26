@@ -49,35 +49,35 @@ export const SUPPORTED_STATS: StatName[] = [
   DAMAGE_STAT_NAME,
 ];
 
-export const STAT_KEY_MAP: {[key in StatName]: {[key in IndividualName]: keyof StatFile}} = {
-  [AVERAGE_DAMAGE_STAT_NAME]: {
-    [ISAAC_LOWERCASE]: 'isaac_damage',
-    [CODY_LOWERCASE]: 'cody_damage',
-    [BEN_LOWERCASE]: 'ben_damage',
-    [TRENTON_LOWERCASE]: 'trenton_damage',
-    [TEAM_LOWERCASE]: 'team_damage',
-  },
-  [AVERAGE_KILLS_STAT_NAME]: {
-    [ISAAC_LOWERCASE]: 'isaac_kills',
-    [CODY_LOWERCASE]: 'cody_kills',
-    [BEN_LOWERCASE]: 'ben_kills',
-    [TRENTON_LOWERCASE]: 'trenton_kills',
-    [TEAM_LOWERCASE]: 'team_kills',
-  },
-  [KILLS_STAT_NAME]: {
-    [ISAAC_LOWERCASE]: 'isaac_kills',
-    [CODY_LOWERCASE]: 'cody_kills',
-    [BEN_LOWERCASE]: 'ben_kills',
-    [TRENTON_LOWERCASE]: 'trenton_kills',
-    [TEAM_LOWERCASE]: 'team_kills',
-  },
-  [DAMAGE_STAT_NAME]: {
-    [ISAAC_LOWERCASE]: 'isaac_damage',
-    [CODY_LOWERCASE]: 'cody_damage',
-    [BEN_LOWERCASE]: 'ben_damage',
-    [TRENTON_LOWERCASE]: 'trenton_damage',
-    [TEAM_LOWERCASE]: 'team_damage',
-  },
+export const STAT_KEY_MAP: {[key in StatName]: string[]} = {
+  [AVERAGE_DAMAGE_STAT_NAME]: [
+    'isaac_damage',
+    'cody_damage',
+    'ben_damage',
+    'trenton_damage',
+    'team_damage',
+  ],
+  [AVERAGE_KILLS_STAT_NAME]: [
+    'isaac_kills',
+    'cody_kills',
+    'ben_kills',
+    'trenton_kills',
+    'team_kills',
+  ],
+  [KILLS_STAT_NAME]: [
+    'isaac_kills',
+    'cody_kills',
+    'ben_kills',
+    'trenton_kills',
+    'team_kills',
+  ],
+  [DAMAGE_STAT_NAME]: [
+    'isaac_damage',
+    'cody_damage',
+    'ben_damage',
+    'trenton_damage',
+    'team_damage',
+  ],
 };
 
 export const LINE_CHART = "line";
@@ -118,7 +118,7 @@ export const BEN_LINE_NAME = "Ben";
 export const TRENTON_LINE_NAME = "Trenton";
 export const TEAM_LINE_NAME = "Team";
 
-export const GAME_INDEX_KEY = "game_index";
+export const GAME_INDEX_KEY = "gameIndex";
 
 // we cut off 10% of game data to normalize it
 export const PERCENTAGE_OF_DATA_TO_REMOVE = 0.10;
