@@ -13,7 +13,7 @@ export default function StatBarChart(props: StatBarChartProps) {
 
   const combinedData = useMemo(() => {
     if (!data.length || !chartOptions.length) return;
-    const combined: Record<string, any>[] = [];
+    const combined: Record<string, number | string>[] = [];
     const dataPoint = data[0];
     const keys = Object.keys(dataPoint).filter(key => key !== 'gameIndex');
 
