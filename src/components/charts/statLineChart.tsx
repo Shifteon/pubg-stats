@@ -2,7 +2,7 @@
 
 import { GAME_INDEX_KEY } from '@/constants';
 import { StatData } from '@/stats/statBase';
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { AxisDomain } from 'recharts/types/util/types';
 
@@ -11,13 +11,7 @@ interface StatLineChartProps {
 }
 
 export default function StatLineChart(props: StatLineChartProps) {
-  const [data, setData] = useState<Record<string, number>[]>(props.data.data || []);
-  const [chartOptions, setChartOptions] = useState(props.data.chartOptions || []);
-
-  useEffect(() => {
-    setData(props.data.data || []);
-    setChartOptions(props.data.chartOptions || []);
-  }, [props]);
+  const { data = [], chartOptions = [] } = props.data;
 
   const getXAxisInterval = (): number => {
     if (data.length > 80) {
@@ -68,7 +62,7 @@ export default function StatLineChart(props: StatLineChartProps) {
     <LineChart
       style={{ width: '100%', height: '100%', maxHeight: '70vh', aspectRatio: 1.5 }}
       responsive
-      data={data}
+      data={props.data.data}
     >
       <CartesianGrid strokeDasharray="3 3" />
       <XAxis interval={getXAxisInterval()} domain={[20, 'auto']} dataKey={GAME_INDEX_KEY} />
@@ -76,7 +70,7 @@ export default function StatLineChart(props: StatLineChartProps) {
       <Tooltip formatter={value => Number(value.valueOf()).toFixed(2)} />
       <Legend />
 
-      {chartOptions.map(options => (
+      {props.data.chartOptions?.map(options => (
         <React.Fragment key={options.key}>
           <Line type="monotone" dot={false} dataKey={options.key} stroke={options.color} name={options.displayName} strokeWidth={2} />
         </React.Fragment>

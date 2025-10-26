@@ -23,7 +23,7 @@ export default function HomeComponent() {
   };
 
   return (
-    <div className="p-2 xl:p-10 lg:p-5 md:p-3">
+    <div className="mt-2 mr-2 ml-2 mb-10 xl:m-10 lg:m-5 md:m-3">
       <Select 
         label="Select a team"
         selectionMode="single"
@@ -35,12 +35,14 @@ export default function HomeComponent() {
         ))
         }
       </Select>
-      {SUPPORTED_STATS.map((statName, index) => (
-        <React.Fragment key={index}>
-          <GamePerformanceStat team={selectedTeam} statName={statName}></GamePerformanceStat>
-        </React.Fragment>
-      ))
-      }
+      <div className="lg:grid lg:grid-cols-2">
+        {SUPPORTED_STATS.map((statName, index) => (
+          <React.Fragment key={index}>
+            <GamePerformanceStat team={selectedTeam} statName={statName}></GamePerformanceStat>
+          </React.Fragment>
+        ))
+        }
+      </div>
     </div>
   );
 }

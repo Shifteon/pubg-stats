@@ -1,36 +1,51 @@
 "use client";
 
 import { StatData } from "@/stats/statBase";
-import React from "react";
-import { useEffect, useState } from "react";
-import { BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar, LegendProps } from "recharts";
+import React, { useMemo } from "react";
+import { BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar } from "recharts";
 
 export interface StatBarChartProps {
   data: StatData;
 }
 
 export default function StatBarChart(props: StatBarChartProps) {
-  const [data, setData] = useState<Record<string, number>[]>(props.data.data || []);
-  const [chartOptions, setChartOptions] = useState(props.data.chartOptions || []);
+  const { data = [], chartOptions = [] } = props.data;
 
-  useEffect(() => {
-    setData(props.data.data || []);
-    setChartOptions(props.data.chartOptions || []);
-  }, [props]);
-  
+  const combinedData = useMemo(() => {
+    if (!data.length || !chartOptions.length) return;
+    const combined: Record<string, any>[] = [];
+    const dataPoint = data[0];
+    const keys = Object.keys(dataPoint).filter(key => key !== 'gameIndex');
+
+    keys.forEach((key, i) => {
+      if (chartOptions[i]) {
+        combined.push({ ...chartOptions[i], [key]: dataPoint[key] });
+      }
+    });
+    return combined;
+  }, [data, chartOptions]);
+
   return (
     <BarChart
       style={{ width: '100%', maxWidth: '1000px', maxHeight: '70vh', aspectRatio: 1.618 }}
-      responsive data={data}>
+      responsive 
+      data={combinedData}
+    >
     <CartesianGrid strokeDasharray="3 3" />
-    <XAxis />
-      <YAxis width="auto" />
-    {/* <Tooltip /> */}
+    <XAxis dataKey="displayName" />
+    <YAxis width="auto" />
+    <Tooltip />
     <Legend />
 
     {chartOptions.map(option => (
       <React.Fragment key={option.key}>
-        <Bar type="monotone" dataKey={option.key} fill={option.color} name={option.displayName} strokeWidth={2} />
+        <Bar 
+          type="monotone" 
+          xAxisId={option.displayName}
+          dataKey={option.key} 
+          fill={option.color} 
+          name={option.displayName}
+        />
       </React.Fragment>
     ))}
   </BarChart>
