@@ -33,7 +33,11 @@ export default function StatLineChart(props: StatLineChartProps) {
     if (!data.length) {
       return ['auto', 'auto'];
     }
-    const values = data.flatMap(stat => stat.value);
+    const values = data.flatMap(stat =>
+      Object.entries(stat)
+        .filter(([key]) => key !== GAME_INDEX_KEY) // Exclude the x-axis key
+        .map(([, value]) => value)
+    );
     const min = Math.min(...values);
     const max = Math.max(...values);
     const bufferPercent = 0.05; // 5%

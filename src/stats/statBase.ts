@@ -114,6 +114,9 @@ export abstract class StatBase {
     if (lowercaseKey.includes(TEAM_LOWERCASE)) {
       return TEAM_LINE_NAME;
     }
+    if (lowercaseKey.includes("win_rate")) {
+      return "Win Rate";
+    }
     return "unkown";
   }
 
