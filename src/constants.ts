@@ -19,11 +19,14 @@ export const AVERAGE_KILLS_STAT_NAME = "avgKills";
 export const AVERAGE_DAMAGE_STAT_NAME = "avgDamage";
 export const KILLS_STAT_NAME = "kills";
 export const DAMAGE_STAT_NAME = "damage";
+export const WIN_RATE_STAT_NAME = "winRate";
+
 
 export const AVERAGE_DAMAGE_STAT_FILE = "avgs.json";
 export const AVERAGE_KILLS_STAT_FILE = "avgs.json";
 export const KILLS_STAT_FILE = "sums.json";
 export const DAMAGE_STAT_FILE = "sums.json";
+export const WIN_RATE_STAT_FILE = "wrate.json";
 
 // lowercase names
 export const ISAAC_LOWERCASE = "isaac";
@@ -87,6 +90,11 @@ export const STAT_CHART_MAP: {[key in StatName]: string} = {
   [DAMAGE_STAT_NAME]: BAR_CHART,
 }
 
+export const AVERAGE_DAMAGE_DISPLAY_NAME = "Average Damage";
+export const AVERAGE_KILLS_DISPLAY_NAME = "Average Kills";
+export const KILLS_DISPLAY_NAME = "Total Kills";
+export const DAMAGE_DISPLAY_NAME = "Total Damage";
+
 export const STAT_DISPLAY_NAME_MAP: {[key in StatName]: string} = {
   [AVERAGE_DAMAGE_STAT_NAME]: "Average Damage",
   [AVERAGE_KILLS_STAT_NAME]: "Average Kills",
@@ -100,6 +108,7 @@ export const CODY_STROKE_COLOR = "#277CE0";
 export const BEN_STROKE_COLOR = "#5a9e37";
 export const TRENTON_STROKE_COLOR = "#b06635";
 export const TEAM_STROKE_COLOR = "#6C3BAA";
+export const DEFAULT_STROKE_COLOR = "#89043D";
 // #52414C
 
 // line names
