@@ -72,7 +72,7 @@ export default function GamePerformanceStat(props: AvgKillsProps) {
   };
 
   return (
-    <div className="relative flex flex-col items-center" style={{ marginTop: 5 }}>
+    <div className="relative mt-2">
       {loading &&
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/10 w-full h-full rounded-lg p-5">
           <Spinner size="lg" label="Loading" labelColor="primary"></Spinner>

@@ -1,11 +1,12 @@
 "use client";
 
-import { Select, SelectItem } from "@heroui/react";
+import { Select, SelectItem, Tab, Tabs } from "@heroui/react";
 import GamePerformanceStat from "./stats/gamePerformance";
-import { SUPPORTED_STATS, TEAM_ALL, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON } from "@/constants";
+import { GAME_SUMMARY_STAT_NAME, SUPPORTED_STATS, TEAM_ALL, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON } from "@/constants";
 import { ChangeEvent, useState } from "react";
 import { TeamName } from "@/types";
 import React from "react";
+import GameSummary from "./stats/gameSummary";
 
 const teamOptions = [
   {key: TEAM_ALL, label: TEAM_ALL},
@@ -13,6 +14,10 @@ const teamOptions = [
   {key: TEAM_NO_TRENTON, label: 'Isaac, Cody, Ben'},
   {key: TEAM_NO_CODY, label: 'Isaac, Ben, Trenton'},
   {key: TEAM_NO_ISAAC, label: 'Cody, Ben, Trenton'},
+];
+
+const stats = [
+  ...SUPPORTED_STATS.filter(stat => stat !== GAME_SUMMARY_STAT_NAME)
 ];
 
 export default function HomeComponent() {
@@ -35,14 +40,24 @@ export default function HomeComponent() {
         ))
         }
       </Select>
-      <div className="lg:grid lg:grid-cols-2">
-        {SUPPORTED_STATS.map((statName, index) => (
-          <React.Fragment key={index}>
-            <GamePerformanceStat team={selectedTeam} statName={statName}></GamePerformanceStat>
-          </React.Fragment>
-        ))
-        }
-      </div>
+      <Tabs
+        className="mt-5"
+       destroyInactiveTabPanel={false}
+      >
+        <Tab key="graphs" title="Graphs">
+          <div className="lg:grid lg:grid-cols-2 gap-1">
+            {stats.map((statName, index) => (
+              <React.Fragment key={index}>
+                <GamePerformanceStat team={selectedTeam} statName={statName}></GamePerformanceStat>
+              </React.Fragment>
+            ))
+            }
+          </div>
+        </Tab>
+        <Tab key="summary" title="Summary">
+          <GameSummary team={selectedTeam} />
+        </Tab>
+      </Tabs>
     </div>
   );
 }

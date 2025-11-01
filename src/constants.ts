@@ -20,6 +20,8 @@ export const AVERAGE_DAMAGE_STAT_NAME = "avgDamage";
 export const KILLS_STAT_NAME = "kills";
 export const DAMAGE_STAT_NAME = "damage";
 export const WIN_RATE_STAT_NAME = "winRate";
+export const GAME_SUMMARY_STAT_NAME = "gameSummary";
+
 
 
 export const AVERAGE_DAMAGE_STAT_FILE = "avgs.json";
@@ -27,6 +29,8 @@ export const AVERAGE_KILLS_STAT_FILE = "avgs.json";
 export const KILLS_STAT_FILE = "sums.json";
 export const DAMAGE_STAT_FILE = "sums.json";
 export const WIN_RATE_STAT_FILE = "wrate.json";
+export const GAME_SUMMARY_STAT_FILE = "data.json";
+
 
 // lowercase names
 export const ISAAC_LOWERCASE = "isaac";
@@ -41,6 +45,7 @@ export const STATS_FILE_MAP: {[key in StatName]: string} = {
   [KILLS_STAT_NAME]: KILLS_STAT_FILE,
   [DAMAGE_STAT_NAME]: DAMAGE_STAT_FILE,
   [WIN_RATE_STAT_NAME]: WIN_RATE_STAT_FILE,
+  [GAME_SUMMARY_STAT_NAME]: GAME_SUMMARY_STAT_FILE,
 };
 
 export const SUPPORTED_STATS: StatName[] = [
@@ -49,6 +54,7 @@ export const SUPPORTED_STATS: StatName[] = [
   AVERAGE_DAMAGE_STAT_NAME,
   KILLS_STAT_NAME,
   DAMAGE_STAT_NAME,
+  GAME_SUMMARY_STAT_NAME,
 ];
 
 export const STAT_KEY_MAP: {[key in StatName]: string[]} = {
@@ -81,6 +87,34 @@ export const STAT_KEY_MAP: {[key in StatName]: string[]} = {
   [WIN_RATE_STAT_NAME]: [
     'win_rate',
   ],
+  [GAME_SUMMARY_STAT_NAME]: [
+    "isaac_kills",
+    "isaac_assists",
+    "isaac_damage",
+    "isaac_rescues",
+    "isaac_recalls",
+    "cody_kills",
+    "cody_assists",
+    "cody_damage",
+    "cody_rescues",
+    "cody_recalls",
+    "trenton_kills",
+    "trenton_assists",
+    "trenton_damage",
+    "trenton_rescues",
+    "trenton_recalls",
+    "ben_kills",
+    "ben_assists",
+    "ben_damage",
+    "ben_rescues",
+    "ben_recalls",
+    "win",
+    "total_kills",
+    "total_assists",
+    "total_damage",
+    "total_rescues",
+    "total_recalls",
+  ]
 };
 
 export const LINE_CHART = "line";
@@ -91,7 +125,7 @@ export const AVERAGE_KILLS_DISPLAY_NAME = "Average Kills";
 export const KILLS_DISPLAY_NAME = "Total Kills";
 export const DAMAGE_DISPLAY_NAME = "Total Damage";
 export const WIN_RATE_DISPLAY_NAME = "Win Rate";
-
+export const GAME_SUMMARY_DISPLAY_NAME = "Game Summary";
 
 // stroke colors
 export const ISAAC_STROKE_COLOR = "#c4ba34";
