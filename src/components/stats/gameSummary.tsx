@@ -111,6 +111,36 @@ export default function GameSummary({ team }: GameSummaryProps) {
     });
   }, [allGameData, team]);
 
+  const playerHighestStats = useMemo(() => {
+    if (allGameData.length === 0) {
+      return {};
+    }
+
+    const players = playerMapping[team] || [];
+    const playerBests: Record<string, Record<string, number>> = {};
+
+    players.forEach(player => {
+      playerBests[player] = {};
+      statKeys.forEach(stat => {
+        playerBests[player][stat] = 0;
+      });
+    });
+
+    allGameData.forEach(game => {
+      players.forEach(player => {
+        statKeys.forEach(stat => {
+          const playerStatKey = `${player}_${stat}`;
+          const statValue = parseFloat(game[playerStatKey]);
+          if (statValue > playerBests[player][stat]) {
+            playerBests[player][stat] = statValue;
+          }
+        });
+      });
+    });
+
+    return playerBests;
+  }, [allGameData, team]);
+
   const gameTablesData = useMemo(() => {
     if (last10Games.length === 0) {
       return [];
@@ -182,6 +212,28 @@ export default function GameSummary({ team }: GameSummaryProps) {
               </CardHeader>
               <CardBody className="text-center text-3xl font-bold">{value}</CardBody>
               <CardFooter className="justify-center text-md capitalize text-gray-500">{player}</CardFooter>
+            </Card>
+          ))}
+        </div>
+      </div>
+      <div className="w-full flex flex-col items-center mb-8">
+        <h2 className="p-2 self-start text-2xl font-bold">Personal Bests</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+          {Object.entries(playerHighestStats).map(([player, stats]) => (
+            <Card key={player}>
+              <CardHeader>
+                <h3 className="text-lg font-semibold capitalize">{player}</h3>
+              </CardHeader>
+              <CardBody>
+                <ul>
+                  {Object.entries(stats).map(([stat, value]) => (
+                    <li key={stat} className="flex justify-between">
+                      <span className="capitalize font-medium">{stat.charAt(0).toUpperCase() + stat.slice(1)}:</span>
+                      <span>{value}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardBody>
             </Card>
           ))}
         </div>
