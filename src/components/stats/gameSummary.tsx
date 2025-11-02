@@ -38,6 +38,7 @@ const playerMapping: Record<string, IndividualName[]> = {
 };
 
 export default function GameSummary({ team }: GameSummaryProps) {
+  /* eslint-disable  @typescript-eslint/no-explicit-any */
   const [allGameData, setAllGameData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
