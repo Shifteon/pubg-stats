@@ -55,7 +55,6 @@ export default function GameSummary({ team }: GameSummaryProps) {
       setLoading(false);
       return;
     }
-    console.log("summary stats: ", stats);
     setAllGameData(stats.data);
     setLoading(false);
   };
@@ -64,27 +63,38 @@ export default function GameSummary({ team }: GameSummaryProps) {
     loadStats();
   }, [team, statClass]);
 
-  const { wins, losses, winRate } = useMemo(() => {
+  const { wins, losses, winRate, winStreak, longestWinStreak } = useMemo(() => {
     if (!allGameData || allGameData.length === 0) {
-      return { wins: 0, losses: 0, winRate: 0 };
+      return { wins: 0, losses: 0, winRate: 0, winStreak: 0, longestWinStreak: 0 };
     }
-
-    const stats = allGameData.reduce(
+    
+    const summary = allGameData.reduce(
       (acc, game) => {
         if (game.win === 1) {
           acc.wins++;
+          acc.currentStreak++;
         } else {
           acc.losses++;
+          acc.longestStreak = Math.max(acc.longestStreak, acc.currentStreak);
+          acc.currentStreak = 0;
         }
         return acc;
       },
-      { wins: 0, losses: 0 }
+      { wins: 0, losses: 0, currentStreak: 0, longestStreak: 0 }
     );
 
-    const totalGames = allGameData.length;
-    const calculatedWinRate = totalGames > 0 ? (stats.wins / totalGames) * 100 : 0;
+    const finalLongestStreak = Math.max(summary.longestStreak, summary.currentStreak);
 
-    return { ...stats, winRate: calculatedWinRate };
+    const totalGames = allGameData.length;
+    const calculatedWinRate = totalGames > 0 ? (summary.wins / totalGames) * 100 : 0;
+
+    return { 
+      wins: summary.wins, 
+      losses: summary.losses, 
+      winRate: calculatedWinRate, 
+      winStreak: summary.currentStreak, 
+      longestWinStreak: finalLongestStreak 
+    };
   }, [allGameData]);
   const last10Games = useMemo(() => [...allGameData].slice(-10).reverse(), [allGameData]);
 
@@ -189,26 +199,36 @@ export default function GameSummary({ team }: GameSummaryProps) {
 
   return (
     <div className="w-full flex flex-col items-center mt-4">
-      <div className="w-full flex justify-start items-center gap-8">
-        <div className="p-2">
-          <h2 className="text-2xl font-bold">Total Games</h2>
-          <p className="text-xl">{allGameData.length}</p>
-        </div>
-        <div className="p-2">
-          <h2 className="text-2xl font-bold">Wins / Losses</h2>
-          <p className="text-xl">{wins} / {losses}</p>
-        </div>
-        <div className="p-2">
-          <h2 className="text-2xl font-bold">Win Rate</h2>
-          <p className="text-xl">{winRate.toFixed(2)}%</p>
-        </div>
-      </div>
       <Accordion 
         selectionMode="multiple" 
         className="w-full mt-4" 
         defaultExpandedKeys="all"
         variant="bordered"
       >
+        <AccordionItem key="overview" title="Overview">
+           <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <Card>
+              <CardHeader className="justify-center"><h3 className="text-lg font-semibold">Total Games</h3></CardHeader>
+              <CardBody className="text-center text-3xl font-bold">{allGameData.length}</CardBody>
+            </Card>
+            <Card>
+              <CardHeader className="justify-center"><h3 className="text-lg font-semibold">Wins / Losses</h3></CardHeader>
+              <CardBody className="text-center text-3xl font-bold">{wins} / {losses}</CardBody>
+            </Card>
+            <Card>
+              <CardHeader className="justify-center"><h3 className="text-lg font-semibold">Win Rate</h3></CardHeader>
+              <CardBody className="text-center text-3xl font-bold">{winRate.toFixed(2)}%</CardBody>
+            </Card>
+            <Card>
+              <CardHeader className="justify-center"><h3 className="text-lg font-semibold">Win Streak</h3></CardHeader>
+              <CardBody className="text-center text-3xl font-bold">{winStreak}</CardBody>
+            </Card>
+            <Card>
+              <CardHeader className="justify-center"><h3 className="text-lg font-semibold">Longest Win Streak</h3></CardHeader>
+              <CardBody className="text-center text-3xl font-bold">{longestWinStreak}</CardBody>
+            </Card>
+          </div>
+        </AccordionItem>
         <AccordionItem key="hall-of-fame" title="Hall of Fame">
           <div className="grid grid-cols-3 gap-2 md:grid-cols-3 lg:grid-cols-5 lg:gap-4 w-full">
             {highestStats.map(({ player, value, stat }) => (
@@ -222,7 +242,7 @@ export default function GameSummary({ team }: GameSummaryProps) {
             ))}
           </div>
         </AccordionItem>
-        <AccordionItem key="personal-bests" title="Player Personal Bests">
+        <AccordionItem key="personal-bests" title="Personal Bests">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
             {Object.entries(playerHighestStats).map(([player, stats]) => {
               const tableData = Object.entries(stats).map(([stat, value]) => ({
@@ -254,7 +274,10 @@ export default function GameSummary({ team }: GameSummaryProps) {
             {gameTablesData.map((game, index) => (
               <div key={index} className="w-full">
                 <h3 className="text-xl font-semibold mb-2">Game {game.gameIndex} - {game.win === 1 ? "🏆 Win" : "❌ Loss"}</h3>
-                <Table aria-label={`Game ${game.gameIndex} Summary`}>
+                <Table 
+                  aria-label={`Game ${game.gameIndex} Summary`}
+                  color="primary"
+                >
                   <TableHeader columns={gameTableColumns}>
                     {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
                   </TableHeader>
