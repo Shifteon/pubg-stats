@@ -19,6 +19,16 @@ interface HighestStat {
   stat: string;
 }
 
+interface PlayerGameStat {
+  player: string;
+  kills: number;
+  assists: number;
+  damage: number;
+  rescues: number;
+  recalls: number;
+}
+
+
 const playerMapping: Record<string, IndividualName[]> = {
   [TEAM_ALL]: ["isaac", "cody", "trenton", "ben"],
   [TEAM_NO_BEN]: ["isaac", "cody", "trenton"],
@@ -44,6 +54,7 @@ export default function GameSummary({ team }: GameSummaryProps) {
       setLoading(false);
       return;
     }
+    console.log("summary stats: ", stats);
     setAllGameData(stats.data);
     setLoading(false);
   };
@@ -52,6 +63,28 @@ export default function GameSummary({ team }: GameSummaryProps) {
     loadStats();
   }, [team, statClass]);
 
+  const { wins, losses, winRate } = useMemo(() => {
+    if (!allGameData || allGameData.length === 0) {
+      return { wins: 0, losses: 0, winRate: 0 };
+    }
+
+    const stats = allGameData.reduce(
+      (acc, game) => {
+        if (game.win === 1) {
+          acc.wins++;
+        } else {
+          acc.losses++;
+        }
+        return acc;
+      },
+      { wins: 0, losses: 0 }
+    );
+
+    const totalGames = allGameData.length;
+    const calculatedWinRate = totalGames > 0 ? (stats.wins / totalGames) * 100 : 0;
+
+    return { ...stats, winRate: calculatedWinRate };
+  }, [allGameData]);
   const last10Games = useMemo(() => [...allGameData].slice(-10).reverse(), [allGameData]);
 
   const highestStats = useMemo(() => {
@@ -78,25 +111,34 @@ export default function GameSummary({ team }: GameSummaryProps) {
     });
   }, [allGameData, team]);
 
-  const columns = useMemo(() => {
-    const players = playerMapping[team] || [];
-    const playerColumns = players.flatMap(player => 
-      statKeys.map(stat => ({
-        key: `${player}_${stat}`,
-        label: `${player.charAt(0).toUpperCase() + player.slice(1)} ${stat.charAt(0).toUpperCase() + stat.slice(1)}`
-      }))
-    );
-    const totalColumns = statKeys.map(stat => ({
-      key: `total_${stat}`,
-      label: `Total ${stat.charAt(0).toUpperCase() + stat.slice(1)}`
-    }));
+  const gameTablesData = useMemo(() => {
+    if (last10Games.length === 0) {
+      return [];
+    }
 
-    return [
-      { key: "win", label: "Win" },
-      ...playerColumns,
-      ...totalColumns
-    ];
-  }, [team]);
+    const players = playerMapping[team] || [];
+
+    return last10Games.map(game => {
+      const gamePlayerData: PlayerGameStat[] = players.map(player => {
+        const playerData: any = { player: player.charAt(0).toUpperCase() + player.slice(1) };
+        statKeys.forEach(stat => {
+          playerData[stat] = game[`${player}_${stat}` as keyof typeof game] || 0;
+        });
+        return playerData as PlayerGameStat;
+      });
+
+      const totalRow: any = { player: 'Total' };
+      statKeys.forEach(stat => {
+        totalRow[stat] = game[`total_${stat}` as keyof typeof game] || 0;
+      });
+
+      return { win: game.win, gameIndex: game.gameIndex, data: [...gamePlayerData, totalRow as PlayerGameStat] };
+    });
+  }, [last10Games, team]);
+
+  const gameTableColumns = [
+    { key: 'player', label: 'Player' }, ...statKeys.map(stat => ({ key: stat, label: stat.charAt(0).toUpperCase() + stat.slice(1) }))
+  ];
 
   if (loading) {
     return (
@@ -116,6 +158,20 @@ export default function GameSummary({ team }: GameSummaryProps) {
 
   return (
     <div className="w-full flex flex-col items-center mt-4">
+      <div className="w-full flex justify-start items-center gap-8">
+        <div className="p-2">
+          <h2 className="text-2xl font-bold">Total Games</h2>
+          <p className="text-xl">{allGameData.length}</p>
+        </div>
+        <div className="p-2">
+          <h2 className="text-2xl font-bold">Wins / Losses</h2>
+          <p className="text-xl">{wins} / {losses}</p>
+        </div>
+        <div className="p-2">
+          <h2 className="text-2xl font-bold">Win Rate</h2>
+          <p className="text-xl">{winRate.toFixed(2)}%</p>
+        </div>
+      </div>
       <div className="w-full flex flex-col items-center mb-8">
         <h2 className="p-2 self-start text-2xl font-bold">Hall of Fame</h2>
         <div className="grid grid-cols-3 gap-2 md:grid-cols-3 lg:grid-cols-5 lg:gap-4 w-full">
@@ -131,24 +187,25 @@ export default function GameSummary({ team }: GameSummaryProps) {
         </div>
       </div>
       <h2 className="p-2 self-start text-2xl font-bold">Last 10 Games</h2>
-      <Table aria-label="Game Summary Table">
-        <TableHeader columns={columns}>
-          {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
-        </TableHeader>
-        <TableBody items={last10Games}>
-          {(item) => (
-            <TableRow key={item.total_kills + Math.random()}>
-              {(columnKey) => {
-                const value = item[columnKey as keyof typeof item];
-                if (columnKey === 'win') {
-                  return <TableCell>{value === 1 ? "🏆" : "❌"}</TableCell>;
-                }
-                return <TableCell>{value}</TableCell>;
-              }}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+      <div className="w-full grid grid-cols-1 lg:grid-cols-2 items-start gap-8">
+        {gameTablesData.map((game, index) => (
+          <div key={index} className="w-full">
+            <h3 className="text-xl font-semibold mb-2">Game {game.gameIndex} - {game.win === 1 ? "🏆 Win" : "❌ Loss"}</h3>
+            <Table aria-label={`Game ${game.gameIndex} Summary`}>
+              <TableHeader columns={gameTableColumns}>
+                {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
+              </TableHeader>
+              <TableBody items={game.data}>
+                {(item) => (
+                  <TableRow key={item.player}>
+                    {(columnKey) => <TableCell>{item[columnKey as keyof typeof item]}</TableCell>}
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

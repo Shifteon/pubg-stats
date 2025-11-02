@@ -9,7 +9,7 @@ export class GameSummaryStat extends StatBase {
   }
 
   async getStats(team: TeamName): Promise<StatData | null> {
-    const data = await this.getStatData(team, STAT_KEY_MAP[GAME_SUMMARY_STAT_NAME]);
+    const data = await this.getStatData(team, STAT_KEY_MAP[GAME_SUMMARY_STAT_NAME], false);
 
     if (!data?.data || data.data.length === 0) {
       return null;

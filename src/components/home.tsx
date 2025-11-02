@@ -42,8 +42,11 @@ export default function HomeComponent() {
       </Select>
       <Tabs
         className="mt-5"
-       destroyInactiveTabPanel={false}
+        destroyInactiveTabPanel={true}
       >
+        <Tab key="summary" title="Summary">
+          <GameSummary team={selectedTeam} />
+        </Tab>
         <Tab key="graphs" title="Graphs">
           <div className="lg:grid lg:grid-cols-2 gap-1">
             {stats.map((statName, index) => (
@@ -53,9 +56,6 @@ export default function HomeComponent() {
             ))
             }
           </div>
-        </Tab>
-        <Tab key="summary" title="Summary">
-          <GameSummary team={selectedTeam} />
         </Tab>
       </Tabs>
     </div>

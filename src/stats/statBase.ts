@@ -61,14 +61,14 @@ export abstract class StatBase {
     }
   }
 
-  protected async getStatData(team: string, keysToKeep: string[]) {
+  protected async getStatData(team: string, keysToKeep: string[], shouldFilter = true) {
     const teamData = this.statsByTeam.get(team);
     if (!teamData || teamData.data.length === 0) {
       const json = await this.fetchData(team);
       if (!json) {
         return null;
       }
-      const preparedData = this.prepareData(json.statArray, keysToKeep);
+      const preparedData = this.prepareData(json.statArray, keysToKeep, shouldFilter);
       if (preparedData) {
         this.statsByTeam.set(team, preparedData);
       }
@@ -120,7 +120,7 @@ export abstract class StatBase {
     return "unkown";
   }
 
-  protected prepareData(statArray: Record<string, string>[], keysToKeep: string[]): StatData {
+  protected prepareData(statArray: Record<string, string>[], keysToKeep: string[], shouldFilter: boolean): StatData {
     const keys = Object.keys(statArray[0]);
     const chartOptions: ChartOptions[] = [];
     for (const key of keys) {
@@ -150,6 +150,12 @@ export abstract class StatBase {
       gameIndex++;
     }
 
+    if (!shouldFilter) {
+      return {
+        chartOptions,
+        data: rawData,
+      };
+    }
     // remove some of the data to nomralize it
     const startIndex = Math.ceil(rawData.length * PERCENTAGE_OF_DATA_TO_REMOVE);
     const filteredData = rawData.slice(startIndex);
