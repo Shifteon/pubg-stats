@@ -1,7 +1,7 @@
 "use client";
 
 import { IndividualName, TeamName } from "@/types";
-import { Card, CardBody, CardFooter, CardHeader } from "@heroui/react";
+import { Accordion, AccordionItem, Card, CardBody, CardFooter, CardHeader } from "@heroui/react";
 import { useEffect, useMemo, useState } from "react";
 import { Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/react";
 import { GameSummaryStat } from "@/stats/gameSummaryStat";
@@ -202,71 +202,70 @@ export default function GameSummary({ team }: GameSummaryProps) {
           <p className="text-xl">{winRate.toFixed(2)}%</p>
         </div>
       </div>
-      <div className="w-full flex flex-col items-center mb-8">
-        <h2 className="p-2 self-start text-2xl font-bold">Hall of Fame</h2>
-        <div className="grid grid-cols-3 gap-2 md:grid-cols-3 lg:grid-cols-5 lg:gap-4 w-full">
-          {highestStats.map(({ player, value, stat }) => (
-            <Card key={stat}>
-              <CardHeader className="justify-center">
-                <h3 className="text-lg font-semibold capitalize">{stat}</h3>
-              </CardHeader>
-              <CardBody className="text-center text-3xl font-bold">{value}</CardBody>
-              <CardFooter className="justify-center text-md capitalize text-gray-500">{player}</CardFooter>
-            </Card>
-          ))}
-        </div>
-      </div>
-      <div className="w-full flex flex-col items-center mb-8">
-        <h2 className="p-2 self-start text-2xl font-bold">Personal Bests</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-          {Object.entries(playerHighestStats).map(([player, stats]) => {
-            const tableData = Object.entries(stats).map(([stat, value]) => ({
-              stat: stat.charAt(0).toUpperCase() + stat.slice(1),
-              value,
-            }));
-            return (
-              <Card key={player}>
-                <CardHeader>
-                  <h3 className="text-lg font-semibold capitalize">{player}</h3>
+      <Accordion 
+        selectionMode="multiple" 
+        className="w-full mt-4" 
+        defaultExpandedKeys="all"
+        variant="bordered"
+      >
+        <AccordionItem key="hall-of-fame" title="Hall of Fame">
+          <div className="grid grid-cols-3 gap-2 md:grid-cols-3 lg:grid-cols-5 lg:gap-4 w-full">
+            {highestStats.map(({ player, value, stat }) => (
+              <Card key={stat}>
+                <CardHeader className="justify-center">
+                  <h3 className="text-lg font-semibold capitalize">{stat}</h3>
                 </CardHeader>
-                <CardBody>
-                  <Table 
-                    aria-label={`${player}'s Personal Bests`}
-                    isStriped={true}
-                  >
-                    <TableHeader columns={[{ key: 'stat', label: 'Stat' }, { key: 'value', label: 'Best' }]}>
-                      {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
-                    </TableHeader>
-                    <TableBody items={tableData}>
-                      {(item) => (<TableRow key={item.stat}>{(columnKey) => <TableCell>{item[columnKey as keyof typeof item]}</TableCell>}</TableRow>)}
-                    </TableBody>
-                  </Table>
-                </CardBody>
+                <CardBody className="text-center text-3xl font-bold">{value}</CardBody>
+                <CardFooter className="justify-center text-md capitalize text-gray-500">{player}</CardFooter>
               </Card>
-            );
-          })}
-        </div>
-      </div>
-      <h2 className="p-2 self-start text-2xl font-bold">Last 10 Games</h2>
-      <div className="w-full grid grid-cols-1 lg:grid-cols-2 items-start gap-8">
-        {gameTablesData.map((game, index) => (
-          <div key={index} className="w-full">
-            <h3 className="text-xl font-semibold mb-2">Game {game.gameIndex} - {game.win === 1 ? "🏆 Win" : "❌ Loss"}</h3>
-            <Table aria-label={`Game ${game.gameIndex} Summary`}>
-              <TableHeader columns={gameTableColumns}>
-                {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
-              </TableHeader>
-              <TableBody items={game.data}>
-                {(item) => (
-                  <TableRow key={item.player}>
-                    {(columnKey) => <TableCell>{item[columnKey as keyof typeof item]}</TableCell>}
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+            ))}
           </div>
-        ))}
-      </div>
+        </AccordionItem>
+        <AccordionItem key="personal-bests" title="Player Personal Bests">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+            {Object.entries(playerHighestStats).map(([player, stats]) => {
+              const tableData = Object.entries(stats).map(([stat, value]) => ({
+                stat: stat.charAt(0).toUpperCase() + stat.slice(1),
+                value,
+              }));
+              return (
+                <Card key={player}>
+                  <CardHeader>
+                    <h3 className="text-lg font-semibold capitalize">{player}</h3>
+                  </CardHeader>
+                  <CardBody>
+                    <Table aria-label={`${player}'s Personal Bests`}>
+                      <TableHeader columns={[{ key: 'stat', label: 'Stat' }, { key: 'value', label: 'Best' }]}>
+                        {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
+                      </TableHeader>
+                      <TableBody items={tableData}>
+                        {(item) => (<TableRow key={item.stat}>{(columnKey) => <TableCell>{item[columnKey as keyof typeof item]}</TableCell>}</TableRow>)}
+                      </TableBody>
+                    </Table>
+                  </CardBody>
+                </Card>
+              );
+            })}
+          </div>
+        </AccordionItem>
+        <AccordionItem key="last-10-games" title="Last 10 Games">
+          <div className="w-full grid grid-cols-1 lg:grid-cols-2 items-start gap-8">
+            {gameTablesData.map((game, index) => (
+              <div key={index} className="w-full">
+                <h3 className="text-xl font-semibold mb-2">Game {game.gameIndex} - {game.win === 1 ? "🏆 Win" : "❌ Loss"}</h3>
+                <Table aria-label={`Game ${game.gameIndex} Summary`}>
+                  <TableHeader columns={gameTableColumns}>
+                    {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
+                  </TableHeader>
+                  <TableBody items={game.data}>
+                    {(item) => (<TableRow key={item.player}>{(columnKey) => <TableCell>{item[columnKey as keyof typeof item]}</TableCell>}</TableRow>)}
+                  </TableBody>
+                </Table>
+              </div>
+            ))}
+          </div>
+        </AccordionItem>
+      </Accordion>
     </div>
   );
 }
