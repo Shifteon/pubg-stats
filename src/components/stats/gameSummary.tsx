@@ -1,7 +1,7 @@
 "use client";
 
 import { IndividualName, TeamName } from "@/types";
-import { Accordion, AccordionItem, Card, CardBody, CardFooter, CardHeader, Tab, Tabs } from "@heroui/react";
+import { Accordion, AccordionItem, Card, CardBody, CardFooter, CardHeader, Pagination, Slider, Tab, Tabs } from "@heroui/react";
 import { useEffect, useMemo, useState } from "react";
 import { Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/react";
 import { GameSummaryStat } from "@/stats/gameSummaryStat";
@@ -44,6 +44,8 @@ export default function GameSummary({ team }: GameSummaryProps) {
   const [allGameData, setAllGameData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
+  const [numberOfGames, setNumberOfGames] = useState(10);
+  const [gameByGamePage, setGameByGamePage] = useState(1);
 
   const statClass = useMemo(() => new GameSummaryStat(), []);
 
@@ -65,7 +67,7 @@ export default function GameSummary({ team }: GameSummaryProps) {
     loadStats();
   }, [team, statClass]);
 
-  const last10Games = useMemo(() => [...allGameData].slice(-10), [allGameData]);
+  const lastXGames = useMemo(() => [...allGameData].slice(-numberOfGames), [allGameData, numberOfGames]);
 
   const highestStats = useMemo(() => {
     if (allGameData.length === 0) {
@@ -122,7 +124,7 @@ export default function GameSummary({ team }: GameSummaryProps) {
   }, [allGameData, team]);
 
   const last10GamesPlayerAvgs = useMemo(() => {
-    if (last10Games.length === 0) {
+    if (lastXGames.length === 0) {
       return {};
     }
 
@@ -136,7 +138,7 @@ export default function GameSummary({ team }: GameSummaryProps) {
       });
     });
 
-    last10Games.forEach(game => {
+    lastXGames.forEach(game => {
       players.forEach(player => {
         statKeys.forEach(stat => {
           const playerStatKey = `${player}_${stat}`;
@@ -147,21 +149,21 @@ export default function GameSummary({ team }: GameSummaryProps) {
 
     Object.keys(playerTotals).forEach(player => {
       Object.keys(playerTotals[player]).forEach(stat => {
-        playerTotals[player][stat] /= last10Games.length;
+        playerTotals[player][stat] /= lastXGames.length;
       });
     });
 
     return playerTotals;
-  }, [last10Games, team]);
+  }, [lastXGames, team]);
 
   const gameTablesData = useMemo(() => {
-    if (last10Games.length === 0) {
+    if (lastXGames.length === 0) {
       return [];
     }
 
     const players = playerMapping[team] || [];
 
-    return last10Games.reverse().map(game => {
+    return [...lastXGames].reverse().map(game => {
       const gamePlayerData: PlayerGameStat[] = players.map(player => {
         const playerData: any = { player: player.charAt(0).toUpperCase() + player.slice(1) };
         statKeys.forEach(stat => {
@@ -177,11 +179,21 @@ export default function GameSummary({ team }: GameSummaryProps) {
 
       return { win: game.win, gameIndex: game.gameIndex, data: [...gamePlayerData, totalRow as PlayerGameStat] };
     });
-  }, [last10Games, team]);
+  }, [lastXGames, team]);
 
   const gameTableColumns = [
     { key: 'player', label: 'Player' }, ...statKeys.map(stat => ({ key: stat, label: stat.charAt(0).toUpperCase() + stat.slice(1) }))
   ];
+
+  const gamesPerPage = 10;
+  const totalGamePages = Math.ceil(gameTablesData.length / gamesPerPage);
+  const paginatedGameTables = useMemo(() => gameTablesData.slice((gameByGamePage - 1) * gamesPerPage, gameByGamePage * gamesPerPage), [gameTablesData, gameByGamePage]);
+
+  useEffect(() => {
+    if (gameByGamePage > totalGamePages) {
+      setGameByGamePage(totalGamePages || 1);
+    }
+  }, [totalGamePages, gameByGamePage]);
 
   if (loading) {
     return (
@@ -210,15 +222,28 @@ export default function GameSummary({ team }: GameSummaryProps) {
         <AccordionItem key="overview" title="Overview">
           <Overview gameData={allGameData} />
         </AccordionItem>
-        <AccordionItem key="last-10-games" title="Last 10 Games">
+        <AccordionItem key="last-10-games" title={`Last ${numberOfGames} Games`}>
           <div className="mb-8">
             <h3 className="text-xl font-semibold mb-2">Overview</h3>
-            <Overview gameData={last10Games} />
+            <Overview gameData={lastXGames} />
           </div>
-          <Tabs aria-label="Last 10 Games Details" color="secondary">
+          {allGameData.length > 10 && (
+            <div className="w-full md:w-1/2 mb-4 px-4">
+              <Slider
+                label="Number of Games"
+                value={numberOfGames}
+                onChange={(value) => setNumberOfGames(value as number)}
+                minValue={10}
+                maxValue={allGameData.length + 10}
+                step={10}
+                color="secondary"
+              />
+            </div>
+          )}
+          <Tabs aria-label={`Last ${numberOfGames} Games Details`} color="secondary">
             <Tab key="game-by-game" title="Game by Game">
               <div className="w-full grid grid-cols-1 lg:grid-cols-2 items-start gap-8 mt-4">
-                {gameTablesData.map((game, index) => (
+                {paginatedGameTables.map((game, index) => (
                   <div key={index} className="w-full">
                     <h3 className="text-xl font-semibold mb-2">Game {game.gameIndex} - {game.win === 1 ? "🏆 Win" : "❌ Loss"}</h3>
                     <Table 
@@ -235,6 +260,16 @@ export default function GameSummary({ team }: GameSummaryProps) {
                   </div>
                 ))}
               </div>
+              {totalGamePages > 1 && (
+                <div className="flex justify-center mt-8">
+                  <Pagination
+                    total={totalGamePages}
+                    page={gameByGamePage}
+                    onChange={setGameByGamePage}
+                    color="secondary"
+                  />
+                </div>
+              )}
             </Tab>
             <Tab key="player-avgs" title="Player Averages">
               <PlayerStatsGrid playerStats={last10GamesPlayerAvgs} valueFormatter={(v) => v.toFixed(2)} />
