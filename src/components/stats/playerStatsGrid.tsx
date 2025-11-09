@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardBody, CardHeader, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/react";
+import { Avatar, Card, CardBody, CardHeader, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/react";
 
 export interface PlayerStatsGridProps {
   playerStats: Record<string, Record<string, number>>;
@@ -8,6 +8,14 @@ export interface PlayerStatsGridProps {
 }
 
 const defaultFormatter = (value: number) => value.toString();
+
+const avatarSrcMap: Record<string, string> = {
+  isaac: "https://5xbmuxxl0mrwzkji.public.blob.vercel-storage.com/avatars/isaac.jpg",
+  cody: "https://5xbmuxxl0mrwzkji.public.blob.vercel-storage.com/avatars/cody.jpg",
+  trenton: "https://5xbmuxxl0mrwzkji.public.blob.vercel-storage.com/avatars/trenton.jpg",
+  ben: "https://5xbmuxxl0mrwzkji.public.blob.vercel-storage.com/avatars/ben.jpg",
+};
+
 
 export default function PlayerStatsGrid({ playerStats, valueFormatter = defaultFormatter }: PlayerStatsGridProps) {
   return (
@@ -19,7 +27,16 @@ export default function PlayerStatsGrid({ playerStats, valueFormatter = defaultF
         }));
         return (
           <Card key={player}>
-            <CardHeader><h3 className="text-lg font-semibold capitalize">{player}</h3></CardHeader>
+            <CardHeader>
+              <Avatar 
+                src={avatarSrcMap[player]} 
+                size="lg" 
+                name={player} 
+                showFallback
+                radius="sm"
+              />
+              <h2 className="text-2xl font-semibold capitalize ml-1">{player}</h2>
+            </CardHeader>
             <CardBody>
               <Table aria-label={`${player}'s stats`}>
                 <TableHeader columns={[{ key: 'stat', label: 'Stat' }, { key: 'value', label: 'Value' }]}>{(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}</TableHeader>
