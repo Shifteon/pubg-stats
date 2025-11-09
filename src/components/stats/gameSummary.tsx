@@ -1,12 +1,13 @@
 "use client";
 
 import { IndividualName, TeamName } from "@/types";
-import { Accordion, AccordionItem, Card, CardBody, CardFooter, CardHeader } from "@heroui/react";
+import { Accordion, AccordionItem, Card, CardBody, CardFooter, CardHeader, Tab, Tabs } from "@heroui/react";
 import { useEffect, useMemo, useState } from "react";
 import { Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/react";
 import { GameSummaryStat } from "@/stats/gameSummaryStat";
 import { TEAM_ALL, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON } from "@/constants";
 import Overview from "./overview";
+import PlayerStatsGrid from "./playerStatsGrid";
 
 export interface GameSummaryProps {
   team: TeamName;
@@ -120,6 +121,39 @@ export default function GameSummary({ team }: GameSummaryProps) {
     return playerBests;
   }, [allGameData, team]);
 
+  const last10GamesPlayerAvgs = useMemo(() => {
+    if (last10Games.length === 0) {
+      return {};
+    }
+
+    const players = playerMapping[team] || [];
+    const playerTotals: Record<string, Record<string, number>> = {};
+
+    players.forEach(player => {
+      playerTotals[player] = {};
+      statKeys.forEach(stat => {
+        playerTotals[player][stat] = 0;
+      });
+    });
+
+    last10Games.forEach(game => {
+      players.forEach(player => {
+        statKeys.forEach(stat => {
+          const playerStatKey = `${player}_${stat}`;
+          playerTotals[player][stat] += parseFloat(game[playerStatKey]) || 0;
+        });
+      });
+    });
+
+    Object.keys(playerTotals).forEach(player => {
+      Object.keys(playerTotals[player]).forEach(stat => {
+        playerTotals[player][stat] /= last10Games.length;
+      });
+    });
+
+    return playerTotals;
+  }, [last10Games, team]);
+
   const gameTablesData = useMemo(() => {
     if (last10Games.length === 0) {
       return [];
@@ -178,26 +212,34 @@ export default function GameSummary({ team }: GameSummaryProps) {
         </AccordionItem>
         <AccordionItem key="last-10-games" title="Last 10 Games">
           <div className="mb-8">
+            <h3 className="text-xl font-semibold mb-2">Overview</h3>
             <Overview gameData={last10Games} />
           </div>
-          <div className="w-full grid grid-cols-1 lg:grid-cols-2 items-start gap-8">
-            {gameTablesData.map((game, index) => (
-              <div key={index} className="w-full">
-                <h3 className="text-xl font-semibold mb-2">Game {game.gameIndex} - {game.win === 1 ? "🏆 Win" : "❌ Loss"}</h3>
-                <Table 
-                  aria-label={`Game ${game.gameIndex} Summary`}
-                  color="primary"
-                >
-                  <TableHeader columns={gameTableColumns}>
-                    {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
-                  </TableHeader>
-                  <TableBody items={game.data}>
-                    {(item) => (<TableRow key={item.player}>{(columnKey) => <TableCell>{item[columnKey as keyof typeof item]}</TableCell>}</TableRow>)}
-                  </TableBody>
-                </Table>
+          <Tabs aria-label="Last 10 Games Details" color="secondary">
+            <Tab key="game-by-game" title="Game by Game">
+              <div className="w-full grid grid-cols-1 lg:grid-cols-2 items-start gap-8 mt-4">
+                {gameTablesData.map((game, index) => (
+                  <div key={index} className="w-full">
+                    <h3 className="text-xl font-semibold mb-2">Game {game.gameIndex} - {game.win === 1 ? "🏆 Win" : "❌ Loss"}</h3>
+                    <Table 
+                      aria-label={`Game ${game.gameIndex} Summary`}
+                      color="primary"
+                    >
+                      <TableHeader columns={gameTableColumns}>
+                        {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
+                      </TableHeader>
+                      <TableBody items={game.data}>
+                        {(item) => (<TableRow key={item.player}>{(columnKey) => <TableCell>{item[columnKey as keyof typeof item]}</TableCell>}</TableRow>)}
+                      </TableBody>
+                    </Table>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </Tab>
+            <Tab key="player-avgs" title="Player Averages">
+              <PlayerStatsGrid playerStats={last10GamesPlayerAvgs} valueFormatter={(v) => v.toFixed(2)} />
+            </Tab>
+          </Tabs>
         </AccordionItem>
         <AccordionItem key="hall-of-fame" title="Hall of Fame">
           <div className="grid grid-cols-3 gap-2 md:grid-cols-3 lg:grid-cols-5 lg:gap-4 w-full">
@@ -213,31 +255,7 @@ export default function GameSummary({ team }: GameSummaryProps) {
           </div>
         </AccordionItem>
         <AccordionItem key="personal-bests" title="Personal Bests">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-            {Object.entries(playerHighestStats).map(([player, stats]) => {
-              const tableData = Object.entries(stats).map(([stat, value]) => ({
-                stat: stat.charAt(0).toUpperCase() + stat.slice(1),
-                value,
-              }));
-              return (
-                <Card key={player}>
-                  <CardHeader>
-                    <h3 className="text-lg font-semibold capitalize">{player}</h3>
-                  </CardHeader>
-                  <CardBody>
-                    <Table aria-label={`${player}'s Personal Bests`}>
-                      <TableHeader columns={[{ key: 'stat', label: 'Stat' }, { key: 'value', label: 'Best' }]}>
-                        {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
-                      </TableHeader>
-                      <TableBody items={tableData}>
-                        {(item) => (<TableRow key={item.stat}>{(columnKey) => <TableCell>{item[columnKey as keyof typeof item]}</TableCell>}</TableRow>)}
-                      </TableBody>
-                    </Table>
-                  </CardBody>
-                </Card>
-              );
-            })}
-          </div>
+          <PlayerStatsGrid playerStats={playerHighestStats} />
         </AccordionItem>
       </Accordion>
     </div>
