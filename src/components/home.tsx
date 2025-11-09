@@ -1,6 +1,6 @@
 "use client";
 
-import { Navbar, NavbarBrand, Select, SelectItem, Tab, Tabs } from "@heroui/react";
+import { Select, SelectItem, Tab, Tabs } from "@heroui/react";
 import GamePerformanceStat from "./stats/gamePerformance";
 import { GAME_SUMMARY_STAT_NAME, SUPPORTED_STATS, TEAM_ALL, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON } from "@/constants";
 import { ChangeEvent, useState } from "react";

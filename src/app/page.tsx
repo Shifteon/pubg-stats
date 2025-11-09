@@ -1,7 +1,10 @@
 import HomeComponent from "@/components/home";
+import NavLayout from "@/components/navLayout";
 
 export default function Home() {
   return (
-    <HomeComponent></HomeComponent>
+    <NavLayout>
+      <HomeComponent></HomeComponent>
+    </NavLayout>
   );
 }

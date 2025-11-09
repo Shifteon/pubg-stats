@@ -16,10 +16,17 @@ import {
   TRENTON_LOWERCASE,
   TEAM_LOWERCASE,
   WIN_RATE_STAT_NAME,
-  GAME_SUMMARY_STAT_NAME
+  GAME_SUMMARY_STAT_NAME,
+  KILL_STEALING_STAT_NAME
 } from "./constants";
 
-export type StatName = typeof AVERAGE_KILLS_STAT_NAME | typeof AVERAGE_DAMAGE_STAT_NAME | typeof KILLS_STAT_NAME | typeof DAMAGE_STAT_NAME | typeof WIN_RATE_STAT_NAME | typeof GAME_SUMMARY_STAT_NAME;
+export type StatName = typeof AVERAGE_KILLS_STAT_NAME 
+| typeof AVERAGE_DAMAGE_STAT_NAME 
+| typeof KILLS_STAT_NAME 
+| typeof DAMAGE_STAT_NAME 
+| typeof WIN_RATE_STAT_NAME 
+| typeof GAME_SUMMARY_STAT_NAME
+| typeof KILL_STEALING_STAT_NAME;
 
 export type TeamName = typeof TEAM_NO_TRENTON | typeof TEAM_NO_CODY | typeof TEAM_NO_BEN | typeof TEAM_NO_ISAAC | typeof TEAM_ALL | typeof TEST_TEAM;
 

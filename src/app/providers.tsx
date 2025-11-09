@@ -1,6 +1,7 @@
 'use client';
 
 import { HeroUIProvider } from "@heroui/react";
+import {ThemeProvider as NextThemesProvider} from "next-themes";
 import React from 'react';
 
 /**
@@ -12,7 +13,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     // The HeroUIProvider wraps your entire application.
     <HeroUIProvider>
-      {children}
+      <NextThemesProvider attribute="class">
+        {children}
+      </NextThemesProvider>
     </HeroUIProvider>
   );
 }

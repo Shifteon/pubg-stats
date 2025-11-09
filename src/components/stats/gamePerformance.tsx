@@ -1,9 +1,9 @@
 "use client";
 
-import { FrontendStatArray, TeamName, StatName } from "@/types";
+import { TeamName, StatName } from "@/types";
 import { useEffect, useMemo, useState } from "react";
 import StatLineChart from "../charts/statLineChart";
-import { AVERAGE_DAMAGE_STAT_NAME, AVERAGE_KILLS_STAT_NAME, BAR_CHART, DAMAGE_STAT_NAME, KILLS_STAT_NAME, LINE_CHART, WIN_RATE_STAT_NAME } from "@/constants";
+import { AVERAGE_DAMAGE_STAT_NAME, AVERAGE_KILLS_STAT_NAME, BAR_CHART, DAMAGE_STAT_NAME, KILL_STEALING_STAT_NAME, KILLS_STAT_NAME, LINE_CHART, WIN_RATE_STAT_NAME } from "@/constants";
 import { Spinner } from "@heroui/react";
 import StatBarChart from "../charts/statBarChart";
 import { StatBase, StatData } from "@/stats/statBase";
@@ -12,6 +12,7 @@ import { AverageDamageStat } from "@/stats/averageDamageStat";
 import { TotalKillsStat } from "@/stats/totalKillsStat";
 import { TotalDamageStat } from "@/stats/totalDamageStat";
 import { WinRateStat } from "@/stats/winrateStat";
+import { KillStealingStat } from "@/stats/killStealingStat";
 
 export interface AvgKillsProps {
   team: TeamName;
@@ -35,6 +36,8 @@ export default function GamePerformanceStat(props: AvgKillsProps) {
         return new TotalDamageStat();
       case WIN_RATE_STAT_NAME:
         return new WinRateStat();
+      case KILL_STEALING_STAT_NAME:
+        return new KillStealingStat();
       default:
         return null;
     }
