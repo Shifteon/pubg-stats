@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/react";
 import { GameSummaryStat } from "@/stats/gameSummaryStat";
 import { TEAM_ALL, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON } from "@/constants";
+import Overview from "./overview";
 
 export interface GameSummaryProps {
   team: TeamName;
@@ -63,40 +64,7 @@ export default function GameSummary({ team }: GameSummaryProps) {
     loadStats();
   }, [team, statClass]);
 
-  const { wins, losses, winRate, winStreak, longestWinStreak } = useMemo(() => {
-    if (!allGameData || allGameData.length === 0) {
-      return { wins: 0, losses: 0, winRate: 0, winStreak: 0, longestWinStreak: 0 };
-    }
-    
-    const summary = allGameData.reduce(
-      (acc, game) => {
-        if (game.win === 1) {
-          acc.wins++;
-          acc.currentStreak++;
-        } else {
-          acc.losses++;
-          acc.longestStreak = Math.max(acc.longestStreak, acc.currentStreak);
-          acc.currentStreak = 0;
-        }
-        return acc;
-      },
-      { wins: 0, losses: 0, currentStreak: 0, longestStreak: 0 }
-    );
-
-    const finalLongestStreak = Math.max(summary.longestStreak, summary.currentStreak);
-
-    const totalGames = allGameData.length;
-    const calculatedWinRate = totalGames > 0 ? (summary.wins / totalGames) * 100 : 0;
-
-    return { 
-      wins: summary.wins, 
-      losses: summary.losses, 
-      winRate: calculatedWinRate, 
-      winStreak: summary.currentStreak, 
-      longestWinStreak: finalLongestStreak 
-    };
-  }, [allGameData]);
-  const last10Games = useMemo(() => [...allGameData].slice(-10).reverse(), [allGameData]);
+  const last10Games = useMemo(() => [...allGameData].slice(-10), [allGameData]);
 
   const highestStats = useMemo(() => {
     if (allGameData.length === 0) {
@@ -159,7 +127,7 @@ export default function GameSummary({ team }: GameSummaryProps) {
 
     const players = playerMapping[team] || [];
 
-    return last10Games.map(game => {
+    return last10Games.reverse().map(game => {
       const gamePlayerData: PlayerGameStat[] = players.map(player => {
         const playerData: any = { player: player.charAt(0).toUpperCase() + player.slice(1) };
         statKeys.forEach(stat => {
@@ -206,27 +174,29 @@ export default function GameSummary({ team }: GameSummaryProps) {
         variant="bordered"
       >
         <AccordionItem key="overview" title="Overview">
-           <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            <Card>
-              <CardHeader className="justify-center"><h3 className="text-lg font-semibold">Total Games</h3></CardHeader>
-              <CardBody className="text-center text-3xl font-bold">{allGameData.length}</CardBody>
-            </Card>
-            <Card>
-              <CardHeader className="justify-center"><h3 className="text-lg font-semibold">Wins / Losses</h3></CardHeader>
-              <CardBody className="text-center text-3xl font-bold">{wins} / {losses}</CardBody>
-            </Card>
-            <Card>
-              <CardHeader className="justify-center"><h3 className="text-lg font-semibold">Win Rate</h3></CardHeader>
-              <CardBody className="text-center text-3xl font-bold">{winRate.toFixed(2)}%</CardBody>
-            </Card>
-            <Card>
-              <CardHeader className="justify-center"><h3 className="text-lg font-semibold">Win Streak</h3></CardHeader>
-              <CardBody className="text-center text-3xl font-bold">{winStreak}</CardBody>
-            </Card>
-            <Card>
-              <CardHeader className="justify-center"><h3 className="text-lg font-semibold">Longest Win Streak</h3></CardHeader>
-              <CardBody className="text-center text-3xl font-bold">{longestWinStreak}</CardBody>
-            </Card>
+          <Overview gameData={allGameData} />
+        </AccordionItem>
+        <AccordionItem key="last-10-games" title="Last 10 Games">
+          <div className="mb-8">
+            <Overview gameData={last10Games} />
+          </div>
+          <div className="w-full grid grid-cols-1 lg:grid-cols-2 items-start gap-8">
+            {gameTablesData.map((game, index) => (
+              <div key={index} className="w-full">
+                <h3 className="text-xl font-semibold mb-2">Game {game.gameIndex} - {game.win === 1 ? "🏆 Win" : "❌ Loss"}</h3>
+                <Table 
+                  aria-label={`Game ${game.gameIndex} Summary`}
+                  color="primary"
+                >
+                  <TableHeader columns={gameTableColumns}>
+                    {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
+                  </TableHeader>
+                  <TableBody items={game.data}>
+                    {(item) => (<TableRow key={item.player}>{(columnKey) => <TableCell>{item[columnKey as keyof typeof item]}</TableCell>}</TableRow>)}
+                  </TableBody>
+                </Table>
+              </div>
+            ))}
           </div>
         </AccordionItem>
         <AccordionItem key="hall-of-fame" title="Hall of Fame">
@@ -267,26 +237,6 @@ export default function GameSummary({ team }: GameSummaryProps) {
                 </Card>
               );
             })}
-          </div>
-        </AccordionItem>
-        <AccordionItem key="last-10-games" title="Last 10 Games">
-          <div className="w-full grid grid-cols-1 lg:grid-cols-2 items-start gap-8">
-            {gameTablesData.map((game, index) => (
-              <div key={index} className="w-full">
-                <h3 className="text-xl font-semibold mb-2">Game {game.gameIndex} - {game.win === 1 ? "🏆 Win" : "❌ Loss"}</h3>
-                <Table 
-                  aria-label={`Game ${game.gameIndex} Summary`}
-                  color="primary"
-                >
-                  <TableHeader columns={gameTableColumns}>
-                    {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
-                  </TableHeader>
-                  <TableBody items={game.data}>
-                    {(item) => (<TableRow key={item.player}>{(columnKey) => <TableCell>{item[columnKey as keyof typeof item]}</TableCell>}</TableRow>)}
-                  </TableBody>
-                </Table>
-              </div>
-            ))}
           </div>
         </AccordionItem>
       </Accordion>

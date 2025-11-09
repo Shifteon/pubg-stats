@@ -22,15 +22,12 @@ export const DAMAGE_STAT_NAME = "damage";
 export const WIN_RATE_STAT_NAME = "winRate";
 export const GAME_SUMMARY_STAT_NAME = "gameSummary";
 
-
-
 export const AVERAGE_DAMAGE_STAT_FILE = "avgs.json";
 export const AVERAGE_KILLS_STAT_FILE = "avgs.json";
 export const KILLS_STAT_FILE = "sums.json";
 export const DAMAGE_STAT_FILE = "sums.json";
 export const WIN_RATE_STAT_FILE = "wrate.json";
 export const GAME_SUMMARY_STAT_FILE = "data.json";
-
 
 // lowercase names
 export const ISAAC_LOWERCASE = "isaac";
