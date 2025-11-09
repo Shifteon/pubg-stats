@@ -1,11 +1,11 @@
 "use client";
 
 import { IndividualName, TeamName } from "@/types";
-import { Accordion, AccordionItem, Card, CardBody, CardFooter, CardHeader, Pagination, Slider, Tab, Tabs } from "@heroui/react";
+import { Accordion, AccordionItem, Avatar, Card, CardBody, CardFooter, CardHeader, Pagination, Slider, Tab, Tabs } from "@heroui/react";
 import { useEffect, useMemo, useState } from "react";
 import { Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/react";
 import { GameSummaryStat } from "@/stats/gameSummaryStat";
-import { TEAM_ALL, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON } from "@/constants";
+import { AVATAR_SRC_MAP, TEAM_ALL, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON } from "@/constants";
 import Overview from "./overview";
 import PlayerStatsGrid from "./playerStatsGrid";
 
@@ -284,7 +284,15 @@ export default function GameSummary({ team }: GameSummaryProps) {
                   <h3 className="text-lg font-semibold capitalize">{stat}</h3>
                 </CardHeader>
                 <CardBody className="text-center text-3xl font-bold">{value}</CardBody>
-                <CardFooter className="justify-center text-md capitalize text-gray-500">{player}</CardFooter>
+                <CardFooter className="justify-center text-md capitalize text-gray-500">
+                  <Avatar
+                    src={AVATAR_SRC_MAP[player]}
+                    size="sm"
+                    name={player}
+                    showFallback
+                  />
+                  <p className="ml-1">{player}</p>
+                </CardFooter>
               </Card>
             ))}
           </div>

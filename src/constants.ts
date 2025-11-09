@@ -15,8 +15,16 @@ export const VALID_TEAM_NAMES = [
   TEST_TEAM,
 ];
 
+export const AVATAR_SRC_MAP: Record<string, string> = {
+  isaac: "https://5xbmuxxl0mrwzkji.public.blob.vercel-storage.com/avatars/isaac.jpg",
+  cody: "https://5xbmuxxl0mrwzkji.public.blob.vercel-storage.com/avatars/cody.jpg",
+  trenton: "https://5xbmuxxl0mrwzkji.public.blob.vercel-storage.com/avatars/trenton.jpg",
+  ben: "https://5xbmuxxl0mrwzkji.public.blob.vercel-storage.com/avatars/ben.jpg",
+};
+
 export const AVERAGE_KILLS_STAT_NAME = "avgKills";
 export const AVERAGE_DAMAGE_STAT_NAME = "avgDamage";
+export const AVERAGE_KILL_STEALING_STAT_NAME = "avgKillStealing";
 export const KILLS_STAT_NAME = "kills";
 export const DAMAGE_STAT_NAME = "damage";
 export const WIN_RATE_STAT_NAME = "winRate";

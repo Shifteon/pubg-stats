@@ -1,5 +1,6 @@
 "use client";
 
+import { AVATAR_SRC_MAP } from "@/constants";
 import { Avatar, Card, CardBody, CardHeader, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/react";
 
 export interface PlayerStatsGridProps {
@@ -8,13 +9,6 @@ export interface PlayerStatsGridProps {
 }
 
 const defaultFormatter = (value: number) => value.toString();
-
-const avatarSrcMap: Record<string, string> = {
-  isaac: "https://5xbmuxxl0mrwzkji.public.blob.vercel-storage.com/avatars/isaac.jpg",
-  cody: "https://5xbmuxxl0mrwzkji.public.blob.vercel-storage.com/avatars/cody.jpg",
-  trenton: "https://5xbmuxxl0mrwzkji.public.blob.vercel-storage.com/avatars/trenton.jpg",
-  ben: "https://5xbmuxxl0mrwzkji.public.blob.vercel-storage.com/avatars/ben.jpg",
-};
 
 
 export default function PlayerStatsGrid({ playerStats, valueFormatter = defaultFormatter }: PlayerStatsGridProps) {
@@ -29,7 +23,7 @@ export default function PlayerStatsGrid({ playerStats, valueFormatter = defaultF
           <Card key={player}>
             <CardHeader>
               <Avatar 
-                src={avatarSrcMap[player]} 
+                src={AVATAR_SRC_MAP[player]} 
                 size="lg" 
                 name={player} 
                 showFallback
