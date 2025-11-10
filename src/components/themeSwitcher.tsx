@@ -55,13 +55,14 @@ export default function ThemeSwitcher() {
       <DropdownMenu
         aria-label="Theme Switcher"
         selectionMode="single"
-        selectedKeys={theme ? [theme] : []}
+        selectedKeys={theme ? [theme] : ['system']}
         onSelectionChange={(keys) => {
           setTheme(Array.from(keys)[0] as string)
         }}
       >
         <DropdownItem key="light">Light</DropdownItem>
         <DropdownItem key="dark">Dark</DropdownItem>
+        <DropdownItem key="system">System</DropdownItem>
       </DropdownMenu>
     </Dropdown>
   );
