@@ -34,7 +34,11 @@ export default function StatBarChart(props: StatBarChartProps) {
     <CartesianGrid strokeDasharray="3 3" />
     <XAxis dataKey="displayName" />
     <YAxis width="auto" />
-    <Tooltip />
+    <Tooltip 
+      contentStyle={{
+        backgroundColor: 'hsl(var(--heroui-content1))',
+      }}
+    />
     <Legend />
 
     {chartOptions.map(option => (

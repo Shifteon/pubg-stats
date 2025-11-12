@@ -32,6 +32,7 @@ export interface StatData {
 export abstract class StatBase {
   public statDisplayName: string;
   public chartType: string;
+  public hasMembers = true;
   protected statName: string;
   protected statsByTeam: Map<string, StatData>;
 

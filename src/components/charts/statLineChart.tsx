@@ -2,9 +2,9 @@
 
 import { GAME_INDEX_KEY } from '@/constants';
 import { StatData } from '@/stats/statBase';
-import React, { useMemo } from 'react';
+import { useTheme } from 'next-themes';
+import React, { useEffect, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import { AxisDomain } from 'recharts/types/util/types';
 
 interface StatLineChartProps {
   data: StatData;
@@ -12,8 +12,9 @@ interface StatLineChartProps {
 
 export default function StatLineChart(props: StatLineChartProps) {
   const { data = [], chartOptions = [] } = props.data;
+  const { theme } = useTheme();
 
-  const getXAxisInterval = (): number => {
+  const xAxisInterval = useMemo(() => {
     if (data.length > 80) {
       return 20;
     }
@@ -21,10 +22,10 @@ export default function StatLineChart(props: StatLineChartProps) {
       return 1;
     }
     return 5;
-  };
+  }, [data]);
 
-  const getYAxisDomain = (): AxisDomain => {
-    if (!data.length) {
+  const yAxisDomain = useMemo(() => {
+     if (!data.length) {
       return ['auto', 'auto'];
     }
     const values = data.flatMap(stat =>
@@ -56,21 +57,27 @@ export default function StatLineChart(props: StatLineChartProps) {
     const newYMax = max + bufferAmount;
 
     return [newYMin, newYMax];
-  };
+  }, [data]);
 
   return (
     <LineChart
       style={{ width: '100%', height: '100%', maxHeight: '70vh', aspectRatio: 1.5 }}
       responsive
-      data={props.data.data}
+      data={data}
     >
       <CartesianGrid strokeDasharray="3 3" />
-      <XAxis interval={getXAxisInterval()} domain={[20, 'auto']} dataKey={GAME_INDEX_KEY} />
-      <YAxis interval="preserveEnd" allowDecimals={false} domain={getYAxisDomain()} startOffset={3} scale="linear" width="auto" type='number' />
-      <Tooltip formatter={value => Number(value.valueOf()).toFixed(2)} />
+      <XAxis interval={xAxisInterval} domain={[20, 'auto']} dataKey={GAME_INDEX_KEY} />
+      <YAxis interval="preserveEnd" allowDecimals={false} domain={yAxisDomain} startOffset={3} scale="linear" width="auto" type='number' />
+      <Tooltip 
+        formatter={value => Number(value.valueOf()).toFixed(2)}
+        contentStyle={{
+          backgroundColor: 'hsl(var(--heroui-content1))',
+          borderColor: 'hsl(var(--heroui-content1-300))'
+        }}
+      />
       <Legend />
 
-      {props.data.chartOptions?.map(options => (
+      {chartOptions?.map(options => (
         <React.Fragment key={options.key}>
           <Line type="monotone" dot={false} dataKey={options.key} stroke={options.color} name={options.displayName} strokeWidth={2} />
         </React.Fragment>

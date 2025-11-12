@@ -1,12 +1,12 @@
 "use client";
 
-import { TeamName, StatName } from "@/types";
+import { TeamName, StatName, IndividualName } from "@/types";
 import { useEffect, useMemo, useState } from "react";
 import StatLineChart from "../charts/statLineChart";
-import { AVERAGE_DAMAGE_STAT_NAME, AVERAGE_KILLS_STAT_NAME, BAR_CHART, DAMAGE_STAT_NAME, KILL_STEALING_STAT_NAME, KILLS_STAT_NAME, LINE_CHART, WIN_RATE_STAT_NAME } from "@/constants";
+import { AVERAGE_DAMAGE_STAT_NAME, AVERAGE_KILLS_STAT_NAME, BAR_CHART, DAMAGE_STAT_NAME, GAME_INDEX_KEY, KILL_STEALING_STAT_NAME, KILLS_STAT_NAME, LINE_CHART, TEAM_MEMBER_MAP, WIN_RATE_STAT_NAME } from "@/constants";
 import { Spinner } from "@heroui/react";
 import StatBarChart from "../charts/statBarChart";
-import { StatBase, StatData } from "@/stats/statBase";
+import { StatData } from "@/stats/statBase";
 import { AverageKillsStat } from "@/stats/averageKillsStat";
 import { AverageDamageStat } from "@/stats/averageDamageStat";
 import { TotalKillsStat } from "@/stats/totalKillsStat";
@@ -17,6 +17,7 @@ import { KillStealingStat } from "@/stats/killStealingStat";
 export interface AvgKillsProps {
   team: TeamName;
   statName: StatName;
+  selectedMembers: IndividualName[];
 }
 
 export default function GamePerformanceStat(props: AvgKillsProps) {
@@ -63,12 +64,41 @@ export default function GamePerformanceStat(props: AvgKillsProps) {
     loadStats();
   }, [props.team, statClass]);
 
+  const filteredStatData = useMemo<StatData>(() => {
+    if (!statData || props.selectedMembers.length === TEAM_MEMBER_MAP[props.team].length || !statClass?.hasMembers) {
+      return statData;
+    }
+
+    const filteredOptions = statData.chartOptions.filter(option =>
+      props.selectedMembers.some(member => option.key.startsWith(member))
+    );
+
+    const dataKeys = Object.keys(statData.data[0]);
+
+    const filteredData = statData.data.map(data => {
+      const filteredData: Record<string, number> = {};
+      dataKeys.forEach(key => {
+        if (props.selectedMembers.some(member => key.startsWith(member)) || key === GAME_INDEX_KEY) {
+          filteredData[key] = data[key];
+        }
+      });
+      return filteredData;
+    });
+    // console.log("Filtered options: ", filteredOptions);
+    // console.log("Filtered data: ", filteredData);
+
+    return {
+      data: filteredData,
+      chartOptions: filteredOptions,
+    };
+  }, [statData, props.selectedMembers, props.team]);
+
   const getChart = () => {
     switch (statClass?.chartType || LINE_CHART) {
       case LINE_CHART:
-        return <StatLineChart data={statData} />;
+        return <StatLineChart data={filteredStatData} />;
       case BAR_CHART:
-        return <StatBarChart data={statData} />;
+        return <StatBarChart data={filteredStatData} />;
       default:
         return <div>View Not Found</div>;
     }
@@ -88,7 +118,6 @@ export default function GamePerformanceStat(props: AvgKillsProps) {
       }
       <div className="w-full flex flex-col items-center">
         <h2 className="p-2 self-start">{statClass?.statDisplayName}</h2>
-        
         {getChart()}
       </div>
     </div>
