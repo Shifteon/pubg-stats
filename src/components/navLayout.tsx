@@ -1,7 +1,7 @@
 "use client";
 
 import { Link, Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenu, NavbarMenuItem } from "@heroui/react";
-import { usePathname } from "next/navigation";
+import CacheRefreshButton from "./cacheRefreshButton";
 import ThemeSwitcher from "./themeSwitcher";
 
 export const Logo = () => {
@@ -42,19 +42,7 @@ export const Logo = () => {
   );
 };
 
-const menuItems = [
-  {
-    name: "Home",
-    url: "/",
-  },
-  {
-    name: "Settings",
-    url: "/settings",
-  },
-];
-
 export default function NavLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
 
   return (
     <>
@@ -69,32 +57,15 @@ export default function NavLayout({ children }: { children: React.ReactNode }) {
             <span className="ml-1">PUBG Stats</span>
           </Link>
         </NavbarBrand>
-        {/* <NavbarContent justify="start">
-          {menuItems.map((item, index) => (
-            <NavbarItem key={index} isActive={pathname === item.url}>
-              <Link color={pathname === item.url ? "primary" : "foreground"} href={item.url}>
-                {item.name}
-              </Link>
-            </NavbarItem>
-          ))
-          }
-        </NavbarContent> */}
       </NavbarContent>
       <NavbarContent justify="end">
+        <NavbarItem>
+          <CacheRefreshButton />
+        </NavbarItem>
         <NavbarItem>
           <ThemeSwitcher />
         </NavbarItem>
       </NavbarContent>
-      {/* <NavbarMenu>
-        {menuItems.map((item, index) => (
-          <NavbarMenuItem key={index} isActive={pathname === item.url}>
-            <Link href={item.url}>
-              {item.name}
-            </Link>
-          </NavbarMenuItem>
-        ))
-        }
-      </NavbarMenu> */}
     </Navbar>
     {children}
     </>

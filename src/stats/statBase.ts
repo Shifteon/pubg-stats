@@ -17,6 +17,7 @@ import {
   TRENTON_LOWERCASE,
   TRENTON_STROKE_COLOR
 } from "@/constants";
+import { apiService } from "../services/apiService";
 
 export interface ChartOptions {
   color: string;
@@ -47,19 +48,7 @@ export abstract class StatBase {
   public abstract getStats(team: string): Promise<StatData | null>;
 
   protected async fetchData(team: string): Promise<{ statArray: Record<string, string>[] } | null> {
-    try {
-      const results = await fetch(`/api/stats?team=${team}&stat=${this.statName}`);
-      if (!results.ok) {
-        return null;
-      }
-
-      const json: { statArray: Record<string, string>[] } = await results.json();
-      
-      return json;
-  } catch (error) {
-      console.log(error);
-      return null;
-    }
+    return apiService.fetchWithCache<{ statArray: Record<string, string>[] }>(`/api/stats?team=${team}&stat=${this.statName}`);
   }
 
   protected async getStatData(team: string, keysToKeep: string[], shouldFilter = true) {
