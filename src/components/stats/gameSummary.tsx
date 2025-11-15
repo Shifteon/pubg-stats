@@ -44,8 +44,8 @@ export default function GameSummary({ team }: GameSummaryProps) {
   const [allGameData, setAllGameData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
-  const [numberOfGames, setNumberOfGames] = useState(10);
   const [gameByGamePage, setGameByGamePage] = useState(1);
+  const [gameRange, setGameRange] = useState<number[]>([0, 0]);
 
   const statClass = useMemo(() => new GameSummaryStat(), []);
 
@@ -61,13 +61,14 @@ export default function GameSummary({ team }: GameSummaryProps) {
     }
     setAllGameData(stats.data);
     setLoading(false);
+    setGameRange([Math.max(0, stats.data.length - 10), stats.data.length]);
   };
 
   useEffect(() => {
     loadStats();
   }, [team, statClass]);
 
-  const lastXGames = useMemo(() => [...allGameData].slice(-numberOfGames), [allGameData, numberOfGames]);
+  const gamesInRange = useMemo(() => allGameData.slice(gameRange[0], gameRange[1]), [allGameData, gameRange]);
 
   const highestStats = useMemo(() => {
     if (allGameData.length === 0) {
@@ -123,8 +124,8 @@ export default function GameSummary({ team }: GameSummaryProps) {
     return playerBests;
   }, [allGameData, team]);
 
-  const last10GamesPlayerAvgs = useMemo(() => {
-    if (lastXGames.length === 0) {
+  const playerAvgsInRange = useMemo(() => {
+    if (gamesInRange.length === 0) {
       return {};
     }
 
@@ -138,7 +139,7 @@ export default function GameSummary({ team }: GameSummaryProps) {
       });
     });
 
-    lastXGames.forEach(game => {
+    gamesInRange.forEach(game => {
       players.forEach(player => {
         statKeys.forEach(stat => {
           const playerStatKey = `${player}_${stat}`;
@@ -149,21 +150,21 @@ export default function GameSummary({ team }: GameSummaryProps) {
 
     Object.keys(playerTotals).forEach(player => {
       Object.keys(playerTotals[player]).forEach(stat => {
-        playerTotals[player][stat] /= lastXGames.length;
+        playerTotals[player][stat] /= gamesInRange.length;
       });
     });
 
     return playerTotals;
-  }, [lastXGames, team]);
+  }, [gamesInRange, team]);
 
   const gameTablesData = useMemo(() => {
-    if (lastXGames.length === 0) {
+    if (gamesInRange.length === 0) {
       return [];
     }
 
     const players = playerMapping[team] || [];
 
-    return [...lastXGames].reverse().map(game => {
+    return [...gamesInRange].reverse().map(game => {
       const gamePlayerData: PlayerGameStat[] = players.map(player => {
         const playerData: any = { player: player.charAt(0).toUpperCase() + player.slice(1) };
         statKeys.forEach(stat => {
@@ -179,7 +180,7 @@ export default function GameSummary({ team }: GameSummaryProps) {
 
       return { win: game.win, gameIndex: game.gameIndex, data: [...gamePlayerData, totalRow as PlayerGameStat] };
     });
-  }, [lastXGames, team]);
+  }, [gamesInRange, team]);
 
   const gameTableColumns = [
     { key: 'player', label: 'Player' }, ...statKeys.map(stat => ({ key: stat, label: stat.charAt(0).toUpperCase() + stat.slice(1) }))
@@ -222,25 +223,25 @@ export default function GameSummary({ team }: GameSummaryProps) {
         <AccordionItem key="overview" title="Overview">
           <Overview gameData={allGameData} />
         </AccordionItem>
-        <AccordionItem key="last-10-games" title={`Last ${numberOfGames} Games`}>
+        <AccordionItem key="games-in-range" title={`Games ${gameRange[0] + 1} - ${gameRange[1]}`}>
           <div className="mb-8">
             <h3 className="text-xl font-semibold mb-2">Overview</h3>
-            <Overview gameData={lastXGames} />
+            <Overview gameData={gamesInRange} />
           </div>
           {allGameData.length > 10 && (
             <div className="w-full md:w-1/2 mb-4 px-4">
               <Slider
-                label="Number of Games"
-                value={numberOfGames}
-                onChange={(value) => setNumberOfGames(value as number)}
-                minValue={10}
-                maxValue={allGameData.length + 10}
-                step={10}
+                label="Game Range"
+                value={gameRange}
+                onChange={(value) => setGameRange(value as number[])}
+                minValue={0}
+                maxValue={allGameData.length}
+                step={1}
                 color="secondary"
               />
             </div>
           )}
-          <Tabs aria-label={`Last ${numberOfGames} Games Details`} color="secondary">
+          <Tabs aria-label={`Games ${gameRange[0] + 1} - ${gameRange[1]} Details`} color="secondary">
             <Tab key="game-by-game" title="Game by Game">
               <div className="w-full grid grid-cols-1 lg:grid-cols-2 items-start gap-8 mt-4">
                 {paginatedGameTables.map((game, index) => (
@@ -272,7 +273,7 @@ export default function GameSummary({ team }: GameSummaryProps) {
               )}
             </Tab>
             <Tab key="player-avgs" title="Player Averages">
-              <PlayerStatsGrid playerStats={last10GamesPlayerAvgs} valueFormatter={(v) => v.toFixed(2)} />
+              <PlayerStatsGrid playerStats={playerAvgsInRange} valueFormatter={(v) => v.toFixed(2)} />
             </Tab>
           </Tabs>
         </AccordionItem>
