@@ -1,14 +1,14 @@
 "use client";
 
-import { IndividualName, TeamName } from "@/types";
+import { IndividualName, TeamName, PlayerGameStat } from "@/types";
 import { Accordion, AccordionItem, Avatar, Card, CardBody, CardFooter, CardHeader, Pagination, Slider, Tab, Tabs } from "@heroui/react";
 import { useEffect, useMemo, useState } from "react";
-import { Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/react";
 import { GameSummaryStat } from "@/stats/gameSummaryStat";
 import { AVATAR_SRC_MAP, TEAM_ALL, TEAM_ISAAC_BEN, TEAM_ISAAC_CODY, TEAM_ISAAC_TRENTON, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON } from "@/constants";
 import Overview from "./overview";
 import PlayerStatsGrid from "./playerStatsGrid";
 import LoadingSpinner from "../loadingSpinner";
+import GameTable from "./GameTable";
 
 export interface GameSummaryProps {
   team: TeamName;
@@ -22,14 +22,7 @@ interface HighestStat {
   stat: string;
 }
 
-interface PlayerGameStat {
-  player: string;
-  kills: number;
-  assists: number;
-  damage: number;
-  rescues: number;
-  recalls: number;
-}
+
 
 
 const playerMapping: Record<string, IndividualName[]> = {
@@ -186,9 +179,7 @@ export default function GameSummary({ team }: GameSummaryProps) {
     });
   }, [gamesInRange, team]);
 
-  const gameTableColumns = [
-    { key: 'player', label: 'Player' }, ...statKeys.map(stat => ({ key: stat, label: stat.charAt(0).toUpperCase() + stat.slice(1) }))
-  ];
+
 
   const gamesPerPage = 10;
   const totalGamePages = Math.ceil(gameTablesData.length / gamesPerPage);
@@ -249,17 +240,7 @@ export default function GameSummary({ team }: GameSummaryProps) {
                 {paginatedGameTables.map((game, index) => (
                   <div key={index} className="w-full">
                     <h3 className="text-xl font-semibold mb-2">Game {game.gameIndex} - {game.win === 1 ? "🏆 Win" : "❌ Loss"}</h3>
-                    <Table
-                      aria-label={`Game ${game.gameIndex} Summary`}
-                      color="primary"
-                    >
-                      <TableHeader columns={gameTableColumns}>
-                        {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
-                      </TableHeader>
-                      <TableBody items={game.data}>
-                        {(item) => (<TableRow key={item.player}>{(columnKey) => <TableCell>{item[columnKey as keyof typeof item]}</TableCell>}</TableRow>)}
-                      </TableBody>
-                    </Table>
+                    <GameTable data={game.data} gameIndex={game.gameIndex} />
                   </div>
                 ))}
               </div>

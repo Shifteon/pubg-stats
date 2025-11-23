@@ -1,13 +1,13 @@
-import { 
-  AVERAGE_KILLS_STAT_NAME, 
-  AVERAGE_DAMAGE_STAT_NAME, 
-  KILLS_STAT_NAME, 
-  DAMAGE_STAT_NAME, 
-  TEAM_NO_TRENTON, 
-  TEAM_NO_CODY, 
-  TEAM_NO_BEN, 
-  TEAM_NO_ISAAC, 
-  TEAM_ALL, 
+import {
+  AVERAGE_KILLS_STAT_NAME,
+  AVERAGE_DAMAGE_STAT_NAME,
+  KILLS_STAT_NAME,
+  DAMAGE_STAT_NAME,
+  TEAM_NO_TRENTON,
+  TEAM_NO_CODY,
+  TEAM_NO_BEN,
+  TEAM_NO_ISAAC,
+  TEAM_ALL,
   TEST_TEAM,
   GAME_INDEX_KEY,
   ISAAC_LOWERCASE,
@@ -20,13 +20,13 @@ import {
   KILL_STEALING_STAT_NAME
 } from "./constants";
 
-export type StatName = typeof AVERAGE_KILLS_STAT_NAME 
-| typeof AVERAGE_DAMAGE_STAT_NAME 
-| typeof KILLS_STAT_NAME 
-| typeof DAMAGE_STAT_NAME 
-| typeof WIN_RATE_STAT_NAME 
-| typeof GAME_SUMMARY_STAT_NAME
-| typeof KILL_STEALING_STAT_NAME;
+export type StatName = typeof AVERAGE_KILLS_STAT_NAME
+  | typeof AVERAGE_DAMAGE_STAT_NAME
+  | typeof KILLS_STAT_NAME
+  | typeof DAMAGE_STAT_NAME
+  | typeof WIN_RATE_STAT_NAME
+  | typeof GAME_SUMMARY_STAT_NAME
+  | typeof KILL_STEALING_STAT_NAME;
 
 export type TeamName = typeof TEAM_NO_TRENTON | typeof TEAM_NO_CODY | typeof TEAM_NO_BEN | typeof TEAM_NO_ISAAC | typeof TEAM_ALL | typeof TEST_TEAM;
 
@@ -84,3 +84,12 @@ export type StatArray = AveragesArray;
 
 // these are array that will be used on the frontend
 export type FrontendStatArray = IndividualStatsArray | WinRateArray;
+
+export interface PlayerGameStat {
+  player: string;
+  kills: number;
+  assists: number;
+  damage: number;
+  rescues: number;
+  recalls: number;
+}
