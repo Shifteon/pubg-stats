@@ -82,7 +82,7 @@ export default function GamesInRange({ allGameData, team }: GamesInRangeProps) {
           <GameByGame gameData={gamesInRange} team={team} />
         </Tab>
         <Tab key="player-avgs" title="Player Averages">
-          <PlayerStatsGrid playerStats={playerAvgsInRange} valueFormatter={(v) => v.toFixed(2)} />
+          <PlayerStatsGrid playerStats={playerAvgsInRange} valueFormatter={(v) => v.toFixed(2)} team={team} />
         </Tab>
       </Tabs>
     </>

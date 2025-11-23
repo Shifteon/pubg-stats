@@ -12,7 +12,7 @@ interface GameModalProps {
 
 export default function GameModal({ isOpen, onOpenChange, game }: GameModalProps) {
   return (
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="5xl" scrollBehavior="inside">
+    <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="5xl" scrollBehavior="inside" backdrop="blur">
       <ModalContent>
         {(onClose) => (
           <>

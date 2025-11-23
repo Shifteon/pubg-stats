@@ -2,7 +2,7 @@
 
 import { TeamName } from "@/types";
 import { useMemo } from "react";
-import PlayerStatsGrid from "./playerStatsGrid";
+import PlayerStatsGrid, { StatValue } from "./playerStatsGrid";
 import { playerMapping, statKeys } from "../utils";
 
 export interface PersonalBestsProps {
@@ -18,12 +18,12 @@ export default function PersonalBests({ gameData, team }: PersonalBestsProps) {
     }
 
     const players = playerMapping[team] || [];
-    const playerBests: Record<string, Record<string, number>> = {};
+    const playerBests: Record<string, Record<string, StatValue>> = {};
 
     players.forEach(player => {
       playerBests[player] = {};
       statKeys.forEach(stat => {
-        playerBests[player][stat] = 0;
+        playerBests[player][stat] = { value: 0, game: null };
       });
     });
 
@@ -32,8 +32,11 @@ export default function PersonalBests({ gameData, team }: PersonalBestsProps) {
         statKeys.forEach(stat => {
           const playerStatKey = `${player}_${stat}`;
           const statValue = parseFloat(game[playerStatKey]);
-          if (statValue > playerBests[player][stat]) {
-            playerBests[player][stat] = statValue;
+          const currentBest = playerBests[player][stat];
+          const currentBestValue = typeof currentBest === 'object' && currentBest !== null && 'value' in currentBest ? currentBest.value : currentBest as number;
+
+          if (statValue > currentBestValue) {
+            playerBests[player][stat] = { value: statValue, game: game };
           }
         });
       });
@@ -43,6 +46,6 @@ export default function PersonalBests({ gameData, team }: PersonalBestsProps) {
   }, [gameData, team]);
 
   return (
-    <PlayerStatsGrid playerStats={playerHighestStats} />
+    <PlayerStatsGrid playerStats={playerHighestStats} team={team} />
   );
 }
