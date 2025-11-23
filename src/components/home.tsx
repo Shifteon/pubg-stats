@@ -77,6 +77,9 @@ export default function HomeComponent() {
 
   const handleTeamChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const newTeam = e.target.value as TeamName;
+    if (!newTeam || newTeam === selectedTeam) {
+      return;
+    }
     setSelectedTeam(newTeam);
     handleUpdateParam('team', newTeam);
   };
