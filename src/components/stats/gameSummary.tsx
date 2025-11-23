@@ -5,7 +5,7 @@ import { Accordion, AccordionItem, Avatar, Card, CardBody, CardFooter, CardHeade
 import { useEffect, useMemo, useState } from "react";
 import { Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/react";
 import { GameSummaryStat } from "@/stats/gameSummaryStat";
-import { AVATAR_SRC_MAP, TEAM_ALL, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON } from "@/constants";
+import { AVATAR_SRC_MAP, TEAM_ALL, TEAM_ISAAC_BEN, TEAM_ISAAC_CODY, TEAM_ISAAC_TRENTON, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON } from "@/constants";
 import Overview from "./overview";
 import PlayerStatsGrid from "./playerStatsGrid";
 
@@ -37,6 +37,9 @@ const playerMapping: Record<string, IndividualName[]> = {
   [TEAM_NO_TRENTON]: ["isaac", "cody", "ben"],
   [TEAM_NO_CODY]: ["isaac", "trenton", "ben"],
   [TEAM_NO_ISAAC]: ["cody", "trenton", "ben"],
+  [TEAM_ISAAC_BEN]: ["isaac", "ben"],
+  [TEAM_ISAAC_TRENTON]: ["isaac", "trenton"],
+  [TEAM_ISAAC_CODY]: ["isaac", "cody"],
 };
 
 export default function GameSummary({ team }: GameSummaryProps) {
@@ -214,9 +217,9 @@ export default function GameSummary({ team }: GameSummaryProps) {
 
   return (
     <div className="w-full flex flex-col items-center mt-4">
-      <Accordion 
-        selectionMode="multiple" 
-        className="w-full mt-4" 
+      <Accordion
+        selectionMode="multiple"
+        className="w-full mt-4"
         defaultExpandedKeys="all"
         variant="bordered"
       >
@@ -247,7 +250,7 @@ export default function GameSummary({ team }: GameSummaryProps) {
                 {paginatedGameTables.map((game, index) => (
                   <div key={index} className="w-full">
                     <h3 className="text-xl font-semibold mb-2">Game {game.gameIndex} - {game.win === 1 ? "🏆 Win" : "❌ Loss"}</h3>
-                    <Table 
+                    <Table
                       aria-label={`Game ${game.gameIndex} Summary`}
                       color="primary"
                     >

@@ -6,6 +6,11 @@ export const TEAM_NO_BEN = "B";
 export const TEAM_NO_ISAAC = "I";
 export const TEAM_ALL = "All";
 export const TEST_TEAM = "testTeam";
+// two man teams
+export const TEAM_ISAAC_TRENTON = "IT";
+export const TEAM_ISAAC_CODY = "IC";
+export const TEAM_ISAAC_BEN = "IB";
+export const TWO_MAN_TEAMS = [TEAM_ISAAC_TRENTON, TEAM_ISAAC_CODY, TEAM_ISAAC_BEN];
 export const VALID_TEAM_NAMES = [
   TEAM_NO_TRENTON,
   TEAM_NO_CODY,
@@ -13,6 +18,9 @@ export const VALID_TEAM_NAMES = [
   TEAM_NO_ISAAC,
   TEAM_ALL,
   TEST_TEAM,
+  TEAM_ISAAC_TRENTON,
+  TEAM_ISAAC_CODY,
+  TEAM_ISAAC_BEN,
 ];
 
 export const AVATAR_SRC_MAP: Record<string, string> = {
@@ -45,7 +53,7 @@ export const BEN_LOWERCASE = "ben";
 export const TRENTON_LOWERCASE = "trenton";
 export const TEAM_LOWERCASE = "team";
 
-export const STATS_FILE_MAP: {[key in StatName]: string} = {
+export const STATS_FILE_MAP: { [key in StatName]: string } = {
   [AVERAGE_DAMAGE_STAT_NAME]: AVERAGE_DAMAGE_STAT_FILE,
   [AVERAGE_KILLS_STAT_NAME]: AVERAGE_KILLS_STAT_FILE,
   [KILLS_STAT_NAME]: KILLS_STAT_FILE,
@@ -65,7 +73,7 @@ export const SUPPORTED_STATS: StatName[] = [
   GAME_SUMMARY_STAT_NAME,
 ];
 
-export const STAT_KEY_MAP: {[key in StatName]: string[]} = {
+export const STAT_KEY_MAP: { [key in StatName]: string[] } = {
   [AVERAGE_DAMAGE_STAT_NAME]: [
     'isaac_damage',
     'cody_damage',
@@ -119,8 +127,6 @@ export const STAT_KEY_MAP: {[key in StatName]: string[]} = {
     "win",
     "total_kills",
     "total_assists",
-    "total_damage",
-    "total_rescues",
     "total_recalls",
   ],
   [KILL_STEALING_STAT_NAME]: [
@@ -129,6 +135,52 @@ export const STAT_KEY_MAP: {[key in StatName]: string[]} = {
     "trenton_steals",
     "ben_steals",
   ],
+};
+
+export const TWO_MAN_GAME_SUMMARY_KEYS = [
+  "isaac_kills",
+  "team_mate_kills",
+  "isaac_assists",
+  "team_mate_assists",
+  "isaac_damage",
+  "team_mate_damage",
+  "isaac_rescues",
+  "team_mate_rescues",
+  "isaac_recalls",
+  "team_mate_recalls",
+  "win",
+  "total_kills",
+  "total_assists",
+  "total_damage",
+  "total_rescues",
+  "total_recalls",
+];
+
+export const getStatKeys = (statName: StatName, teamName: string): string[] => {
+  if (!VALID_TEAM_NAMES.includes(teamName)) {
+    throw new Error(`Invalid team name: ${teamName}`);
+  }
+  if (!SUPPORTED_STATS.includes(statName)) {
+    throw new Error(`Invalid stat name: ${statName}`);
+  }
+  // this is the same no matter what
+  if (statName === WIN_RATE_STAT_NAME) {
+    return STAT_KEY_MAP[statName];
+  }
+
+  if (statName === GAME_SUMMARY_STAT_NAME && TWO_MAN_TEAMS.includes(teamName)) {
+    const teamMembers = TEAM_MEMBER_MAP[teamName];
+    const teamMate = teamMembers.find((member) => member !== ISAAC_LOWERCASE && member !== TEAM_LOWERCASE);
+
+    if (teamMate) {
+      return TWO_MAN_GAME_SUMMARY_KEYS.map((key) => key.replace("team_mate", teamMate));
+    }
+  }
+
+  if (TWO_MAN_TEAMS.includes(teamName)) {
+    return STAT_KEY_MAP[statName].filter((key) => key.includes("total") || TEAM_MEMBER_MAP[teamName].some((teamMember) => key.includes(teamMember)));
+  }
+  return STAT_KEY_MAP[statName];
 };
 
 export const LINE_CHART = "line";
@@ -166,6 +218,9 @@ export const TEAM_MEMBER_MAP: Record<string, string[]> = {
   [TEAM_NO_CODY]: [ISAAC_LOWERCASE, BEN_LOWERCASE, TRENTON_LOWERCASE, TEAM_LOWERCASE],
   [TEAM_NO_ISAAC]: [CODY_LOWERCASE, BEN_LOWERCASE, TRENTON_LOWERCASE, TEAM_LOWERCASE],
   [TEAM_NO_TRENTON]: [ISAAC_LOWERCASE, CODY_LOWERCASE, BEN_LOWERCASE, TEAM_LOWERCASE],
+  [TEAM_ISAAC_BEN]: [ISAAC_LOWERCASE, BEN_LOWERCASE, TEAM_LOWERCASE],
+  [TEAM_ISAAC_CODY]: [ISAAC_LOWERCASE, CODY_LOWERCASE, TEAM_LOWERCASE],
+  [TEAM_ISAAC_TRENTON]: [ISAAC_LOWERCASE, TRENTON_LOWERCASE, TEAM_LOWERCASE],
 };
 
 // we cut off 10% of game data to normalize it

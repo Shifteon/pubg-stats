@@ -1,4 +1,4 @@
-import { AVERAGE_KILLS_DISPLAY_NAME, AVERAGE_KILLS_STAT_NAME, LINE_CHART, STAT_KEY_MAP } from "@/constants";
+import { AVERAGE_KILLS_DISPLAY_NAME, AVERAGE_KILLS_STAT_NAME, getStatKeys, LINE_CHART } from "@/constants";
 import { StatBase, StatData } from "./statBase";
 
 export class AverageKillsStat extends StatBase {
@@ -7,6 +7,11 @@ export class AverageKillsStat extends StatBase {
   }
 
   public async getStats(team: string): Promise<StatData| null> {
-    return await this.getStatData(team, STAT_KEY_MAP[AVERAGE_KILLS_STAT_NAME]);
+    try {
+      const statKeys = getStatKeys(AVERAGE_KILLS_STAT_NAME, team);
+      return await this.getStatData(team, statKeys);
+    } catch {
+      return null;
+    }
   }
 }

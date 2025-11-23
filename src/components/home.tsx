@@ -2,22 +2,23 @@
 
 import { Avatar, Chip, Select, SelectItem, Tab, Tabs } from "@heroui/react";
 import GamePerformanceStat from "./stats/gamePerformance";
-import { AVATAR_SRC_MAP, GAME_SUMMARY_STAT_NAME, SUPPORTED_STATS, TEAM_ALL, TEAM_MEMBER_MAP, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON } from "@/constants";
-import { ChangeEvent, useEffect, useState } from "react";
-import { IndividualName, TeamName } from "@/types";
+import { AVATAR_SRC_MAP, GAME_SUMMARY_STAT_NAME, KILL_STEALING_STAT_NAME, SUPPORTED_STATS, TEAM_ALL, TEAM_ISAAC_BEN, TEAM_ISAAC_CODY, TEAM_ISAAC_TRENTON, TEAM_MEMBER_MAP, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON, TWO_MAN_TEAMS } from "@/constants";
+import { ChangeEvent, useCallback, useEffect, useState } from "react";
+import { Key } from '@react-types/shared';
+import { IndividualName, StatName, TeamName } from "@/types";
 import React from "react";
 import GameSummary from "./stats/gameSummary";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 const teamOptions = [
-  {key: TEAM_ALL, label: TEAM_ALL},
-  {key: TEAM_NO_BEN, label: 'Isaac, Cody, Trenton'},
-  {key: TEAM_NO_TRENTON, label: 'Isaac, Cody, Ben'},
-  {key: TEAM_NO_CODY, label: 'Isaac, Ben, Trenton'},
-  {key: TEAM_NO_ISAAC, label: 'Cody, Ben, Trenton'},
-];
-
-const stats = [
-  ...SUPPORTED_STATS.filter(stat => stat !== GAME_SUMMARY_STAT_NAME)
+  { key: TEAM_ALL, label: TEAM_ALL },
+  { key: TEAM_NO_BEN, label: 'Isaac, Cody, Trenton' },
+  { key: TEAM_NO_TRENTON, label: 'Isaac, Cody, Ben' },
+  { key: TEAM_NO_CODY, label: 'Isaac, Ben, Trenton' },
+  { key: TEAM_NO_ISAAC, label: 'Cody, Ben, Trenton' },
+  { key: TEAM_ISAAC_BEN, label: 'Isaac, Ben' },
+  { key: TEAM_ISAAC_CODY, label: 'Isaac, Cody' },
+  { key: TEAM_ISAAC_TRENTON, label: 'Isaac, Trenton' },
 ];
 
 const CloseIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -44,12 +45,47 @@ const PlusIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 export default function HomeComponent() {
-  const [selectedTeam, setSelectedTeam] = useState<TeamName>(TEAM_ALL);
-  const [selectedMembers, setSelectedMembers] = useState<IndividualName[]>(TEAM_MEMBER_MAP[selectedTeam] as IndividualName[]);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
 
-  const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    setSelectedTeam(e.target.value as TeamName);
+  const [selectedTeam, setSelectedTeam] = useState<TeamName>(() => {
+    const teamFromParams = searchParams.get('team') as TeamName;
+    if (teamFromParams && teamOptions.some(o => o.key === teamFromParams)) {
+      return teamFromParams;
+    }
+    return TEAM_ALL;
+  });
+  const [selectedMembers, setSelectedMembers] = useState<IndividualName[]>(TEAM_MEMBER_MAP[selectedTeam] as IndividualName[]);
+  const [selectedTab, setSelectedTab] = useState<Key>(() => {
+    const tabFromParams = searchParams.get('tab') as Key;
+    if (tabFromParams && ['summary', 'graphs'].includes(tabFromParams as string)) {
+      return tabFromParams;
+    }
+    return 'summary' as Key;
+  });
+
+  const initStatsToGraph = () => {
+    if (TWO_MAN_TEAMS.includes(selectedTeam)) {
+      // Two man teams don't have kill stealing stat
+      return [...SUPPORTED_STATS.filter(stat => stat !== GAME_SUMMARY_STAT_NAME && stat !== KILL_STEALING_STAT_NAME)];
+    }
+    return [...SUPPORTED_STATS.filter(stat => stat !== GAME_SUMMARY_STAT_NAME)];
   };
+
+  const [statsToGraph, setStatsToGraph] = useState<StatName[]>(initStatsToGraph());
+
+  const handleTeamChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const newTeam = e.target.value as TeamName;
+    setSelectedTeam(newTeam);
+    handleUpdateParam('team', newTeam);
+  };
+
+  const handleTabChange = (newTab: Key) => {
+    setSelectedTab(newTab);
+    handleUpdateParam('tab', newTab as string);
+  };
+
 
   const handleMemberSelectionChange = (memberName: IndividualName) => {
     setSelectedMembers(prevSelected => {
@@ -61,17 +97,42 @@ export default function HomeComponent() {
     });
   };
 
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set(name, value);
+      return params.toString();
+    },
+    [searchParams]
+  );
+
+  const handleUpdateParam = (paramName: string, paramValue: string) => {
+    router.push(pathname + '?' + createQueryString(paramName, paramValue));
+  };
+
+  useEffect(() => {
+    const teamFromParams = searchParams.get('team') as TeamName;
+    const tabFromParams = searchParams.get('tab') as Key;
+    if (teamFromParams && teamOptions.some(o => o.key === teamFromParams) && teamFromParams !== selectedTeam) {
+      setSelectedTeam(teamFromParams);
+    }
+    if (tabFromParams && ['summary', 'graphs'].includes(tabFromParams as string) && tabFromParams !== selectedTab) {
+      setSelectedTab(tabFromParams);
+    }
+  }, [searchParams]);
+
   useEffect(() => {
     setSelectedMembers(TEAM_MEMBER_MAP[selectedTeam] as IndividualName[]);
+    setStatsToGraph(initStatsToGraph());
   }, [selectedTeam]);
 
   return (
     <>
       <div className="mt-2 mr-2 ml-2 mb-10 xl:m-10 lg:m-5 md:m-3">
-        <Select 
+        <Select
           label="Select a team"
           selectionMode="single"
-          onChange={handleChange}
+          onChange={handleTeamChange}
           selectedKeys={[selectedTeam]}
         >
           {teamOptions.map((team) => (
@@ -83,6 +144,8 @@ export default function HomeComponent() {
           className="mt-5"
           destroyInactiveTabPanel={true}
           color="primary"
+          onSelectionChange={handleTabChange}
+          selectedKey={selectedTab}
         >
           <Tab key="summary" title="Summary">
             <GameSummary team={selectedTeam} />
@@ -110,7 +173,7 @@ export default function HomeComponent() {
               </div>
             </div>
             <div className="lg:grid lg:grid-cols-2 gap-1">
-              {stats.map((statName, index) => (
+              {statsToGraph.map((statName, index) => (
                 <React.Fragment key={index}>
                   <GamePerformanceStat team={selectedTeam} statName={statName} selectedMembers={selectedMembers}></GamePerformanceStat>
                 </React.Fragment>

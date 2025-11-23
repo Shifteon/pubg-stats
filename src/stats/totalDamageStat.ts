@@ -1,4 +1,4 @@
-import { DAMAGE_STAT_NAME, DAMAGE_DISPLAY_NAME, BAR_CHART, STAT_KEY_MAP } from "@/constants";
+import { DAMAGE_STAT_NAME, DAMAGE_DISPLAY_NAME, BAR_CHART, getStatKeys } from "@/constants";
 import { StatBase, StatData } from "./statBase";
 
 export class TotalDamageStat extends StatBase {
@@ -7,13 +7,18 @@ export class TotalDamageStat extends StatBase {
   }
 
   public async getStats(team: string): Promise<StatData| null> {
-    const data = await this.getStatData(team, STAT_KEY_MAP[DAMAGE_STAT_NAME]);
-    if (!data) {
+    try {
+      const statKeys = getStatKeys(DAMAGE_STAT_NAME, team);
+      const data = await this.getStatData(team, statKeys);
+      if (!data) {
+        return null;
+      }
+      return {
+        chartOptions: data.chartOptions,
+        data: data.data.slice(-1),
+      }
+    } catch {
       return null;
-    }
-    return {
-      chartOptions: data.chartOptions,
-      data: data.data.slice(-1),
     }
   }
 }

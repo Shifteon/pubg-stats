@@ -1,4 +1,4 @@
-import { BAR_CHART, GAME_SUMMARY_DISPLAY_NAME, GAME_SUMMARY_STAT_NAME, STAT_KEY_MAP } from "@/constants";
+import { BAR_CHART, GAME_SUMMARY_DISPLAY_NAME, GAME_SUMMARY_STAT_NAME, getStatKeys } from "@/constants";
 import { StatBase, StatData } from "./statBase";
 import { TeamName } from "@/types";
 
@@ -9,12 +9,18 @@ export class GameSummaryStat extends StatBase {
   }
 
   async getStats(team: TeamName): Promise<StatData | null> {
-    const data = await this.getStatData(team, STAT_KEY_MAP[GAME_SUMMARY_STAT_NAME], false);
+    try {
+      const statKeys = getStatKeys(GAME_SUMMARY_STAT_NAME, team);
+      const data = await this.getStatData(team, statKeys, false);
 
-    if (!data?.data || data.data.length === 0) {
+      if (!data?.data || data.data.length === 0) {
+        return null;
+      }
+      console.log(data.data);
+
+      return { data: data.data, chartOptions: data?.chartOptions };
+    } catch {
       return null;
     }
-
-    return { data: data.data, chartOptions: data?.chartOptions };
   }
 }

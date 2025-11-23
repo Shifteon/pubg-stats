@@ -1,4 +1,4 @@
-import { WIN_RATE_STAT_NAME, LINE_CHART, STAT_KEY_MAP, WIN_RATE_DISPLAY_NAME } from "@/constants";
+import { WIN_RATE_STAT_NAME, LINE_CHART, WIN_RATE_DISPLAY_NAME, getStatKeys } from "@/constants";
 import { StatBase, StatData } from "./statBase";
 
 export class WinRateStat extends StatBase {
@@ -9,6 +9,11 @@ export class WinRateStat extends StatBase {
   }
 
   public async getStats(team: string): Promise<StatData| null> {
-    return await this.getStatData(team, STAT_KEY_MAP[WIN_RATE_STAT_NAME]);
+    try {
+      const statKeys = getStatKeys(WIN_RATE_STAT_NAME, team);
+      return await this.getStatData(team, statKeys);
+    } catch {
+      return null;
+    }
   }
 }
