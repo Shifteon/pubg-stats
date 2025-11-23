@@ -3,33 +3,35 @@
 import { Link, Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenu, NavbarMenuItem } from "@heroui/react";
 import CacheRefreshButton from "./cacheRefreshButton";
 import ThemeSwitcher from "./themeSwitcher";
+import { Suspense } from "react";
+import LoadingSpinner from "./loadingSpinner";
 
 export const Logo = () => {
   return (
-    <svg 
-      viewBox="0 0 32 32" 
-      fill="none" 
+    <svg
+      viewBox="0 0 32 32"
+      fill="none"
       xmlns="http://www.w3.org/2000/svg"
       width={36}
       height={36}
-      // Pass any props like className, height, width, etc.
-      // {...props}
+    // Pass any props like className, height, width, etc.
+    // {...props}
     >
       {/* Outer Circle Reticle (Targeting/Crosshair) */}
-      <circle 
-        cx="16" 
-        cy="16" 
-        r="14" 
-        stroke="currentColor" 
-        strokeWidth="2" 
+      <circle
+        cx="16"
+        cy="16"
+        r="14"
+        stroke="currentColor"
+        strokeWidth="2"
         fill="none"
       />
 
       {/* Vertical and Horizontal Reticle Lines */}
-      <path 
-        d="M16 2V30M2 16H30" 
-        stroke="currentColor" 
-        strokeWidth="1" 
+      <path
+        d="M16 2V30M2 16H30"
+        stroke="currentColor"
+        strokeWidth="1"
         strokeLinecap="round"
       />
 
@@ -46,28 +48,30 @@ export default function NavLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-    <Navbar
-      shouldHideOnScroll
-      maxWidth="xl"
-    >
-      <NavbarContent justify="start">
-        <NavbarBrand>
-          <Link href="/" color="foreground">
-            <Logo />
-            <span className="ml-1">PUBG Stats</span>
-          </Link>
-        </NavbarBrand>
-      </NavbarContent>
-      <NavbarContent justify="end">
-        <NavbarItem>
-          <CacheRefreshButton />
-        </NavbarItem>
-        <NavbarItem>
-          <ThemeSwitcher />
-        </NavbarItem>
-      </NavbarContent>
-    </Navbar>
-    {children}
+      <Navbar
+        shouldHideOnScroll
+        maxWidth="xl"
+      >
+        <NavbarContent justify="start">
+          <NavbarBrand>
+            <Link href="/" color="foreground">
+              <Logo />
+              <span className="ml-1">PUBG Stats</span>
+            </Link>
+          </NavbarBrand>
+        </NavbarContent>
+        <NavbarContent justify="end">
+          <NavbarItem>
+            <CacheRefreshButton />
+          </NavbarItem>
+          <NavbarItem>
+            <ThemeSwitcher />
+          </NavbarItem>
+        </NavbarContent>
+      </Navbar>
+      <Suspense fallback={<LoadingSpinner />}>
+        {children}
+      </Suspense>
     </>
   );
 }

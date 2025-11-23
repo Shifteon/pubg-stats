@@ -8,6 +8,7 @@ import { GameSummaryStat } from "@/stats/gameSummaryStat";
 import { AVATAR_SRC_MAP, TEAM_ALL, TEAM_ISAAC_BEN, TEAM_ISAAC_CODY, TEAM_ISAAC_TRENTON, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON } from "@/constants";
 import Overview from "./overview";
 import PlayerStatsGrid from "./playerStatsGrid";
+import LoadingSpinner from "../loadingSpinner";
 
 export interface GameSummaryProps {
   team: TeamName;
@@ -201,9 +202,7 @@ export default function GameSummary({ team }: GameSummaryProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center w-full h-full p-5 mt-2">
-        <Spinner size="lg" label="Loading" labelColor="primary"></Spinner>
-      </div>
+      <LoadingSpinner />
     );
   }
 
