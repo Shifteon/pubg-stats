@@ -1,4 +1,4 @@
-import HomeComponent from "@/components/home";
+import HomeComponent from "@/components/home/home";
 import NavLayout from "@/components/navLayout";
 
 export default function Home() {

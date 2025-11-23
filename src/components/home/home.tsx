@@ -1,13 +1,13 @@
 "use client";
 
 import { Avatar, Chip, Select, SelectItem, Tab, Tabs } from "@heroui/react";
-import GamePerformanceStat from "./stats/gamePerformance";
+import GamePerformanceStat from "../gamePerformance/gamePerformance";
 import { AVATAR_SRC_MAP, GAME_SUMMARY_STAT_NAME, KILL_STEALING_STAT_NAME, SUPPORTED_STATS, TEAM_ALL, TEAM_ISAAC_BEN, TEAM_ISAAC_CODY, TEAM_ISAAC_TRENTON, TEAM_MEMBER_MAP, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON, TWO_MAN_TEAMS } from "@/constants";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { Key } from '@react-types/shared';
 import { IndividualName, StatName, TeamName } from "@/types";
 import React from "react";
-import GameSummary from "./stats/gameSummary";
+import GameSummary from "../gameSummary/gameSummary";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 const teamOptions = [
