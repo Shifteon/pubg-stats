@@ -93,3 +93,9 @@ export interface PlayerGameStat {
   rescues: number;
   recalls: number;
 }
+
+export interface GameSummaryData {
+  win: number;
+  gameIndex: number;
+  data: PlayerGameStat[];
+}

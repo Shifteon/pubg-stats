@@ -1,7 +1,7 @@
 "use client";
 
-import { IndividualName, TeamName, PlayerGameStat } from "@/types";
-import { Accordion, AccordionItem, Avatar, Card, CardBody, CardFooter, CardHeader, Pagination, Slider, Tab, Tabs } from "@heroui/react";
+import { IndividualName, TeamName, PlayerGameStat, GameSummaryData } from "@/types";
+import { Accordion, AccordionItem, Avatar, Card, CardBody, CardFooter, CardHeader, Pagination, Slider, Tab, Tabs, useDisclosure } from "@heroui/react";
 import { useEffect, useMemo, useState } from "react";
 import { GameSummaryStat } from "@/stats/gameSummaryStat";
 import { AVATAR_SRC_MAP, TEAM_ALL, TEAM_ISAAC_BEN, TEAM_ISAAC_CODY, TEAM_ISAAC_TRENTON, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON } from "@/constants";
@@ -9,6 +9,7 @@ import Overview from "./overview";
 import PlayerStatsGrid from "./playerStatsGrid";
 import LoadingSpinner from "../loadingSpinner";
 import GameTable from "./GameTable";
+import GameModal from "./GameModal";
 
 export interface GameSummaryProps {
   team: TeamName;
@@ -20,6 +21,7 @@ interface HighestStat {
   player: IndividualName;
   value: number;
   stat: string;
+  gameIndex: number;
 }
 
 
@@ -43,6 +45,8 @@ export default function GameSummary({ team }: GameSummaryProps) {
   const [loadingError, setLoadingError] = useState(false);
   const [gameByGamePage, setGameByGamePage] = useState(1);
   const [gameRange, setGameRange] = useState<number[]>([0, 0]);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [selectedGame, setSelectedGame] = useState<GameSummaryData | null>(null);
 
   const statClass = useMemo(() => new GameSummaryStat(), []);
 
@@ -75,14 +79,14 @@ export default function GameSummary({ team }: GameSummaryProps) {
     const players = playerMapping[team] || [];
 
     return statKeys.map(stat => {
-      let highest: HighestStat = { player: "ben", value: -1, stat };
+      let highest: HighestStat = { player: "ben", value: -1, stat, gameIndex: -1 };
 
       allGameData.forEach(game => {
         players.forEach(player => {
           const playerStatKey = `${player}_${stat}`;
           const statValue = parseFloat(game[playerStatKey]);
           if (statValue > highest.value) {
-            highest = { player, value: statValue, stat };
+            highest = { player, value: statValue, stat, gameIndex: game.gameIndex };
           }
         });
       });
@@ -154,6 +158,23 @@ export default function GameSummary({ team }: GameSummaryProps) {
     return playerTotals;
   }, [gamesInRange, team]);
 
+  const processGameData = (game: any, players: IndividualName[]): GameSummaryData => {
+    const gamePlayerData: PlayerGameStat[] = players.map(player => {
+      const playerData: any = { player: player.charAt(0).toUpperCase() + player.slice(1) };
+      statKeys.forEach(stat => {
+        playerData[stat] = game[`${player}_${stat}` as keyof typeof game] || 0;
+      });
+      return playerData as PlayerGameStat;
+    });
+
+    const totalRow: any = { player: 'Total' };
+    statKeys.forEach(stat => {
+      totalRow[stat] = game[`total_${stat}` as keyof typeof game] || 0;
+    });
+
+    return { win: game.win, gameIndex: game.gameIndex, data: [...gamePlayerData, totalRow as PlayerGameStat] };
+  };
+
   const gameTablesData = useMemo(() => {
     if (gamesInRange.length === 0) {
       return [];
@@ -161,23 +182,17 @@ export default function GameSummary({ team }: GameSummaryProps) {
 
     const players = playerMapping[team] || [];
 
-    return [...gamesInRange].reverse().map(game => {
-      const gamePlayerData: PlayerGameStat[] = players.map(player => {
-        const playerData: any = { player: player.charAt(0).toUpperCase() + player.slice(1) };
-        statKeys.forEach(stat => {
-          playerData[stat] = game[`${player}_${stat}` as keyof typeof game] || 0;
-        });
-        return playerData as PlayerGameStat;
-      });
-
-      const totalRow: any = { player: 'Total' };
-      statKeys.forEach(stat => {
-        totalRow[stat] = game[`total_${stat}` as keyof typeof game] || 0;
-      });
-
-      return { win: game.win, gameIndex: game.gameIndex, data: [...gamePlayerData, totalRow as PlayerGameStat] };
-    });
+    return [...gamesInRange].reverse().map(game => processGameData(game, players));
   }, [gamesInRange, team]);
+
+  const handleCardClick = (gameIndex: number) => {
+    const game = allGameData.find(g => g.gameIndex === gameIndex);
+    if (game) {
+      const players = playerMapping[team] || [];
+      setSelectedGame(processGameData(game, players));
+      onOpen();
+    }
+  };
 
 
 
@@ -262,8 +277,8 @@ export default function GameSummary({ team }: GameSummaryProps) {
         </AccordionItem>
         <AccordionItem key="hall-of-fame" title="Hall of Fame">
           <div className="grid grid-cols-3 gap-2 md:grid-cols-3 lg:grid-cols-5 lg:gap-4 w-full">
-            {highestStats.map(({ player, value, stat }) => (
-              <Card key={stat}>
+            {highestStats.map(({ player, value, stat, gameIndex }) => (
+              <Card key={stat} isPressable onPress={() => handleCardClick(gameIndex)}>
                 <CardHeader className="justify-center">
                   <h3 className="text-lg font-semibold capitalize">{stat}</h3>
                 </CardHeader>
@@ -285,6 +300,13 @@ export default function GameSummary({ team }: GameSummaryProps) {
           <PlayerStatsGrid playerStats={playerHighestStats} />
         </AccordionItem>
       </Accordion>
+      {selectedGame && (
+        <GameModal
+          isOpen={isOpen}
+          onOpenChange={onOpenChange}
+          game={selectedGame}
+        />
+      )}
     </div>
   );
 }
