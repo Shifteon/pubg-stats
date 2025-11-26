@@ -127,6 +127,8 @@ export const STAT_KEY_MAP: { [key in StatName]: string[] } = {
     "win",
     "total_kills",
     "total_assists",
+    "total_damage",
+    "total_rescues",
     "total_recalls",
   ],
   [KILL_STEALING_STAT_NAME]: [
