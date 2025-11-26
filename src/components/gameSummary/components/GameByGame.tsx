@@ -4,6 +4,7 @@ import { TeamName } from "@/types";
 import { Pagination, Accordion, AccordionItem } from "@heroui/react";
 import { useEffect, useMemo, useState } from "react";
 import GameTable from "./GameTable";
+import GameSort, { SortConfig } from "./GameSort";
 import { playerMapping, statKeys, processGameData } from "../utils";
 import GameFilter, { Filter } from "./GameFilter";
 
@@ -17,6 +18,7 @@ export default function GameByGame({ gameData, team }: GameByGameProps) {
   const [gameByGamePage, setGameByGamePage] = useState(1);
   const [filters, setFilters] = useState<Filter[]>([]);
   const [filterResult, setFilterResult] = useState<string>("all");
+  const [sortConfig, setSortConfig] = useState<SortConfig | null>(null);
 
   const players = useMemo(() => {
     const teamPlayers = playerMapping[team] || [];
@@ -50,8 +52,28 @@ export default function GameByGame({ gameData, team }: GameByGameProps) {
       return [];
     }
 
-    return [...filteredGameData].reverse().map(game => processGameData(game, team));
-  }, [filteredGameData, team]);
+    let dataToSort = [...filteredGameData];
+
+    if (sortConfig) {
+      dataToSort.sort((a, b) => {
+        const key = sortConfig.player === 'Total'
+          ? `total_${sortConfig.stat}`
+          : `${sortConfig.player.toLowerCase()}_${sortConfig.stat}`;
+
+        const valA = a[key] || 0;
+        const valB = b[key] || 0;
+
+        if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+    } else {
+      // Default reverse chronological order if no sort is applied
+      dataToSort = dataToSort.reverse();
+    }
+
+    return dataToSort.map(game => processGameData(game, team));
+  }, [filteredGameData, team, sortConfig]);
 
   const gamesPerPage = 10;
   const totalGamePages = Math.ceil(gameTablesData.length / gamesPerPage);
@@ -88,7 +110,7 @@ export default function GameByGame({ gameData, team }: GameByGameProps) {
   return (
     <>
       <Accordion variant="bordered">
-        <AccordionItem key="1" aria-label="Filters" title="Filters">
+        <AccordionItem key="1" aria-label="Filter and Sort" title="Filter and Sort">
           <GameFilter
             players={players}
             stats={statKeys}
@@ -98,6 +120,15 @@ export default function GameByGame({ gameData, team }: GameByGameProps) {
             filterResult={filterResult}
             onFilterResultChange={(value) => {
               setFilterResult(value);
+              setGameByGamePage(1);
+            }}
+          />
+          <GameSort
+            players={players}
+            stats={statKeys}
+            sortConfig={sortConfig}
+            onSortChange={(config) => {
+              setSortConfig(config);
               setGameByGamePage(1);
             }}
           />
