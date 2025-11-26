@@ -1,10 +1,11 @@
 "use client";
 
 import { TeamName } from "@/types";
-import { Pagination } from "@heroui/react";
+import { Pagination, Accordion, AccordionItem } from "@heroui/react";
 import { useEffect, useMemo, useState } from "react";
 import GameTable from "./GameTable";
-import { processGameData } from "../utils";
+import { playerMapping, statKeys, processGameData } from "../utils";
+import GameFilter, { Filter } from "./GameFilter";
 
 export interface GameByGameProps {
   /* eslint-disable  @typescript-eslint/no-explicit-any */
@@ -14,14 +15,38 @@ export interface GameByGameProps {
 
 export default function GameByGame({ gameData, team }: GameByGameProps) {
   const [gameByGamePage, setGameByGamePage] = useState(1);
+  const [filters, setFilters] = useState<Filter[]>([]);
+
+  const players = useMemo(() => {
+    const teamPlayers = playerMapping[team] || [];
+    return [...teamPlayers.map(p => p.charAt(0).toUpperCase() + p.slice(1)), "Total"];
+  }, [team]);
+
+  const filteredGameData = useMemo(() => {
+    return gameData.filter(game => {
+      return filters.every(filter => {
+        const key = filter.player === 'Total'
+          ? `total_${filter.stat}`
+          : `${filter.player.toLowerCase()}_${filter.stat}`;
+        const gameValue = game[key] || 0;
+
+        switch (filter.operator) {
+          case '>=': return gameValue >= filter.value;
+          case '<=': return gameValue <= filter.value;
+          case '=': return gameValue === filter.value;
+          default: return true;
+        }
+      });
+    });
+  }, [gameData, filters]);
 
   const gameTablesData = useMemo(() => {
-    if (gameData.length === 0) {
+    if (filteredGameData.length === 0) {
       return [];
     }
 
-    return [...gameData].reverse().map(game => processGameData(game, team));
-  }, [gameData, team]);
+    return [...filteredGameData].reverse().map(game => processGameData(game, team));
+  }, [filteredGameData, team]);
 
   const gamesPerPage = 10;
   const totalGamePages = Math.ceil(gameTablesData.length / gamesPerPage);
@@ -33,8 +58,29 @@ export default function GameByGame({ gameData, team }: GameByGameProps) {
     }
   }, [totalGamePages, gameByGamePage]);
 
+  const handleAddFilter = (filter: Filter) => {
+    setFilters([...filters, filter]);
+    setGameByGamePage(1);
+  };
+
+  const handleRemoveFilter = (index: number) => {
+    setFilters(filters.filter((_, i) => i !== index));
+    setGameByGamePage(1);
+  };
+
   return (
     <>
+      <Accordion variant="bordered">
+        <AccordionItem key="1" aria-label="Filters" title="Filters">
+          <GameFilter
+            players={players}
+            stats={statKeys}
+            onAddFilter={handleAddFilter}
+            activeFilters={filters}
+            onRemoveFilter={handleRemoveFilter}
+          />
+        </AccordionItem>
+      </Accordion>
       <div className="w-full grid grid-cols-1 lg:grid-cols-2 items-start gap-8 mt-4">
         {paginatedGameTables.map((game, index) => (
           <div key={index} className="w-full">
@@ -42,6 +88,11 @@ export default function GameByGame({ gameData, team }: GameByGameProps) {
             <GameTable data={game.data} gameIndex={game.gameIndex} />
           </div>
         ))}
+        {paginatedGameTables.length === 0 && (
+          <div className="col-span-1 lg:col-span-2 text-center text-gray-500 py-8">
+            No games match the selected filters.
+          </div>
+        )}
       </div>
       {totalGamePages > 1 && (
         <div className="flex justify-center mt-8">
