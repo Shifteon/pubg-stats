@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Chip, Input, Select, SelectItem } from "@heroui/react";
+import { Button, Chip, Input, Select, SelectItem, RadioGroup, Radio } from "@heroui/react";
 import { useState } from "react";
 
 export interface Filter {
@@ -16,6 +16,8 @@ interface GameFilterProps {
   onAddFilter: (filter: Filter) => void;
   activeFilters: Filter[];
   onRemoveFilter: (index: number) => void;
+  filterResult: string;
+  onFilterResultChange: (value: string) => void;
 }
 
 const operators = [
@@ -30,6 +32,8 @@ export default function GameFilter({
   onAddFilter,
   activeFilters,
   onRemoveFilter,
+  filterResult,
+  onFilterResultChange,
 }: GameFilterProps) {
   const [selectedPlayer, setSelectedPlayer] = useState<string>("");
   const [selectedStat, setSelectedStat] = useState<string>("");
@@ -110,6 +114,19 @@ export default function GameFilter({
         <Button color="primary" onPress={handleAddFilter}>
           Add Filter
         </Button>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <RadioGroup
+          label="Filter by Result"
+          orientation="horizontal"
+          value={filterResult}
+          onValueChange={onFilterResultChange}
+        >
+          <Radio value="all">All</Radio>
+          <Radio value="win">Win</Radio>
+          <Radio value="loss">Loss</Radio>
+        </RadioGroup>
       </div>
 
       {activeFilters.length > 0 && (

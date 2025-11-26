@@ -16,6 +16,7 @@ export interface GameByGameProps {
 export default function GameByGame({ gameData, team }: GameByGameProps) {
   const [gameByGamePage, setGameByGamePage] = useState(1);
   const [filters, setFilters] = useState<Filter[]>([]);
+  const [filterResult, setFilterResult] = useState<string>("all");
 
   const players = useMemo(() => {
     const teamPlayers = playerMapping[team] || [];
@@ -24,6 +25,10 @@ export default function GameByGame({ gameData, team }: GameByGameProps) {
 
   const filteredGameData = useMemo(() => {
     return gameData.filter(game => {
+      // Filter by Result
+      if (filterResult === 'win' && game.win !== 1) return false;
+      if (filterResult === 'loss' && game.win !== 0) return false;
+
       return filters.every(filter => {
         const key = filter.player === 'Total'
           ? `total_${filter.stat}`
@@ -38,7 +43,7 @@ export default function GameByGame({ gameData, team }: GameByGameProps) {
         }
       });
     });
-  }, [gameData, filters]);
+  }, [gameData, filters, filterResult]);
 
   const gameTablesData = useMemo(() => {
     if (filteredGameData.length === 0) {
@@ -59,7 +64,19 @@ export default function GameByGame({ gameData, team }: GameByGameProps) {
   }, [totalGamePages, gameByGamePage]);
 
   const handleAddFilter = (filter: Filter) => {
-    setFilters([...filters, filter]);
+    setFilters(prevFilters => {
+      const existingIndex = prevFilters.findIndex(
+        f => f.player === filter.player && f.stat === filter.stat
+      );
+
+      if (existingIndex >= 0) {
+        const newFilters = [...prevFilters];
+        newFilters[existingIndex] = filter;
+        return newFilters;
+      }
+
+      return [...prevFilters, filter];
+    });
     setGameByGamePage(1);
   };
 
@@ -78,6 +95,11 @@ export default function GameByGame({ gameData, team }: GameByGameProps) {
             onAddFilter={handleAddFilter}
             activeFilters={filters}
             onRemoveFilter={handleRemoveFilter}
+            filterResult={filterResult}
+            onFilterResultChange={(value) => {
+              setFilterResult(value);
+              setGameByGamePage(1);
+            }}
           />
         </AccordionItem>
       </Accordion>
