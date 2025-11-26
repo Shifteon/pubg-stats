@@ -60,7 +60,7 @@ export default function HallOfFame({ gameData, team }: HallOfFameProps) {
             <CardBody className="text-center text-3xl font-bold">{value}</CardBody>
             <CardFooter className="justify-center text-md capitalize text-gray-500">
               <Avatar
-                src={AVATAR_SRC_MAP[player]}
+                src={AVATAR_SRC_MAP[player]?.src}
                 size="sm"
                 name={player}
                 showFallback

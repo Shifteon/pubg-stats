@@ -164,7 +164,7 @@ export default function HomeComponent() {
                       key={member}
                       variant={isSelected ? "solid" : "bordered"}
                       color={isSelected ? "primary" : "default"}
-                      avatar={<Avatar name={member.charAt(0).toUpperCase()} src={AVATAR_SRC_MAP[member]} />}
+                      avatar={<Avatar name={member.charAt(0).toUpperCase()} src={AVATAR_SRC_MAP[member]?.src} />}
                       endContent={isSelected ? <CloseIcon /> : <PlusIcon />}
                       onClick={() => handleMemberSelectionChange(member as IndividualName)}
                       className="cursor-pointer"

@@ -1,4 +1,8 @@
 import { StatName } from "@/types";
+import isaacAvatar from "@/assets/avatars/isaac.jpg";
+import codyAvatar from "@/assets/avatars/cody.jpg";
+import trentonAvatar from "@/assets/avatars/trenton.jpg";
+import benAvatar from "@/assets/avatars/ben.jpg";
 
 export const TEAM_NO_TRENTON = "T";
 export const TEAM_NO_CODY = "C";
@@ -23,11 +27,13 @@ export const VALID_TEAM_NAMES = [
   TEAM_ISAAC_BEN,
 ];
 
-export const AVATAR_SRC_MAP: Record<string, string> = {
-  isaac: "https://5xbmuxxl0mrwzkji.public.blob.vercel-storage.com/avatars/isaac.jpg",
-  cody: "https://5xbmuxxl0mrwzkji.public.blob.vercel-storage.com/avatars/cody.jpg",
-  trenton: "https://5xbmuxxl0mrwzkji.public.blob.vercel-storage.com/avatars/trenton.jpg",
-  ben: "https://5xbmuxxl0mrwzkji.public.blob.vercel-storage.com/avatars/ben.jpg",
+import { StaticImageData } from "next/image";
+
+export const AVATAR_SRC_MAP: Record<string, StaticImageData> = {
+  isaac: isaacAvatar,
+  cody: codyAvatar,
+  trenton: trentonAvatar,
+  ben: benAvatar,
 };
 
 export const AVERAGE_KILLS_STAT_NAME = "avgKills";

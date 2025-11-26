@@ -47,7 +47,7 @@ export default function PlayerStatsGrid({ playerStats, valueFormatter = defaultF
             <Card key={player}>
               <CardHeader>
                 <Avatar
-                  src={AVATAR_SRC_MAP[player]}
+                  src={AVATAR_SRC_MAP[player]?.src}
                   size="lg"
                   name={player}
                   showFallback
