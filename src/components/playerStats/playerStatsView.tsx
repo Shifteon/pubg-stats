@@ -1,5 +1,6 @@
 "use client";
 
+import { TEAM_DISPLAY_NAMES } from "@/constants";
 import { useMemo, useState } from "react";
 import { PlayerAggregatedData, PlayerTeamStats } from "@/stats/playerStat";
 import { BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar, ResponsiveContainer, Cell } from "recharts";
@@ -21,10 +22,15 @@ export default function PlayerStatsView({ data, playerName }: PlayerStatsViewPro
 
   const sortedData = useMemo(() => {
     // Sort by selected metric descending
-    return [...data.data].sort((a, b) => {
+    const sorted = [...data.data].sort((a, b) => {
       // @ts-ignore
       return b[selectedMetric] - a[selectedMetric];
     });
+
+    return sorted.map(item => ({
+      ...item,
+      teamDisplayName: TEAM_DISPLAY_NAMES[item.teamName] || item.teamName
+    }));
   }, [data, selectedMetric]);
 
   const bestTeam = sortedData.length > 0 ? sortedData[0] : null;
@@ -60,7 +66,7 @@ export default function PlayerStatsView({ data, playerName }: PlayerStatsViewPro
         <div className="p-4 bg-content1 rounded-lg">
           <p className="text-lg">
             Best Team for <span className="font-bold">{METRICS.find(m => m.key === selectedMetric)?.label}</span>:
-            <span className="text-primary font-bold ml-2">{bestTeam.teamName}</span>
+            <span className="text-primary font-bold ml-2">{bestTeam.teamDisplayName}</span>
             <span className="text-default-500 ml-2">({formatValue(bestTeam[selectedMetric as keyof PlayerTeamStats] as number)})</span>
           </p>
         </div>
@@ -78,7 +84,7 @@ export default function PlayerStatsView({ data, playerName }: PlayerStatsViewPro
             }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="teamName" />
+            <XAxis dataKey="teamDisplayName" />
             <YAxis />
             <Tooltip
               contentStyle={{

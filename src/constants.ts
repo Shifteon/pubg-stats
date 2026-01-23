@@ -233,3 +233,14 @@ export const TEAM_MEMBER_MAP: Record<string, string[]> = {
 
 // we cut off 10% of game data to normalize it
 export const PERCENTAGE_OF_DATA_TO_REMOVE = 0.10;
+
+export const TEAM_DISPLAY_NAMES: Record<string, string> = {
+  [TEAM_ALL]: TEAM_ALL,
+  [TEAM_NO_BEN]: 'Isaac, Cody, Trenton',
+  [TEAM_NO_TRENTON]: 'Isaac, Cody, Ben',
+  [TEAM_NO_CODY]: 'Isaac, Ben, Trenton',
+  [TEAM_NO_ISAAC]: 'Cody, Ben, Trenton',
+  [TEAM_ISAAC_BEN]: 'Isaac, Ben',
+  [TEAM_ISAAC_CODY]: 'Isaac, Cody',
+  [TEAM_ISAAC_TRENTON]: 'Isaac, Trenton',
+};

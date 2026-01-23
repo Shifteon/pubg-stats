@@ -2,7 +2,7 @@
 
 import { Avatar, Chip, Select, SelectItem, Tab, Tabs } from "@heroui/react";
 import GamePerformanceStat from "../gamePerformance/gamePerformance";
-import { AVATAR_SRC_MAP, GAME_SUMMARY_STAT_NAME, KILL_STEALING_STAT_NAME, SUPPORTED_STATS, TEAM_ALL, TEAM_ISAAC_BEN, TEAM_ISAAC_CODY, TEAM_ISAAC_TRENTON, TEAM_MEMBER_MAP, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON, TWO_MAN_TEAMS } from "@/constants";
+import { AVATAR_SRC_MAP, GAME_SUMMARY_STAT_NAME, KILL_STEALING_STAT_NAME, SUPPORTED_STATS, TEAM_ALL, TEAM_DISPLAY_NAMES, TEAM_ISAAC_BEN, TEAM_ISAAC_CODY, TEAM_ISAAC_TRENTON, TEAM_MEMBER_MAP, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON, TWO_MAN_TEAMS } from "@/constants";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { Key } from '@react-types/shared';
 import { IndividualName, StatName, TeamName } from "@/types";
@@ -11,14 +11,14 @@ import GameSummary from "../gameSummary/gameSummary";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 const teamOptions = [
-  { key: TEAM_ALL, label: TEAM_ALL },
-  { key: TEAM_NO_BEN, label: 'Isaac, Cody, Trenton' },
-  { key: TEAM_NO_TRENTON, label: 'Isaac, Cody, Ben' },
-  { key: TEAM_NO_CODY, label: 'Isaac, Ben, Trenton' },
-  { key: TEAM_NO_ISAAC, label: 'Cody, Ben, Trenton' },
-  { key: TEAM_ISAAC_BEN, label: 'Isaac, Ben' },
-  { key: TEAM_ISAAC_CODY, label: 'Isaac, Cody' },
-  { key: TEAM_ISAAC_TRENTON, label: 'Isaac, Trenton' },
+  { key: TEAM_ALL, label: TEAM_DISPLAY_NAMES[TEAM_ALL] },
+  { key: TEAM_NO_BEN, label: TEAM_DISPLAY_NAMES[TEAM_NO_BEN] },
+  { key: TEAM_NO_TRENTON, label: TEAM_DISPLAY_NAMES[TEAM_NO_TRENTON] },
+  { key: TEAM_NO_CODY, label: TEAM_DISPLAY_NAMES[TEAM_NO_CODY] },
+  { key: TEAM_NO_ISAAC, label: TEAM_DISPLAY_NAMES[TEAM_NO_ISAAC] },
+  { key: TEAM_ISAAC_BEN, label: TEAM_DISPLAY_NAMES[TEAM_ISAAC_BEN] },
+  { key: TEAM_ISAAC_CODY, label: TEAM_DISPLAY_NAMES[TEAM_ISAAC_CODY] },
+  { key: TEAM_ISAAC_TRENTON, label: TEAM_DISPLAY_NAMES[TEAM_ISAAC_TRENTON] },
 ];
 
 const CloseIcon = (props: React.SVGProps<SVGSVGElement>) => (
