@@ -111,7 +111,11 @@ export default function GameFilter({
           size="sm"
         />
 
-        <Button color="primary" onPress={handleAddFilter}>
+        <Button
+          color="primary"
+          onPress={handleAddFilter}
+          isDisabled={!selectedPlayer || !selectedStat || !selectedOperator || filterValue === ""}
+        >
           Add Filter
         </Button>
       </div>
