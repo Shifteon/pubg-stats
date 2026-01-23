@@ -1,21 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { PlayerAggregatedData } from "@/stats/playerStat";
 import { Avatar, Tabs, Tab, Divider } from "@heroui/react";
 import OverviewTab from "./OverviewTab";
 import ByTeamTab from "./ByTeamTab";
 import { usePlayerStatsData } from "@/hooks/usePlayerStatsData";
 
 interface PlayerStatsViewProps {
-  data: PlayerAggregatedData;
+  stats: ReturnType<typeof usePlayerStatsData>;
   playerName: string;
 }
 
-export default function PlayerStatsView({ data, playerName }: PlayerStatsViewProps) {
+export default function PlayerStatsView({ stats, playerName }: PlayerStatsViewProps) {
   const [selectedTab, setSelectedTab] = useState<string>("overview");
 
   const {
+    data,
     designation,
     avatarSrc,
     aggregatedStats,
@@ -23,7 +23,9 @@ export default function PlayerStatsView({ data, playerName }: PlayerStatsViewPro
     signatureStatValue,
     mostPlayedTeamName,
     formatValue
-  } = usePlayerStatsData(data, playerName);
+  } = stats;
+
+  if (!data) return null; // Should be handled by loading state in parent
 
   return (
     <div className="w-full flex flex-col gap-6">
@@ -49,7 +51,7 @@ export default function PlayerStatsView({ data, playerName }: PlayerStatsViewPro
             <div className="p-4 bg-background/50 rounded-lg inline-block">
               <p className="text-sm text-default-500 uppercase font-bold tracking-wider">Best Stat (Avg)</p>
               <p className="text-2xl font-bold">
-                {signatureStatConfig.label}: <span className="text-secondary">{formatValue(signatureStatConfig.key, signatureStatValue)}</span>
+                {signatureStatConfig.label}: <span className="text-secondary">{formatValue(signatureStatConfig.key, Number(signatureStatValue))}</span>
               </p>
             </div>
 

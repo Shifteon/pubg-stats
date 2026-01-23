@@ -18,7 +18,7 @@ export interface PlayerTeamStats {
 
 export interface PlayerAggregatedData {
   data: PlayerTeamStats[];
-  allGames: any[];
+  allGames: Record<string, number>[];
 }
 
 export class PlayerStat {
