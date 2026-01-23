@@ -1,14 +1,10 @@
 import {
-  AVERAGE_DAMAGE_STAT_NAME,
-  AVERAGE_KILLS_STAT_NAME,
   TEAM_MEMBER_MAP,
   VALID_TEAM_NAMES,
-  WIN_RATE_STAT_NAME
 } from "@/constants";
 import { AverageDamageStat } from "./averageDamageStat";
 import { AverageKillsStat } from "./averageKillsStat";
 import { WinRateStat } from "./winrateStat";
-import { ChartOptions } from "./statBase";
 
 export interface PlayerTeamStats {
   teamName: string;
@@ -19,7 +15,6 @@ export interface PlayerTeamStats {
 }
 
 export interface PlayerAggregatedData {
-  chartOptions: ChartOptions[];
   data: PlayerTeamStats[];
 }
 
@@ -47,25 +42,23 @@ export class PlayerStat {
         this.winRateStat.getStats(team)
       ]);
 
-      // Calculate averages for the player in this team
-      // The existing getStats returns arrays of data (per game usually)
-      // We need to aggregate this into a single value per team for the player
-
       const playerDamageKey = `${playerName.toLowerCase()}_damage`;
       const playerKillsKey = `${playerName.toLowerCase()}_kills`;
 
-      let totalDamage = 0;
-      let totalKills = 0;
+      let currentAvgDamage = 0;
+      let currentAvgKills = 0;
       let gamesCount = 0;
       let currentWinRate = 0;
 
       if (damageData && damageData.data.length > 0) {
         gamesCount = damageData.data.length;
-        totalDamage = damageData.data.reduce((sum, game) => sum + (game[playerDamageKey] || 0), 0);
+        const lastGame = damageData.data[damageData.data.length - 1];
+        currentAvgDamage = lastGame[playerDamageKey] || 0;
       }
 
       if (killsData && killsData.data.length > 0) {
-        totalKills = killsData.data.reduce((sum, game) => sum + (game[playerKillsKey] || 0), 0);
+        const lastGame = killsData.data[killsData.data.length - 1];
+        currentAvgKills = lastGame[playerKillsKey] || 0;
       }
 
       if (winRateData && winRateData.data.length > 0) {
@@ -75,8 +68,8 @@ export class PlayerStat {
 
       return {
         teamName: team,
-        avgDamage: gamesCount > 0 ? totalDamage / gamesCount : 0,
-        avgKills: gamesCount > 0 ? totalKills / gamesCount : 0,
+        avgDamage: currentAvgDamage,
+        avgKills: currentAvgKills,
         winRate: currentWinRate,
         gamesPlayed: gamesCount
       };
@@ -86,7 +79,6 @@ export class PlayerStat {
 
 
     return {
-      chartOptions: [],
       data: results
     };
   }
