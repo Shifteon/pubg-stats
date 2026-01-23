@@ -59,6 +59,26 @@ export default function NavLayout({ children }: { children: React.ReactNode }) {
               <span className="ml-1">PUBG Stats</span>
             </Link>
           </NavbarBrand>
+          <NavbarItem>
+            <Link href="/player/isaac" color="foreground" className="ml-4">
+              Isaac
+            </Link>
+          </NavbarItem>
+          <NavbarItem>
+            <Link href="/player/cody" color="foreground" className="ml-4">
+              Cody
+            </Link>
+          </NavbarItem>
+          <NavbarItem>
+            <Link href="/player/ben" color="foreground" className="ml-4">
+              Ben
+            </Link>
+          </NavbarItem>
+          <NavbarItem>
+            <Link href="/player/trenton" color="foreground" className="ml-4">
+              Trenton
+            </Link>
+          </NavbarItem>
         </NavbarContent>
         <NavbarContent justify="end">
           <NavbarItem>
