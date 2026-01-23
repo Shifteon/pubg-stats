@@ -1,6 +1,6 @@
 "use client";
 
-import { TEAM_DISPLAY_NAMES } from "@/constants";
+import { TEAM_ABBREVIATIONS } from "@/constants";
 import { useMemo } from "react";
 import { PlayerAggregatedData, PlayerTeamStats } from "@/stats/playerStat";
 import { BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar, ResponsiveContainer, Cell } from "recharts";
@@ -24,7 +24,7 @@ export default function ByTeamTab({ data }: ByTeamTabProps) {
 
     return sorted.map(item => ({
       ...item,
-      teamDisplayName: TEAM_DISPLAY_NAMES[item.teamName] || item.teamName
+      teamDisplayName: TEAM_ABBREVIATIONS[item.teamName] || item.teamName
     }));
   };
 

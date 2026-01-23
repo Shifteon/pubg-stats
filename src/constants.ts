@@ -245,6 +245,17 @@ export const TEAM_DISPLAY_NAMES: Record<string, string> = {
   [TEAM_ISAAC_TRENTON]: 'Isaac, Trenton',
 };
 
+export const TEAM_ABBREVIATIONS: Record<string, string> = {
+  [TEAM_ALL]: TEAM_ALL,
+  [TEAM_NO_BEN]: 'I, C, T',
+  [TEAM_NO_TRENTON]: 'I, C, B',
+  [TEAM_NO_CODY]: 'I, B, T',
+  [TEAM_NO_ISAAC]: 'C, B, T',
+  [TEAM_ISAAC_BEN]: 'I, B',
+  [TEAM_ISAAC_CODY]: 'I, C',
+  [TEAM_ISAAC_TRENTON]: 'I, T',
+};
+
 export const PLAYER_DESIGNATIONS: Record<string, string> = {
   [ISAAC_LOWERCASE]: "The Sniper",
   [CODY_LOWERCASE]: "The Designated Driver",
