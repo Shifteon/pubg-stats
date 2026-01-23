@@ -244,3 +244,10 @@ export const TEAM_DISPLAY_NAMES: Record<string, string> = {
   [TEAM_ISAAC_CODY]: 'Isaac, Cody',
   [TEAM_ISAAC_TRENTON]: 'Isaac, Trenton',
 };
+
+export const PLAYER_DESIGNATIONS: Record<string, string> = {
+  [ISAAC_LOWERCASE]: "The Sniper",
+  [CODY_LOWERCASE]: "The Designated Driver",
+  [BEN_LOWERCASE]: "The Kill Stealer",
+  [TRENTON_LOWERCASE]: "The Tank",
+};
