@@ -28,30 +28,30 @@ export default function StatBarChart(props: StatBarChartProps) {
   return (
     <BarChart
       style={{ width: '100%', maxWidth: '1000px', maxHeight: '70vh', aspectRatio: 1.618 }}
-      responsive 
+      responsive
       data={combinedData}
     >
-    <CartesianGrid strokeDasharray="3 3" />
-    <XAxis dataKey="displayName" />
-    <YAxis width="auto" />
-    <Tooltip 
-      contentStyle={{
-        backgroundColor: 'hsl(var(--heroui-content1))',
-      }}
-    />
-    <Legend />
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis dataKey="displayName" />
+      <YAxis width="auto" />
+      <Tooltip
+        contentStyle={{
+          backgroundColor: 'hsl(var(--heroui-content1))',
+        }}
+      />
+      <Legend />
 
-    {chartOptions.map(option => (
-      <React.Fragment key={option.key}>
-        <Bar 
-          type="monotone" 
-          xAxisId={option.displayName}
-          dataKey={option.key} 
-          fill={option.color} 
-          name={option.displayName}
-        />
-      </React.Fragment>
-    ))}
-  </BarChart>
+      {chartOptions.map(option => (
+        <React.Fragment key={option.key}>
+          <Bar
+            type="monotone"
+            xAxisId={option.displayName}
+            dataKey={option.key}
+            fill={option.color}
+            name={option.displayName}
+          />
+        </React.Fragment>
+      ))}
+    </BarChart>
   );
 }

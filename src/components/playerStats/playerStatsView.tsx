@@ -30,7 +30,7 @@ export default function PlayerStatsView({ stats, playerName }: PlayerStatsViewPr
   return (
     <div className="w-full flex flex-col gap-6">
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-0 bg-content1 p-6 rounded-lg items-center md:items-start">
+        <div className="flex flex-col gap-0 p-6 rounded-lg items-center md:items-start">
           {/* Player Name */}
           <div className="flex flex-col md:flex-row shrink-0 items-center gap-4">
             <Avatar
@@ -47,15 +47,15 @@ export default function PlayerStatsView({ stats, playerName }: PlayerStatsViewPr
           </div>
 
           {/* Stats */}
-          <div className="flex gap-4 flex-wrap justify-center md:justify-start self-end">
-            <div className="p-4 bg-background/50 rounded-lg inline-block">
+          <div className="mt-4 md:mt-0 flex gap-4 flex-wrap justify-center md:justify-start self-end">
+            <div className="text-center md:text-left md:p-4 bg-background/50 rounded-lg inline-block">
               <p className="text-sm text-default-500 uppercase font-bold tracking-wider">Best Stat (Avg)</p>
               <p className="text-2xl font-bold">
                 {signatureStatConfig.label}: <span className="text-secondary">{formatValue(signatureStatConfig.key, Number(signatureStatValue))}</span>
               </p>
             </div>
 
-            <div className="p-4 bg-background/50 rounded-lg inline-block">
+            <div className="text-center md:text-left md:p-4 bg-background/50 rounded-lg inline-block">
               <p className="text-sm text-default-500 uppercase font-bold tracking-wider">Most Played Team</p>
               <p className="text-2xl font-bold line-clamp-1">
                 {mostPlayedTeamName}

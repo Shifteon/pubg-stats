@@ -1,7 +1,6 @@
 "use client";
 
 import { TEAM_ABBREVIATIONS } from "@/constants";
-import { useMemo } from "react";
 import { PlayerAggregatedData, PlayerTeamStats } from "@/stats/playerStat";
 import { BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar, ResponsiveContainer, Cell } from "recharts";
 
@@ -70,6 +69,12 @@ export default function ByTeamTab({ data }: ByTeamTabProps) {
                     contentStyle={{
                       backgroundColor: 'hsl(var(--heroui-content1))',
                       borderRadius: '8px',
+                    }}
+                    labelStyle={{
+                      color: 'hsl(var(--text-primary))',
+                    }}
+                    itemStyle={{
+                      color: 'hsl(var(--text-primary))',
                     }}
                     formatter={(value: number) => [formatValue(value, metric.key), metric.label]}
                   />
