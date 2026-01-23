@@ -23,8 +23,7 @@ export default function PlayerStatsView({ data, playerName }: PlayerStatsViewPro
   const sortedData = useMemo(() => {
     // Sort by selected metric descending
     const sorted = [...data.data].sort((a, b) => {
-      // @ts-ignore
-      return b[selectedMetric] - a[selectedMetric];
+      return (b[selectedMetric as keyof PlayerTeamStats] as number) - (a[selectedMetric as keyof PlayerTeamStats] as number);
     });
 
     return sorted.map(item => ({

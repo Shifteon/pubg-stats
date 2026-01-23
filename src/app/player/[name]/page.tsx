@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, Suspense } from "react";
 import { PlayerStat, PlayerAggregatedData } from "@/stats/playerStat";
 import PlayerStatsView from "@/components/playerStats/playerStatsView";
 import { Spinner } from "@heroui/react";
@@ -48,8 +48,10 @@ export default function PlayerPage({ params }: PlayerPageProps) {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <PlayerStatsView data={data} playerName={name} />
-    </div>
+    <Suspense fallback={<Spinner size="lg" label="Loading Player Stats..." />}>
+      <div className="container mx-auto p-4">
+        <PlayerStatsView data={data} playerName={name} />
+      </div>
+    </Suspense>
   );
 }
