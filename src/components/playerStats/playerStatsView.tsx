@@ -35,9 +35,6 @@ export default function PlayerStatsView({ data, playerName }: PlayerStatsViewPro
   const bestTeam = sortedData.length > 0 ? sortedData[0] : null;
 
   const formatValue = (value: number) => {
-    if (selectedMetric === "winRate") {
-      return `${(value * 100).toFixed(1)}%`;
-    }
     return value.toFixed(1);
   };
 
