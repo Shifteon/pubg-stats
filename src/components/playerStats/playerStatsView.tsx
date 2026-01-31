@@ -89,7 +89,7 @@ export default function PlayerStatsView({ stats, playerName }: PlayerStatsViewPr
         >
           <Tab key="overview" title="Overview">
             {/* Pass aggregatedStats to avoid recalculation */}
-            <OverviewTab aggregatedStats={aggregatedStats} />
+            <OverviewTab aggregatedStats={aggregatedStats} allPlayersStats={stats.allPlayersStats} playerName={playerName} />
           </Tab>
           <Tab key="byteam" title="By Team">
             <ByTeamTab data={data} />

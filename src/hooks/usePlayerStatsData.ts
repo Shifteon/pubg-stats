@@ -24,6 +24,7 @@ type BestStatConfig = {
 export const usePlayerStatsData = (playerName: string) => {
   const [data, setData] = useState<PlayerAggregatedData | null>(null);
   const [bestStat, setBestStat] = useState<BestStatConfig | undefined>(undefined);
+  const [allPlayersStats, setAllPlayersStats] = useState<Record<string, AggregatedStats> | null>(null);
   const [loading, setLoading] = useState(true);
 
   const normalizedName = playerName.toLowerCase();
@@ -48,6 +49,8 @@ export const usePlayerStatsData = (playerName: string) => {
         PLAYER_NAMES.forEach((p, index) => {
           playerStatsMap[p] = calculateAggregatedStats(allPlayersData[index], p);
         });
+
+        setAllPlayersStats(playerStatsMap);
 
         // Calculate best stats for everyone
         const calculatedBestStats = calculateBestStats(playerStatsMap);
@@ -116,6 +119,7 @@ export const usePlayerStatsData = (playerName: string) => {
     signatureStatConfig,
     signatureStatValue,
     mostPlayedTeamName,
-    formatValue
+    formatValue,
+    allPlayersStats
   };
 };
