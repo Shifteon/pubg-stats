@@ -1,10 +1,17 @@
 "use client";
 
-import { TeamName } from "@/types";
+import { GameSummaryData, TeamName } from "@/types";
 import { useEffect, useState } from "react";
-import PlayerStatsGrid, { StatValue } from "./playerStatsGrid";
+import PlayerStatCard from "./PlayerStatCard";
 import { apiService } from "@/services/apiService";
-import { Spinner } from "@heroui/react";
+import { Spinner, useDisclosure } from "@heroui/react";
+import GameModal from "./GameModal";
+import { processGameData } from "../utils";
+
+export interface StatValue {
+  value: number;
+  game: Record<string, unknown> | null;
+}
 
 export interface PersonalBestsProps {
   team: TeamName;
@@ -15,6 +22,9 @@ export interface PersonalBestsProps {
 export default function PersonalBests({ team, start, end }: PersonalBestsProps) {
   const [playerHighestStats, setPlayerHighestStats] = useState<Record<string, Record<string, StatValue>>>({});
   const [loading, setLoading] = useState(true);
+
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [selectedGame, setSelectedGame] = useState<GameSummaryData | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -41,6 +51,12 @@ export default function PersonalBests({ team, start, end }: PersonalBestsProps) 
     };
   }, [team, start, end]);
 
+  const handleGameClick = (game: Record<string, unknown>) => {
+    const processedGame = processGameData(game, team);
+    setSelectedGame(processedGame);
+    onOpen();
+  };
+
   return (
     <div className="relative w-full">
       {loading && (
@@ -48,9 +64,23 @@ export default function PersonalBests({ team, start, end }: PersonalBestsProps) 
           <Spinner />
         </div>
       )}
-      <div className={loading ? 'opacity-50' : ''}>
-        <PlayerStatsGrid playerStats={playerHighestStats} team={team} />
+      <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full ${loading ? 'opacity-50' : ''}`}>
+        {Object.entries(playerHighestStats).map(([player, stats]) => (
+          <PlayerStatCard
+            key={player}
+            player={player}
+            stats={stats}
+            onGameClick={handleGameClick}
+          />
+        ))}
       </div>
+      {selectedGame && (
+        <GameModal
+          isOpen={isOpen}
+          onOpenChange={onOpenChange}
+          game={selectedGame}
+        />
+      )}
     </div>
   );
 }

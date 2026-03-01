@@ -1,10 +1,11 @@
 "use client";
 
-import { Link, Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenuToggle, NavbarMenu } from "@heroui/react";
+import { Link, Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenuToggle, NavbarMenu, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@heroui/react";
 import CacheRefreshButton from "./cacheRefreshButton";
 import ThemeSwitcher from "./themeSwitcher";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { GROUPS_TEAM_NAMES, PLAYER_NAMES, TEAM_DISPLAY_NAMES, TEST_TEAM, TWO_MAN_TEAMS } from "@/constants";
 
 export const Logo = () => {
   return (
@@ -45,32 +46,112 @@ export const Logo = () => {
 };
 
 
+
+export const ChevronDown = ({ fill, size, height, width, ...props }: React.SVGProps<SVGSVGElement> & { size?: number | string }) => {
+  return (
+    <svg
+      fill="none"
+      height={size || height || 24}
+      viewBox="0 0 24 24"
+      width={size || width || 24}
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        d="m19.92 8.95-6.52 6.52c-.77.77-2.03.77-2.8 0L4.08 8.95"
+        stroke={fill}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeMiterlimit={10}
+        strokeWidth={1.5}
+      />
+    </svg>
+  );
+};
+
+
 export default function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const activePath = usePathname();
 
   const menuItems = [
     {
-      label: "Home",
-      href: "/",
+      label: "Teams",
+      items: [...GROUPS_TEAM_NAMES.filter((team) => team !== TEST_TEAM).map((team) => {
+        return {
+          label: TEAM_DISPLAY_NAMES[team],
+          href: `/?team=${team}`,
+        }
+      }),
+      ...TWO_MAN_TEAMS.map((team) => {
+        return {
+          label: TEAM_DISPLAY_NAMES[team],
+          href: `/?team=${team}`,
+        }
+      })
+      ],
     },
     {
-      label: "Isaac",
-      href: "/player/isaac",
-    },
-    {
-      label: "Cody",
-      href: "/player/cody",
-    },
-    {
-      label: "Ben",
-      href: "/player/ben",
-    },
-    {
-      label: "Trenton",
-      href: "/player/trenton",
-    },
+      label: "Players",
+      items: PLAYER_NAMES.map((player) => {
+        return {
+          label: player.charAt(0).toUpperCase() + player.slice(1),
+          href: `/player/${player}`,
+        }
+      }),
+    }
   ];
+
+  const isActivePath = (path: string) => {
+    return activePath === path;
+  };
+
+
+
+  const icons = {
+    chevron: <ChevronDown fill="currentColor" size={16} />,
+  };
+
+  const navLinks = (
+    <>
+      <NavbarItem isActive={isActivePath("/") && !activePath.includes("?team=")}>
+        <Link href="/" color={isActivePath("/") && !activePath.includes("?team=") ? "primary" : "foreground"}>
+          Home
+        </Link>
+      </NavbarItem>
+      {menuItems.map((menu) => (
+        <Dropdown key={menu.label}>
+          <NavbarItem>
+            <DropdownTrigger>
+              <Button
+                disableRipple
+                className="p-0 bg-transparent data-[hover=true]:bg-transparent"
+                endContent={icons.chevron}
+                radius="sm"
+                variant="light"
+              >
+                {menu.label}
+              </Button>
+            </DropdownTrigger>
+          </NavbarItem>
+          <DropdownMenu
+            aria-label={`${menu.label} options`}
+            className="w-[340px]"
+          >
+            {menu.items.map((item) => (
+              <DropdownItem
+                key={`${item.label}-${item.href}`}
+              >
+                <Link href={item.href} color={isActivePath(item.href) ? "primary" : "foreground"} className="w-full">
+                  {item.label}
+                </Link>
+              </DropdownItem>
+            ))}
+          </DropdownMenu>
+        </Dropdown>
+      ))}
+    </>
+  );
 
   return (
     <Navbar
@@ -92,23 +173,11 @@ export default function NavBar() {
       </NavbarContent>
 
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        {menuItems.map((item) => (
-          <NavbarItem key={item.label} isActive={activePath === item.href}>
-            <Link href={item.href} color={activePath === item.href ? "primary" : "foreground"}>
-              {item.label}
-            </Link>
-          </NavbarItem>
-        ))}
+        {navLinks}
       </NavbarContent>
 
       <NavbarMenu>
-        {menuItems.map((item) => (
-          <NavbarItem key={item.label} isActive={activePath === item.href}>
-            <Link href={item.href} color={activePath === item.href ? "primary" : "foreground"}>
-              {item.label}
-            </Link>
-          </NavbarItem>
-        ))}
+        {navLinks}
       </NavbarMenu>
 
       <NavbarContent justify="end">

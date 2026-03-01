@@ -48,12 +48,13 @@ export async function GET(
     const highestStats = statKeys.map(stat => {
       let highest: HighestStat = { player: players[0] as IndividualName || "ben", value: -1, stat, gameIndex: -1 };
 
-      data.forEach((game: any) => {
+      data.forEach((game: Record<string, unknown>) => {
         players.forEach(player => {
           const playerStatKey = `${player}_${stat}`;
-          const statValue = parseFloat(game[playerStatKey]);
+          const rawStatValue = game[playerStatKey];
+          const statValue = typeof rawStatValue === "string" ? parseFloat(rawStatValue) : (typeof rawStatValue === "number" ? rawStatValue : 0);
           if (statValue > highest.value) {
-            highest = { player: player as IndividualName, value: statValue, stat, gameIndex: game.gameIndex };
+            highest = { player: player as IndividualName, value: statValue, stat, gameIndex: game.gameIndex as number };
           }
         });
       });
