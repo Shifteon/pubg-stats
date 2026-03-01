@@ -3,16 +3,11 @@
 import { TeamName, StatName, IndividualName } from "@/types";
 import { useEffect, useMemo, useState } from "react";
 import StatLineChart from "../charts/statLineChart";
-import { AVERAGE_DAMAGE_STAT_NAME, AVERAGE_KILLS_STAT_NAME, BAR_CHART, DAMAGE_STAT_NAME, GAME_INDEX_KEY, KILL_STEALING_STAT_NAME, KILLS_STAT_NAME, LINE_CHART, TEAM_MEMBER_MAP, WIN_RATE_STAT_NAME } from "@/constants";
+import { BAR_CHART, GAME_INDEX_KEY, LINE_CHART, TEAM_MEMBER_MAP } from "@/constants";
 import { Spinner } from "@heroui/react";
 import StatBarChart from "../charts/statBarChart";
 import { StatData } from "@/stats/statBase";
-import { AverageKillsStat } from "@/stats/averageKillsStat";
-import { AverageDamageStat } from "@/stats/averageDamageStat";
-import { TotalKillsStat } from "@/stats/totalKillsStat";
-import { TotalDamageStat } from "@/stats/totalDamageStat";
-import { WinRateStat } from "@/stats/winrateStat";
-import { KillStealingStat } from "@/stats/killStealingStat";
+import { apiService } from "@/services/apiService";
 
 export interface AvgKillsProps {
   team: TeamName;
@@ -20,41 +15,53 @@ export interface AvgKillsProps {
   selectedMembers: IndividualName[];
 }
 
+// Map the statName prop to its user-friendly display name
+const STAT_DISPLAY_NAMES: Record<string, string> = {
+  avgKills: "Average Kills",
+  avgDamage: "Average Damage",
+  winRate: "Win Rate",
+  killStealing: "Kill Stealing",
+  kills: "Total Kills",
+  damage: "Total Damage",
+};
+
+// Based on the legacy stat classes, map out the default chart type for each stat
+const STAT_CHART_TYPES: Record<string, string> = {
+  avgKills: LINE_CHART,
+  avgDamage: LINE_CHART,
+  winRate: LINE_CHART,
+  killStealing: LINE_CHART,
+  kills: BAR_CHART,
+  damage: BAR_CHART,
+};
+
+// Based on legacy logic, Kill Stealing & Win Rate don't support individual member filtering because they calculate off the team natively or compare internally
+const STATS_WITHOUT_MEMBERS = ["killStealing", "winRate"];
+
 export default function GamePerformanceStat(props: AvgKillsProps) {
   const [statData, setStatData] = useState<StatData>({ data: [], chartOptions: [] });
   const [loading, setLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
 
-  const statClass = useMemo(() => {
-    switch (props.statName) {
-      case AVERAGE_KILLS_STAT_NAME:
-        return new AverageKillsStat();
-      case AVERAGE_DAMAGE_STAT_NAME:
-        return new AverageDamageStat();
-      case KILLS_STAT_NAME:
-        return new TotalKillsStat();
-      case DAMAGE_STAT_NAME:
-        return new TotalDamageStat();
-      case WIN_RATE_STAT_NAME:
-        return new WinRateStat();
-      case KILL_STEALING_STAT_NAME:
-        return new KillStealingStat();
-      default:
-        return null;
-    }
-  }, [props.statName]);
+  const statDisplayName = STAT_DISPLAY_NAMES[props.statName] || "Unknown Stat";
+  const chartType = STAT_CHART_TYPES[props.statName] || LINE_CHART;
+  const hasMembers = !STATS_WITHOUT_MEMBERS.includes(props.statName);
 
   const loadStats = async () => {
     setLoading(true);
     setLoadingError(false);
-    if (!statClass) return;
 
-    const stats = await statClass.getStats(props.team);
-    if (!stats) {
+    // Fetch the stat data from the new dynamic API endpoint!
+    // Output structure mimics the old StatClass.getStats payload: { data: [], chartOptions: [] }
+    const url = `/api/team/${props.team}/stats/${props.statName}`;
+    const stats = await apiService.fetchWithCache<StatData>(url);
+
+    if (!stats || !stats.data) {
       setLoadingError(true);
       setLoading(false);
       return;
     }
+
     setStatData(stats);
     setLoading(false);
   }
@@ -62,10 +69,10 @@ export default function GamePerformanceStat(props: AvgKillsProps) {
   // fetch stats from api on load
   useEffect(() => {
     loadStats();
-  }, [props.team, statClass]);
+  }, [props.team, props.statName]);
 
   const filteredStatData = useMemo<StatData>(() => {
-    if (!statData || props.selectedMembers.length === TEAM_MEMBER_MAP[props.team].length || !statClass?.hasMembers) {
+    if (!statData || props.selectedMembers.length === TEAM_MEMBER_MAP[props.team].length || !hasMembers) {
       return statData;
     }
 
@@ -73,28 +80,26 @@ export default function GamePerformanceStat(props: AvgKillsProps) {
       props.selectedMembers.some(member => option.key.startsWith(member))
     );
 
-    const dataKeys = Object.keys(statData.data[0]);
+    const dataKeys = Object.keys(statData.data[0] || {});
 
     const filteredData = statData.data.map(data => {
-      const filteredData: Record<string, number> = {};
+      const filteredDataObj: Record<string, number> = {};
       dataKeys.forEach(key => {
         if (props.selectedMembers.some(member => key.startsWith(member)) || key === GAME_INDEX_KEY) {
-          filteredData[key] = data[key];
+          filteredDataObj[key] = data[key];
         }
       });
-      return filteredData;
+      return filteredDataObj;
     });
-    // console.log("Filtered options: ", filteredOptions);
-    // console.log("Filtered data: ", filteredData);
 
     return {
       data: filteredData,
       chartOptions: filteredOptions,
     };
-  }, [statData, props.selectedMembers, props.team]);
+  }, [statData, props.selectedMembers, props.team, hasMembers]);
 
   const getChart = () => {
-    switch (statClass?.chartType || LINE_CHART) {
+    switch (chartType) {
       case LINE_CHART:
         return <StatLineChart data={filteredStatData} />;
       case BAR_CHART:
@@ -117,7 +122,7 @@ export default function GamePerformanceStat(props: AvgKillsProps) {
         </div>
       }
       <div className="w-full flex flex-col items-center">
-        <h2 className="p-2 self-start">{statClass?.statDisplayName}</h2>
+        <h2 className="p-2 self-start">{statDisplayName}</h2>
         {getChart()}
       </div>
     </div>

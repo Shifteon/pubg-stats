@@ -15,10 +15,12 @@ export interface GamesInRangeProps {
 }
 
 export default function GamesInRange({ allGameData, team }: GamesInRangeProps) {
+  const [visualGameRange, setVisualGameRange] = useState<number[]>([0, 0]);
   const [gameRange, setGameRange] = useState<number[]>([0, 0]);
 
   useEffect(() => {
     if (allGameData.length > 0) {
+      setVisualGameRange([Math.max(0, allGameData.length - 10), allGameData.length]);
       setGameRange([Math.max(0, allGameData.length - 10), allGameData.length]);
     }
   }, [allGameData]);
@@ -62,14 +64,15 @@ export default function GamesInRange({ allGameData, team }: GamesInRangeProps) {
     <>
       <div className="mb-8">
         <h3 className="text-xl font-semibold mb-2">Overview</h3>
-        <Overview gameData={gamesInRange} />
+        <Overview team={team} start={gameRange[0]} end={gameRange[1]} />
       </div>
       {allGameData.length > 10 && (
         <div className="w-full md:w-1/2 mb-4 px-4">
           <Slider
             label="Game Range"
-            value={gameRange}
-            onChange={(value) => setGameRange(value as number[])}
+            value={visualGameRange}
+            onChange={(value) => setVisualGameRange(value as number[])}
+            onChangeEnd={(value) => setGameRange(value as number[])}
             minValue={0}
             maxValue={allGameData.length}
             step={1}

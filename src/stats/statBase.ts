@@ -1,19 +1,19 @@
-import { 
-  BEN_LINE_NAME, 
-  BEN_LOWERCASE, 
-  BEN_STROKE_COLOR, 
-  CODY_LINE_NAME, 
-  CODY_LOWERCASE, 
-  CODY_STROKE_COLOR, 
-  DEFAULT_STROKE_COLOR, 
-  ISAAC_LINE_NAME, 
-  ISAAC_LOWERCASE, 
-  ISAAC_STROKE_COLOR, 
-  PERCENTAGE_OF_DATA_TO_REMOVE, 
-  TEAM_LINE_NAME, 
-  TEAM_LOWERCASE, 
-  TEAM_STROKE_COLOR, 
-  TRENTON_LINE_NAME, 
+import {
+  BEN_LINE_NAME,
+  BEN_LOWERCASE,
+  BEN_STROKE_COLOR,
+  CODY_LINE_NAME,
+  CODY_LOWERCASE,
+  CODY_STROKE_COLOR,
+  DEFAULT_STROKE_COLOR,
+  ISAAC_LINE_NAME,
+  ISAAC_LOWERCASE,
+  ISAAC_STROKE_COLOR,
+  PERCENTAGE_OF_DATA_TO_REMOVE,
+  TEAM_LINE_NAME,
+  TEAM_LOWERCASE,
+  TEAM_STROKE_COLOR,
+  TRENTON_LINE_NAME,
   TRENTON_LOWERCASE,
   TRENTON_STROKE_COLOR
 } from "@/constants";
@@ -44,11 +44,27 @@ export abstract class StatBase {
     this.statDisplayName = displayName;
     this.chartType = chartType;
   }
-  
+
   public abstract getStats(team: string): Promise<StatData | null>;
 
   protected async fetchData(team: string): Promise<{ statArray: Record<string, string>[] } | null> {
-    return apiService.fetchWithCache<{ statArray: Record<string, string>[] }>(`/api/stats?team=${team}&stat=${this.statName}`);
+    if (typeof window !== 'undefined') {
+      // Client-side execution: use HTTP fetch
+      return apiService.fetchWithCache<{ statArray: Record<string, string>[] }>(`/api/stats?team=${team}&stat=${this.statName}`);
+    } else {
+      // Server-side execution: bypass HTTP and call logic directly
+      const { getStatArray } = await import('@/utils/getStatArray');
+
+      try {
+        /* eslint-disable  @typescript-eslint/no-explicit-any */
+        const statArray = await getStatArray(this.statName as any, team as any);
+        if (!statArray) return null;
+        return { statArray: statArray as unknown as Record<string, string>[] };
+      } catch (error) {
+        console.error("Error fetching data on server", error);
+        return null;
+      }
+    }
   }
 
   protected async getStatData(team: string, keysToKeep: string[], shouldFilter = true) {
@@ -136,7 +152,7 @@ export abstract class StatBase {
         }
         rawObject[key] = Number(stat[key]);
       }
-      rawData.push({...rawObject, gameIndex});
+      rawData.push({ ...rawObject, gameIndex });
       gameIndex++;
     }
 

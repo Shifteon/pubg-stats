@@ -1,51 +1,56 @@
 "use client";
 
 import { TeamName } from "@/types";
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 import PlayerStatsGrid, { StatValue } from "./playerStatsGrid";
-import { playerMapping, statKeys } from "../utils";
+import { apiService } from "@/services/apiService";
+import { Spinner } from "@heroui/react";
 
 export interface PersonalBestsProps {
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
-  gameData: any[];
   team: TeamName;
+  start?: number;
+  end?: number;
 }
 
-export default function PersonalBests({ gameData, team }: PersonalBestsProps) {
-  const playerHighestStats = useMemo(() => {
-    if (gameData.length === 0) {
-      return {};
-    }
+export default function PersonalBests({ team, start, end }: PersonalBestsProps) {
+  const [playerHighestStats, setPlayerHighestStats] = useState<Record<string, Record<string, StatValue>>>({});
+  const [loading, setLoading] = useState(true);
 
-    const players = playerMapping[team] || [];
-    const playerBests: Record<string, Record<string, StatValue>> = {};
+  useEffect(() => {
+    let isMounted = true;
 
-    players.forEach(player => {
-      playerBests[player] = {};
-      statKeys.forEach(stat => {
-        playerBests[player][stat] = { value: 0, game: null };
-      });
-    });
+    const fetchPersonalBests = async () => {
+      setLoading(true);
+      let url = `/api/team/${team}/personal-bests`;
+      if (start !== undefined && end !== undefined) {
+        url += `?start=${start}&end=${end}`;
+      }
 
-    gameData.forEach(game => {
-      players.forEach(player => {
-        statKeys.forEach(stat => {
-          const playerStatKey = `${player}_${stat}`;
-          const statValue = parseFloat(game[playerStatKey]);
-          const currentBest = playerBests[player][stat];
-          const currentBestValue = typeof currentBest === 'object' && currentBest !== null && 'value' in currentBest ? currentBest.value : currentBest as number;
+      const data = await apiService.fetchWithCache<Record<string, Record<string, StatValue>>>(url);
 
-          if (statValue > currentBestValue) {
-            playerBests[player][stat] = { value: statValue, game: game };
-          }
-        });
-      });
-    });
+      if (isMounted && data) {
+        setPlayerHighestStats(data);
+      }
+      if (isMounted) setLoading(false);
+    };
 
-    return playerBests;
-  }, [gameData, team]);
+    fetchPersonalBests();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [team, start, end]);
 
   return (
-    <PlayerStatsGrid playerStats={playerHighestStats} team={team} />
+    <div className="relative w-full">
+      {loading && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/5 rounded-lg">
+          <Spinner />
+        </div>
+      )}
+      <div className={loading ? 'opacity-50' : ''}>
+        <PlayerStatsGrid playerStats={playerHighestStats} team={team} />
+      </div>
+    </div>
   );
 }

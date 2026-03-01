@@ -2,13 +2,13 @@
 
 import { TeamName } from "@/types";
 import { Accordion, AccordionItem } from "@heroui/react";
-import { useEffect, useMemo, useState } from "react";
-import { GameSummaryStat } from "@/stats/gameSummaryStat";
+import { useEffect, useState } from "react";
 import Overview from "./components/overview";
 import LoadingSpinner from "../loadingSpinner";
 import HallOfFame from "./components/HallOfFame";
 import PersonalBests from "./components/PersonalBests";
 import GamesInRange from "./components/GamesInRange";
+import { apiService } from "@/services/apiService";
 
 export interface GameSummaryProps {
   team: TeamName;
@@ -20,25 +20,26 @@ export default function GameSummary({ team }: GameSummaryProps) {
   const [loading, setLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
 
-  const statClass = useMemo(() => new GameSummaryStat(), []);
-
   const loadStats = async () => {
     setLoading(true);
     setLoadingError(false);
 
-    const stats = await statClass.getStats(team);
-    if (!stats || !stats.data) {
+    // Fetch the raw game array from the new API
+    const url = `/api/team/${team}/games`;
+    const data = await apiService.fetchWithCache<any[]>(url);
+
+    if (!data) {
       setLoadingError(true);
       setLoading(false);
       return;
     }
-    setAllGameData(stats.data);
+    setAllGameData(data);
     setLoading(false);
   };
 
   useEffect(() => {
     loadStats();
-  }, [team, statClass]);
+  }, [team]);
 
   if (loading) {
     return (
@@ -63,16 +64,16 @@ export default function GameSummary({ team }: GameSummaryProps) {
         variant="bordered"
       >
         <AccordionItem key="overview" title="Overview">
-          <Overview gameData={allGameData} />
+          <Overview team={team} />
         </AccordionItem>
         <AccordionItem key="games-in-range" title="Games in Range">
           <GamesInRange allGameData={allGameData} team={team} />
         </AccordionItem>
         <AccordionItem key="hall-of-fame" title="Hall of Fame">
-          <HallOfFame gameData={allGameData} team={team} />
+          <HallOfFame team={team} />
         </AccordionItem>
         <AccordionItem key="personal-bests" title="Personal Bests">
-          <PersonalBests gameData={allGameData} team={team} />
+          <PersonalBests team={team} />
         </AccordionItem>
       </Accordion>
     </div>

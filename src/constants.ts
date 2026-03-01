@@ -16,16 +16,17 @@ export const TEAM_ISAAC_CODY = "IC";
 export const TEAM_ISAAC_BEN = "IB";
 export const TWO_MAN_TEAMS = [TEAM_ISAAC_TRENTON, TEAM_ISAAC_CODY, TEAM_ISAAC_BEN];
 export const VALID_TEAM_NAMES = [
+  TEAM_ALL,
   TEAM_NO_TRENTON,
   TEAM_NO_CODY,
   TEAM_NO_BEN,
   TEAM_NO_ISAAC,
-  TEAM_ALL,
   TEST_TEAM,
   TEAM_ISAAC_TRENTON,
   TEAM_ISAAC_CODY,
   TEAM_ISAAC_BEN,
 ];
+export const GROUPS_TEAM_NAMES = [TEAM_ALL, TEAM_NO_TRENTON, TEAM_NO_CODY, TEAM_NO_BEN, TEAM_NO_ISAAC];
 
 import { StaticImageData } from "next/image";
 
@@ -58,6 +59,8 @@ export const CODY_LOWERCASE = "cody";
 export const BEN_LOWERCASE = "ben";
 export const TRENTON_LOWERCASE = "trenton";
 export const TEAM_LOWERCASE = "team";
+
+export const PLAYER_NAMES = [ISAAC_LOWERCASE, CODY_LOWERCASE, BEN_LOWERCASE, TRENTON_LOWERCASE];
 
 export const STATS_FILE_MAP: { [key in StatName]: string } = {
   [AVERAGE_DAMAGE_STAT_NAME]: AVERAGE_DAMAGE_STAT_FILE,

@@ -32,6 +32,8 @@ export default function PlayerStatsGrid({ playerStats, valueFormatter = defaultF
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+        {/* TODO: Don't loop here. We should just pass one instance of data here and the parent can loop.
+         Also, the parent should pass a click handler and can have the modal or whatever else */}
         {Object.entries(playerStats).map(([player, stats]) => {
           const tableData = Object.entries(stats).map(([stat, val]) => {
             // TODO: this is really messy

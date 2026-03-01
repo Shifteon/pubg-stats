@@ -1,48 +1,55 @@
 "use client";
 
 import { GameSummaryData, TeamName } from "@/types";
-import { Avatar, Card, CardBody, CardFooter, CardHeader, useDisclosure } from "@heroui/react";
-import { useMemo, useState } from "react";
+import { Avatar, Card, CardBody, CardFooter, CardHeader, Spinner, useDisclosure } from "@heroui/react";
+import { useEffect, useState } from "react";
 import { AVATAR_SRC_MAP } from "@/constants";
-import { HighestStat, playerMapping, processGameData, statKeys } from "../utils";
+import { HighestStat, processGameData } from "../utils";
 import GameModal from "./GameModal";
+import { apiService } from "@/services/apiService";
 
 export interface HallOfFameProps {
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
-  gameData: any[];
   team: TeamName;
+  start?: number;
+  end?: number;
 }
 
-export default function HallOfFame({ gameData, team }: HallOfFameProps) {
+export default function HallOfFame({ team, start, end }: HallOfFameProps) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedGame, setSelectedGame] = useState<GameSummaryData | null>(null);
 
-  const highestStats = useMemo(() => {
-    if (gameData.length === 0) {
-      return [];
-    }
+  const [highestStats, setHighestStats] = useState<HighestStat[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    const players = playerMapping[team] || [];
+  useEffect(() => {
+    let isMounted = true;
 
-    return statKeys.map(stat => {
-      let highest: HighestStat = { player: "ben", value: -1, stat, gameIndex: -1 };
+    const fetchHallOfFame = async () => {
+      setLoading(true);
+      let url = `/api/team/${team}/hall-of-fame`;
+      if (start !== undefined && end !== undefined) {
+        url += `?start=${start}&end=${end}`;
+      }
 
-      gameData.forEach(game => {
-        players.forEach(player => {
-          const playerStatKey = `${player}_${stat}`;
-          const statValue = parseFloat(game[playerStatKey]);
-          if (statValue > highest.value) {
-            highest = { player, value: statValue, stat, gameIndex: game.gameIndex };
-          }
-        });
-      });
+      const data = await apiService.fetchWithCache<HighestStat[]>(url);
 
-      return highest;
-    });
-  }, [gameData, team]);
+      if (isMounted && data) {
+        setHighestStats(data);
+      }
+      if (isMounted) setLoading(false);
+    };
 
-  const handleCardClick = (gameIndex: number) => {
-    const game = gameData.find(g => g.gameIndex === gameIndex);
+    fetchHallOfFame();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [team, start, end]);
+
+  const handleCardClick = async (gameIndex: number) => {
+    if (gameIndex === -1) return;
+    const url = `/api/team/${team}/games/${gameIndex}`;
+    const game = await apiService.fetchWithCache<Record<string, unknown>>(url);
     if (game) {
       setSelectedGame(processGameData(game, team));
       onOpen();
@@ -50,8 +57,13 @@ export default function HallOfFame({ gameData, team }: HallOfFameProps) {
   };
 
   return (
-    <>
-      <div className="grid grid-cols-3 gap-2 md:grid-cols-3 lg:grid-cols-5 lg:gap-4 w-full">
+    <div className="relative w-full">
+      {loading && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/5 rounded-lg">
+          <Spinner />
+        </div>
+      )}
+      <div className={`grid grid-cols-3 gap-2 md:grid-cols-3 lg:grid-cols-5 lg:gap-4 w-full ${loading ? 'opacity-50' : ''}`}>
         {highestStats.map(({ player, value, stat, gameIndex }) => (
           <Card key={stat} isPressable onPress={() => handleCardClick(gameIndex)}>
             <CardHeader className="justify-center">
@@ -77,6 +89,6 @@ export default function HallOfFame({ gameData, team }: HallOfFameProps) {
           game={selectedGame}
         />
       )}
-    </>
+    </div>
   );
 }
