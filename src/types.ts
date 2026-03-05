@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import {
   AVERAGE_KILLS_STAT_NAME,
   AVERAGE_DAMAGE_STAT_NAME,
@@ -99,3 +101,66 @@ export interface GameSummaryData {
   gameIndex: number;
   data: PlayerGameStat[];
 }
+
+export const playerAveragesSchema = z.object({
+  playerId: z.string(),
+  kills: z.number(),
+  assists: z.number(),
+  damage: z.number(),
+  rescues: z.number(),
+  recalls: z.number(),
+});
+
+export type PlayerAverages = z.infer<typeof playerAveragesSchema>;
+
+export const playerBestStatSchema = z.object({
+  bestStat: z.string(),
+  bestStatValue: z.number(),
+});
+
+export type PlayerBestStat = z.infer<typeof playerBestStatSchema>;
+
+export const playerTeamStatsSchema = z.object({
+  teamId: z.string(),
+  teamName: z.string(),
+  gamesPlayed: z.number(),
+  winRate: z.number(),
+  averageKills: z.number(),
+  averageDamage: z.number(),
+});
+
+export type PlayerTeamStats = z.infer<typeof playerTeamStatsSchema>;
+
+export const playerSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  color: z.string(),
+  designation: z.string(),
+  playerAverages: playerAveragesSchema,
+  totalGamesPlayed: z.number(),
+  totalWins: z.number(),
+  totalLosses: z.number(),
+  winRate: z.number(),
+  mostPlayedTeam: z.string(),
+  playerTeamStats: z.array(playerTeamStatsSchema),
+});
+
+export type Player = z.infer<typeof playerSchema>;
+
+export const playersSchema = z.array(z.object({
+  id: z.string(),
+  name: z.string(),
+  color: z.string(),
+  designation: z.string(),
+}));
+
+export type Players = z.infer<typeof playersSchema>;
+
+export const teamSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  teamType: z.string(),
+  players: z.array(playerSchema),
+});
+
+export type Team = z.infer<typeof teamSchema>;

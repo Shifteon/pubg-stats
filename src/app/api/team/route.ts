@@ -1,0 +1,26 @@
+import { supabase } from "@/lib/supabase";
+import { teamSchema } from "@/types";
+import { NextResponse } from "next/server";
+
+export async function GET() {
+  const { data: teams, error } = await supabase.from("teams").select(`
+    id,
+    name,
+    teamType:team_type,
+    players(
+      id,
+      name,
+      color,
+      designation
+    )
+  `);
+
+  if (error) {
+    console.error("Error fetching teams:", error);
+    return NextResponse.json({ error: "Failed to fetch teams" }, { status: 500 });
+  }
+
+  const teamData = teamSchema.array().parse(teams);
+
+  return NextResponse.json(teamData);
+}
