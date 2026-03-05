@@ -3,9 +3,10 @@
 import { Link, Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenuToggle, NavbarMenu, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@heroui/react";
 import CacheRefreshButton from "./cacheRefreshButton";
 import ThemeSwitcher from "./themeSwitcher";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { GROUPS_TEAM_NAMES, PLAYER_NAMES, TEAM_DISPLAY_NAMES, TEST_TEAM, TWO_MAN_TEAMS } from "@/constants";
+import { Teams, Player } from "@/types";
+import { capitalize } from "@/utils/stringUtils";
 
 export const Logo = () => {
   return (
@@ -74,31 +75,35 @@ export default function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const activePath = usePathname();
 
+  const [teams, setTeams] = useState<Teams>([]);
+  const [players, setPlayers] = useState<Player[]>([]);
+
+  useEffect(() => {
+    fetch('/api/team')
+      .then((res) => res.json())
+      .then((data) => setTeams(data))
+      .catch((err) => console.error("Error fetching teams:", err));
+
+    fetch('/api/player')
+      .then((res) => res.json())
+      .then((data) => setPlayers(data))
+      .catch((err) => console.error("Error fetching players:", err));
+  }, []);
+
   const menuItems = [
     {
       label: "Teams",
-      items: [...GROUPS_TEAM_NAMES.filter((team) => team !== TEST_TEAM).map((team) => {
-        return {
-          label: TEAM_DISPLAY_NAMES[team],
-          href: `/?team=${team}`,
-        }
-      }),
-      ...TWO_MAN_TEAMS.map((team) => {
-        return {
-          label: TEAM_DISPLAY_NAMES[team],
-          href: `/?team=${team}`,
-        }
-      })
-      ],
+      items: teams.map((team) => ({
+        label: team.name,
+        href: `/?team=${team.teamType}`,
+      })),
     },
     {
       label: "Players",
-      items: PLAYER_NAMES.map((player) => {
-        return {
-          label: player.charAt(0).toUpperCase() + player.slice(1),
-          href: `/player/${player}`,
-        }
-      }),
+      items: players.map((player) => ({
+        label: capitalize(player.name),
+        href: `/player/${capitalize(player.name)}`,
+      })),
     }
   ];
 

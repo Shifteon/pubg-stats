@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import { teamSchema } from "@/types";
+import { teamsSchema } from "@/types";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -20,7 +20,7 @@ export async function GET() {
     return NextResponse.json({ error: "Failed to fetch teams" }, { status: 500 });
   }
 
-  const teamData = teamSchema.array().parse(teams);
+  const teamData = teamsSchema.parse(teams);
 
   return NextResponse.json(teamData);
 }

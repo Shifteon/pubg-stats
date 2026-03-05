@@ -131,11 +131,16 @@ export const playerTeamStatsSchema = z.object({
 
 export type PlayerTeamStats = z.infer<typeof playerTeamStatsSchema>;
 
-export const playerSchema = z.object({
+export const playerMetadataSchema = z.object({
   id: z.string(),
   name: z.string(),
   color: z.string(),
   designation: z.string(),
+});
+
+export type PlayerMetadata = z.infer<typeof playerMetadataSchema>;
+
+export const playerSchema = playerMetadataSchema.extend({
   playerAverages: playerAveragesSchema,
   totalGamesPlayed: z.number(),
   totalWins: z.number(),
@@ -147,20 +152,82 @@ export const playerSchema = z.object({
 
 export type Player = z.infer<typeof playerSchema>;
 
-export const playersSchema = z.array(z.object({
-  id: z.string(),
-  name: z.string(),
-  color: z.string(),
-  designation: z.string(),
-}));
+export const playersSchema = z.array(playerMetadataSchema);
 
 export type Players = z.infer<typeof playersSchema>;
 
-export const teamSchema = z.object({
+export const gameSchema = z.object({
+  id: z.string(),
+  teamId: z.string(),
+  gameIndex: z.number(),
+  isWin: z.boolean(),
+  matchType: z.enum(["duo", "squad"]),
+  stats: z.array(z.object({
+    playerId: z.string(),
+    playerName: z.string(),
+    kills: z.number(),
+    assists: z.number(),
+    damage: z.number(),
+    rescues: z.number(),
+    recalls: z.number(),
+  }))
+});
+
+export type Game = z.infer<typeof gameSchema>;
+
+export const statPairSchema = z.object({
+  stat: z.enum(["kills", "assists", "damage", "rescues", "recalls"]),
+  statValue: z.number(),
+});
+
+export type StatPair = z.infer<typeof statPairSchema>;
+
+export const teamHallOfFameSchema = z.record(
+  z.string(), // key is the stat name, e.g. "kills", "assists"
+  z.object({
+    playerId: z.string(),
+    gameId: z.string(),
+    statPair: statPairSchema,
+  })
+);
+
+export type TeamHallOfFame = z.infer<typeof teamHallOfFameSchema>;
+
+export const teamPersonalBestSchema = z.record(
+  z.string(), // key is the playerId
+  z.object({
+    kills: statPairSchema,
+    assists: statPairSchema,
+    damage: statPairSchema,
+    rescues: statPairSchema,
+    recalls: statPairSchema,
+  })
+);
+
+export type TeamPersonalBest = z.infer<typeof teamPersonalBestSchema>;
+
+export const teamOverviewSchema = z.object({
+  teamId: z.string(),
+  teamName: z.string(),
+  teamType: z.string(),
+  players: playersSchema,
+  totalGames: z.number(),
+  totalWins: z.number(),
+  totalLosses: z.number(),
+  winRate: z.number(),
+  winStreak: z.number(),
+  longestWinStreak: z.number(),
+  hallOfFame: teamHallOfFameSchema,
+  teamPersonalBests: teamPersonalBestSchema,
+});
+
+export type TeamOverview = z.infer<typeof teamOverviewSchema>;
+
+export const teamsSchema = z.array(z.object({
   id: z.string(),
   name: z.string(),
   teamType: z.string(),
   players: z.array(playerSchema),
-});
+}));
 
-export type Team = z.infer<typeof teamSchema>;
+export type Teams = z.infer<typeof teamsSchema>;
