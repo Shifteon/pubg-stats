@@ -159,7 +159,7 @@ export type Players = z.infer<typeof playersSchema>;
 export const gameSchema = z.object({
   id: z.string(),
   teamId: z.string(),
-  gameIndex: z.number(),
+  gameNumber: z.number(),
   isWin: z.boolean(),
   matchType: z.enum(["duo", "squad"]),
   stats: z.array(z.object({
