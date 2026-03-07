@@ -1,4 +1,4 @@
-import TeamView from "@/components/team/teamView";
+import TeamView from "@/app/team/[teamId]/components/teamView";
 
 type Params = Promise<{ teamName: string }>;
 

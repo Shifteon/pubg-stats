@@ -1,14 +1,14 @@
 "use client";
 
 import { Avatar, Chip, Tab, Tabs } from "@heroui/react";
-import GamePerformanceStat from "@/components/gamePerformance/gamePerformance";
+import GamePerformanceStat from "@/app/team/[teamId]/components/gamePerformance/gamePerformance";
 import { AVATAR_SRC_MAP, GAME_SUMMARY_STAT_NAME, KILL_STEALING_STAT_NAME, SUPPORTED_STATS, TEAM_ALL, TEAM_DISPLAY_NAMES, TEAM_MEMBER_MAP, TWO_MAN_TEAMS } from "@/constants";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { Key } from '@react-types/shared';
 import { IndividualName, StatName, TeamName, Teams } from "@/types";
 import React from "react";
-import GameSummary from "@/components/gameSummary/gameSummary";
-import GamesInRange from "@/components/gameSummary/components/GamesInRange";
+import GameSummary from "@/app/team/[teamId]/components/gameSummary/gameSummary";
+import GamesInRange from "@/app/team/[teamId]/components/gameSummary/components/GamesInRange";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import LoadingSpinner from "@/components/loadingSpinner";
 

@@ -4,7 +4,7 @@ import { TeamName } from "@/types";
 import { Accordion, AccordionItem } from "@heroui/react";
 import { useEffect, useState } from "react";
 import Overview from "./components/overview";
-import LoadingSpinner from "../loadingSpinner";
+import LoadingSpinner from "../../../../../components/loadingSpinner";
 import HallOfFame from "./components/HallOfFame";
 import PersonalBests from "./components/PersonalBests";
 import { apiService } from "@/services/apiService";
