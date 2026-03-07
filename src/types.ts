@@ -231,3 +231,19 @@ export const teamsSchema = z.array(z.object({
 }));
 
 export type Teams = z.infer<typeof teamsSchema>;
+
+export const teamStatTimelinePointSchema = z.object({
+  gameIndex: z.number(),
+  avgKills: z.record(z.string(), z.number()),
+  avgDamage: z.record(z.string(), z.number()),
+  kills: z.record(z.string(), z.number()),
+  damage: z.record(z.string(), z.number()),
+  winRate: z.number(),
+  killStealing: z.record(z.string(), z.number()),
+});
+
+export type TeamStatTimelinePoint = z.infer<typeof teamStatTimelinePointSchema>;
+
+export const teamStatTimelineSchema = z.array(teamStatTimelinePointSchema);
+
+export type TeamStatTimeline = z.infer<typeof teamStatTimelineSchema>;
