@@ -8,6 +8,7 @@ import { Key } from '@react-types/shared';
 import { IndividualName, StatName, TeamName } from "@/types";
 import React from "react";
 import GameSummary from "../gameSummary/gameSummary";
+import GamesInRange from "../gameSummary/components/GamesInRange";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 const teamOptions = [
@@ -59,7 +60,7 @@ export default function HomeComponent() {
   const [selectedMembers, setSelectedMembers] = useState<IndividualName[]>(TEAM_MEMBER_MAP[selectedTeam] as IndividualName[]);
   const [selectedTab, setSelectedTab] = useState<Key>(() => {
     const tabFromParams = searchParams.get('tab') as Key;
-    if (tabFromParams && ['summary', 'graphs'].includes(tabFromParams as string)) {
+    if (tabFromParams && ['summary', 'graphs', 'games-in-range'].includes(tabFromParams as string)) {
       return tabFromParams;
     }
     return 'summary' as Key;
@@ -119,7 +120,7 @@ export default function HomeComponent() {
     if (teamFromParams && teamOptions.some(o => o.key === teamFromParams) && teamFromParams !== selectedTeam) {
       setSelectedTeam(teamFromParams);
     }
-    if (tabFromParams && ['summary', 'graphs'].includes(tabFromParams as string) && tabFromParams !== selectedTab) {
+    if (tabFromParams && ['summary', 'graphs', 'games-in-range'].includes(tabFromParams as string) && tabFromParams !== selectedTab) {
       setSelectedTab(tabFromParams);
     }
   }, [searchParams]);
@@ -152,6 +153,11 @@ export default function HomeComponent() {
         >
           <Tab key="summary" title="Summary">
             <GameSummary team={selectedTeam} />
+          </Tab>
+          <Tab key="games-in-range" title="Games in Range">
+            <div className="mt-4">
+              <GamesInRange team={selectedTeam} />
+            </div>
           </Tab>
           <Tab key="graphs" title="Graphs">
             <div className="p-2 mt-2">

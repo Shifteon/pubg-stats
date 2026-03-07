@@ -7,7 +7,6 @@ import Overview from "./components/overview";
 import LoadingSpinner from "../loadingSpinner";
 import HallOfFame from "./components/HallOfFame";
 import PersonalBests from "./components/PersonalBests";
-import GamesInRange from "./components/GamesInRange";
 import { apiService } from "@/services/apiService";
 
 export interface GameSummaryProps {
@@ -78,9 +77,6 @@ export default function GameSummary({ team }: GameSummaryProps) {
       >
         <AccordionItem key="overview" title="Overview">
           <Overview team={team} />
-        </AccordionItem>
-        <AccordionItem key="games-in-range" title="Games in Range">
-          <GamesInRange totalGamesCount={totalGamesCount} team={team} />
         </AccordionItem>
         <AccordionItem key="hall-of-fame" title="Hall of Fame">
           <HallOfFame team={team} />

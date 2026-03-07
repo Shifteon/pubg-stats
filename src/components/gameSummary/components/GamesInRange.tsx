@@ -11,10 +11,10 @@ import { apiService } from "@/services/apiService";
 
 export interface GamesInRangeProps {
   team: TeamName;
-  totalGamesCount: number;
 }
 
-export default function GamesInRange({ team, totalGamesCount }: GamesInRangeProps) {
+export default function GamesInRange({ team }: GamesInRangeProps) {
+  const [totalGamesCount, setTotalGamesCount] = useState<number>(0);
   const [visualGameRange, setVisualGameRange] = useState<number[]>([0, 0]);
   const [gameRange, setGameRange] = useState<number[]>([0, 0]);
   const [gamesInRange, setGamesInRange] = useState<Record<string, unknown>[]>([]);
@@ -30,12 +30,37 @@ export default function GamesInRange({ team, totalGamesCount }: GamesInRangeProp
   useEffect(() => {
     let isMounted = true;
     const fetchRange = async () => {
-      if (totalGamesCount === 0) return;
       setLoading(true);
-      const url = `/api/team/${team}/games?start=${gameRange[0]}&end=${gameRange[1]}`;
-      const data = await apiService.fetchWithCache<Record<string, unknown>[]>(url);
-      if (isMounted && data) {
-        setGamesInRange(data);
+
+      // Fetch total games count to determine bounds
+      const allGamesUrl = `/api/team/${team}/games`;
+      const allData = await apiService.fetchWithCache<unknown[]>(allGamesUrl);
+
+      if (isMounted && allData) {
+        const count = allData.length;
+        setTotalGamesCount(count);
+
+        if (count > 0) {
+          const start = Math.max(0, count - 10);
+          const end = count;
+
+          if (gameRange[0] === 0 && gameRange[1] === 0) {
+            setVisualGameRange([start, end]);
+            setGameRange([start, end]);
+            // Use these new bounds for the fetch
+            const url = `/api/team/${team}/games?start=${start}&end=${end}`;
+            const data = await apiService.fetchWithCache<Record<string, unknown>[]>(url);
+            if (isMounted && data) {
+              setGamesInRange(data);
+            }
+          } else {
+            const url = `/api/team/${team}/games?start=${gameRange[0]}&end=${gameRange[1]}`;
+            const data = await apiService.fetchWithCache<Record<string, unknown>[]>(url);
+            if (isMounted && data) {
+              setGamesInRange(data);
+            }
+          }
+        }
       }
       if (isMounted) setLoading(false);
     };
