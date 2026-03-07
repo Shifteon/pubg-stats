@@ -1,197 +1,55 @@
 "use client";
 
-import { Avatar, Chip, Select, SelectItem, Tab, Tabs } from "@heroui/react";
-import GamePerformanceStat from "../gamePerformance/gamePerformance";
-import { AVATAR_SRC_MAP, GAME_SUMMARY_STAT_NAME, KILL_STEALING_STAT_NAME, SUPPORTED_STATS, TEAM_ALL, TEAM_DISPLAY_NAMES, TEAM_ISAAC_BEN, TEAM_ISAAC_CODY, TEAM_ISAAC_TRENTON, TEAM_MEMBER_MAP, TEAM_NO_BEN, TEAM_NO_CODY, TEAM_NO_ISAAC, TEAM_NO_TRENTON, TWO_MAN_TEAMS } from "@/constants";
-import { ChangeEvent, useCallback, useEffect, useState } from "react";
-import { Key } from '@react-types/shared';
-import { IndividualName, StatName, TeamName } from "@/types";
-import React from "react";
-import GameSummary from "../gameSummary/gameSummary";
-import GamesInRange from "../gameSummary/components/GamesInRange";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-
-const teamOptions = [
-  { key: TEAM_ALL, label: TEAM_DISPLAY_NAMES[TEAM_ALL] },
-  { key: TEAM_NO_BEN, label: TEAM_DISPLAY_NAMES[TEAM_NO_BEN] },
-  { key: TEAM_NO_TRENTON, label: TEAM_DISPLAY_NAMES[TEAM_NO_TRENTON] },
-  { key: TEAM_NO_CODY, label: TEAM_DISPLAY_NAMES[TEAM_NO_CODY] },
-  { key: TEAM_NO_ISAAC, label: TEAM_DISPLAY_NAMES[TEAM_NO_ISAAC] },
-  { key: TEAM_ISAAC_BEN, label: TEAM_DISPLAY_NAMES[TEAM_ISAAC_BEN] },
-  { key: TEAM_ISAAC_CODY, label: TEAM_DISPLAY_NAMES[TEAM_ISAAC_CODY] },
-  { key: TEAM_ISAAC_TRENTON, label: TEAM_DISPLAY_NAMES[TEAM_ISAAC_TRENTON] },
-];
-
-const CloseIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    aria-hidden="true"
-    focusable="false"
-    height="1em"
-    role="presentation"
-    viewBox="0 0 24 24"
-    width="1em"
-    {...props}
-  >
-    <path
-      d="M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2zm4.3 14.3a.996.996 0 01-1.41 0L12 13.41l-2.89 2.89a.996.996 0 11-1.41-1.41L10.59 12 7.7 9.11a.996.996 0 111.41-1.41L12 10.59l2.89-2.89a.996.996 0 111.41 1.41L13.41 12l2.89 2.89a.996.996 0 010 1.41z"
-      fill="currentColor"
-    />
-  </svg>
-);
-
-const PlusIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg aria-hidden="true" focusable="false" height="1em" role="presentation" viewBox="0 0 24 24" width="1em" {...props}>
-    <path d="M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2zm5 11h-4v4a1 1 0 01-2 0v-4H7a1 1 0 010-2h4V7a1 1 0 012 0v4h4a1 1 0 010 2z" fill="currentColor" />
-  </svg>
-);
+import { Link, Button, Card, CardBody, CardHeader } from "@heroui/react";
 
 export default function HomeComponent() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const [selectedTeam, setSelectedTeam] = useState<TeamName>(() => {
-    const teamFromParams = searchParams.get('team') as TeamName;
-    if (teamFromParams && teamOptions.some(o => o.key === teamFromParams)) {
-      return teamFromParams;
-    }
-    return TEAM_ALL;
-  });
-  const [selectedMembers, setSelectedMembers] = useState<IndividualName[]>(TEAM_MEMBER_MAP[selectedTeam] as IndividualName[]);
-  const [selectedTab, setSelectedTab] = useState<Key>(() => {
-    const tabFromParams = searchParams.get('tab') as Key;
-    if (tabFromParams && ['summary', 'graphs', 'games-in-range'].includes(tabFromParams as string)) {
-      return tabFromParams;
-    }
-    return 'summary' as Key;
-  });
-
-  const initStatsToGraph = () => {
-    if (TWO_MAN_TEAMS.includes(selectedTeam)) {
-      // Two man teams don't have kill stealing stat
-      return [...SUPPORTED_STATS.filter(stat => stat !== GAME_SUMMARY_STAT_NAME && stat !== KILL_STEALING_STAT_NAME)];
-    }
-    return [...SUPPORTED_STATS.filter(stat => stat !== GAME_SUMMARY_STAT_NAME)];
-  };
-
-  const [statsToGraph, setStatsToGraph] = useState<StatName[]>(initStatsToGraph());
-
-  const handleTeamChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    const newTeam = e.target.value as TeamName;
-    if (!newTeam || newTeam === selectedTeam) {
-      return;
-    }
-    setSelectedTeam(newTeam);
-    handleUpdateParam('team', newTeam);
-  };
-
-  const handleTabChange = (newTab: Key) => {
-    setSelectedTab(newTab);
-    handleUpdateParam('tab', newTab as string);
-  };
-
-
-  const handleMemberSelectionChange = (memberName: IndividualName) => {
-    setSelectedMembers(prevSelected => {
-      if (prevSelected.includes(memberName)) {
-        return prevSelected.filter(m => m !== memberName);
-      } else {
-        return [...prevSelected, memberName];
-      }
-    });
-  };
-
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set(name, value);
-      return params.toString();
-    },
-    [searchParams]
-  );
-
-  const handleUpdateParam = (paramName: string, paramValue: string) => {
-    router.push(pathname + '?' + createQueryString(paramName, paramValue));
-  };
-
-  useEffect(() => {
-    const teamFromParams = searchParams.get('team') as TeamName;
-    const tabFromParams = searchParams.get('tab') as Key;
-    if (teamFromParams && teamOptions.some(o => o.key === teamFromParams) && teamFromParams !== selectedTeam) {
-      setSelectedTeam(teamFromParams);
-    }
-    if (tabFromParams && ['summary', 'graphs', 'games-in-range'].includes(tabFromParams as string) && tabFromParams !== selectedTab) {
-      setSelectedTab(tabFromParams);
-    }
-  }, [searchParams]);
-
-  useEffect(() => {
-    setSelectedMembers(TEAM_MEMBER_MAP[selectedTeam] as IndividualName[]);
-    setStatsToGraph(initStatsToGraph());
-  }, [selectedTeam]);
-
   return (
-    <>
-      <div className="mt-2 mr-2 ml-2 mb-10 xl:m-10 lg:m-5 md:m-3">
-        <Select
-          label="Select a team"
-          selectionMode="single"
-          onChange={handleTeamChange}
-          selectedKeys={[selectedTeam]}
-        >
-          {teamOptions.map((team) => (
-            <SelectItem key={team.key}>{team.label}</SelectItem>
-          ))
-          }
-        </Select>
-        <Tabs
-          className="mt-5"
-          destroyInactiveTabPanel={true}
-          color="primary"
-          onSelectionChange={handleTabChange}
-          selectedKey={selectedTab}
-        >
-          <Tab key="summary" title="Summary">
-            <GameSummary team={selectedTeam} />
-          </Tab>
-          <Tab key="games-in-range" title="Games in Range">
-            <div className="mt-4">
-              <GamesInRange team={selectedTeam} />
-            </div>
-          </Tab>
-          <Tab key="graphs" title="Graphs">
-            <div className="p-2 mt-2">
-              <p className="text-sm text-gray-500 mb-2">Filter Members</p>
-              <div className="flex flex-wrap gap-2">
-                {TEAM_MEMBER_MAP[selectedTeam].map((member) => {
-                  const isSelected = selectedMembers.includes(member as IndividualName);
-                  return (
-                    <Chip
-                      key={member}
-                      variant={isSelected ? "solid" : "bordered"}
-                      color={isSelected ? "primary" : "default"}
-                      avatar={<Avatar name={member.charAt(0).toUpperCase()} src={AVATAR_SRC_MAP[member]?.src} />}
-                      endContent={isSelected ? <CloseIcon /> : <PlusIcon />}
-                      onClick={() => handleMemberSelectionChange(member as IndividualName)}
-                      className="cursor-pointer"
-                    >
-                      {member.charAt(0).toUpperCase() + member.slice(1)}
-                    </Chip>
-                  );
-                })}
-              </div>
-            </div>
-            <div className="lg:grid lg:grid-cols-2 gap-1">
-              {statsToGraph.map((statName, index) => (
-                <React.Fragment key={index}>
-                  <GamePerformanceStat team={selectedTeam} statName={statName} selectedMembers={selectedMembers}></GamePerformanceStat>
-                </React.Fragment>
-              ))
-              }
-            </div>
-          </Tab>
-        </Tabs>
+    <div className="mt-10 mx-4 lg:mx-20">
+      <div className="text-center mb-10">
+        <h1 className="text-4xl font-bold tracking-tight sm:text-6xl mb-4">PUBG Stats Tracker</h1>
+        <p className="text-xl text-default-500 max-w-2xl mx-auto">
+          Welcome to the PUBG Stats Tracker! View detailed performance metrics, game summaries, and
+          player comparisons across different team combinations.
+        </p>
       </div>
-    </>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mt-12">
+        <Card className="p-4">
+          <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
+            <h4 className="font-bold text-large">Teams</h4>
+            <p className="text-tiny text-default-500">Analyze performance by group composition</p>
+          </CardHeader>
+          <CardBody className="overflow-visible py-2">
+            <p className="mb-4 text-default-600">
+              Explore how different team combinations perform together.
+              View win rates, average kills, damage, and game-by-game breakdowns for any squad.
+            </p>
+            <div className="mt-auto pt-4">
+              <Button as={Link} href="/team/All" color="primary" variant="flat" className="w-full sm:w-auto">
+                View All Teams
+              </Button>
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card className="p-4">
+          <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
+            <h4 className="font-bold text-large">Players</h4>
+            <p className="text-tiny text-default-500">Deep dive into individual statistics</p>
+          </CardHeader>
+          <CardBody className="overflow-visible py-2">
+            <p className="mb-4 text-default-600">
+              Check out individual player stats, weapons usage, and personal bests.
+              Compare performance across different team compositions.
+            </p>
+            <div className="mt-auto pt-4">
+              <Button as={Link} href="/player/e031ca37-9759-4503-ac8b-4a7cf5ea0a05" color="primary" variant="flat" className="w-full sm:w-auto">
+                View Players
+              </Button>
+            </div>
+          </CardBody>
+        </Card>
+      </div>
+    </div>
   );
 }

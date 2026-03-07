@@ -95,7 +95,7 @@ export default function NavBar() {
       label: "Teams",
       items: teams.map((team) => ({
         label: team.name,
-        href: `/?team=${team.teamType}`,
+        href: `/team/${team.name}`,
       })),
     },
     {
@@ -119,8 +119,8 @@ export default function NavBar() {
 
   const navLinks = (
     <>
-      <NavbarItem isActive={isActivePath("/") && !activePath.includes("?team=")}>
-        <Link href="/" color={isActivePath("/") && !activePath.includes("?team=") ? "primary" : "foreground"}>
+      <NavbarItem isActive={isActivePath("/")}>
+        <Link href="/" color={isActivePath("/") ? "primary" : "foreground"}>
           Home
         </Link>
       </NavbarItem>
