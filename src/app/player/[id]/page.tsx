@@ -1,7 +1,7 @@
 "use client";
 
 import { use, Suspense } from "react";
-import PlayerStatsView from "@/components/playerStats/playerStatsView";
+import PlayerStatsView from "./components/playerStatsView";
 import { Spinner } from "@heroui/react";
 import { usePlayer } from "@/hooks/usePlayer";
 
