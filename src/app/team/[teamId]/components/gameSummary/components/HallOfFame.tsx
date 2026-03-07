@@ -5,7 +5,7 @@ import { Avatar, Card, CardBody, CardFooter, CardHeader, Spinner, useDisclosure 
 import { useEffect, useState } from "react";
 import { AVATAR_SRC_MAP } from "@/constants";
 import { HighestStat, processGameData } from "../utils";
-import GameModal from "./GameModal";
+import GameModal from "../../GameModal";
 import { apiService } from "@/services/apiService";
 
 export interface HallOfFameProps {

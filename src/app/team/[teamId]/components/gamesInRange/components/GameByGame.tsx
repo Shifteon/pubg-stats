@@ -3,9 +3,9 @@
 import { TeamName } from "@/types";
 import { Pagination, Accordion, AccordionItem } from "@heroui/react";
 import { useEffect, useMemo, useState } from "react";
-import GameTable from "./GameTable";
+import GameTable from "../../GameTable";
 import GameSort, { SortConfig } from "./GameSort";
-import { playerMapping, statKeys, processGameData } from "../utils";
+import { playerMapping, statKeys, processGameData } from "../../gameSummary/utils";
 import GameFilter, { Filter } from "./GameFilter";
 
 export interface GameByGameProps {

@@ -8,7 +8,7 @@ import { Key } from '@react-types/shared';
 import { IndividualName, StatName, TeamName, Teams } from "@/types";
 import React from "react";
 import GameSummary from "@/app/team/[teamId]/components/gameSummary/gameSummary";
-import GamesInRange from "@/app/team/[teamId]/components/gameSummary/components/GamesInRange";
+import GamesInRange from "@/app/team/[teamId]/components/gamesInRange/GamesInRange";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import LoadingSpinner from "@/components/loadingSpinner";
 

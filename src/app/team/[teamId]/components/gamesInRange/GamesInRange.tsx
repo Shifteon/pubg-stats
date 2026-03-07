@@ -3,10 +3,10 @@
 import { TeamName } from "@/types";
 import { Slider, Tab, Tabs, Spinner } from "@heroui/react";
 import { useEffect, useMemo, useState } from "react";
-import Overview from "./overview";
-import PlayerStatCard from "./PlayerStatCard";
-import GameByGame from "./GameByGame";
-import { playerMapping, statKeys } from "../utils";
+import Overview from "../gameSummary/components/overview";
+import PlayerStatCard from "../gameSummary/components/PlayerStatCard";
+import GameByGame from "./components/GameByGame";
+import { playerMapping, statKeys } from "../gameSummary/utils";
 import { apiService } from "@/services/apiService";
 
 export interface GamesInRangeProps {

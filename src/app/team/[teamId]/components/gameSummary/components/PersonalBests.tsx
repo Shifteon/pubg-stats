@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import PlayerStatCard from "./PlayerStatCard";
 import { apiService } from "@/services/apiService";
 import { Spinner, useDisclosure } from "@heroui/react";
-import GameModal from "./GameModal";
+import GameModal from "../../GameModal";
 import { processGameData } from "../utils";
 
 export interface StatValue {

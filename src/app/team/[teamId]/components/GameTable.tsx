@@ -8,7 +8,7 @@ interface GameTableProps {
   gameIndex: number;
 }
 
-import { statKeys } from "../utils";
+import { statKeys } from "./gameSummary/utils";
 
 export default function GameTable({ data, gameIndex }: GameTableProps) {
   const gameTableColumns = [

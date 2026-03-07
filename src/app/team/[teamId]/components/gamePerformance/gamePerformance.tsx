@@ -2,10 +2,10 @@
 
 import { TeamName, StatName, IndividualName } from "@/types";
 import { useEffect, useMemo, useState } from "react";
-import StatLineChart from "../charts/statLineChart";
+import StatLineChart from "@/components/charts/statLineChart";
 import { BAR_CHART, GAME_INDEX_KEY, LINE_CHART, TEAM_MEMBER_MAP } from "@/constants";
 import { Spinner } from "@heroui/react";
-import StatBarChart from "../charts/statBarChart";
+import StatBarChart from "@/components/charts/statBarChart";
 import { StatData } from "@/stats/statBase";
 import { apiService } from "@/services/apiService";
 
