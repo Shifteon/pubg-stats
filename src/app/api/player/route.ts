@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import { playerSchema } from "@/types";
+import { playerMetadataSchema } from "@/types";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -16,7 +16,7 @@ export async function GET() {
     return NextResponse.json({ error: "Failed to fetch players" }, { status: 500 });
   }
 
-  const playerData = z.array(playerSchema).parse(players);
+  const playerData = z.array(playerMetadataSchema).parse(players);
 
   return NextResponse.json(playerData);
 }

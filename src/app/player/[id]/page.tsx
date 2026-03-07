@@ -3,19 +3,19 @@
 import { use, Suspense } from "react";
 import PlayerStatsView from "@/components/playerStats/playerStatsView";
 import { Spinner } from "@heroui/react";
-import { usePlayerStatsData } from "@/hooks/usePlayerStatsData";
+import { usePlayer } from "@/hooks/usePlayer";
 
 interface PlayerPageProps {
-  params: Promise<{ name: string }>;
+  params: Promise<{ id: string }>;
 }
 
 export default function PlayerPage({ params }: PlayerPageProps) {
   // Unwrap params using React.use()
-  const { name } = use(params);
+  const { id } = use(params);
 
-  const stats = usePlayerStatsData(name);
+  const { player, isLoading, isError } = usePlayer(id);
 
-  if (stats.loading) {
+  if (isLoading) {
     return (
       <div className="w-full h-screen flex justify-center items-center">
         <Spinner size="lg" label="Loading Player Stats..." />
@@ -23,10 +23,10 @@ export default function PlayerPage({ params }: PlayerPageProps) {
     );
   }
 
-  if (!stats.data || stats.data.data.length === 0) {
+  if (isError || !player) {
     return (
       <div className="w-full h-screen flex justify-center items-center">
-        <h1 className="text-2xl">No data found for player: {name}</h1>
+        <h1 className="text-2xl text-danger">No data found for player: {id}</h1>
       </div>
     );
   }
@@ -34,7 +34,7 @@ export default function PlayerPage({ params }: PlayerPageProps) {
   return (
     <Suspense fallback={<Spinner size="lg" label="Loading Player Stats..." />}>
       <div className="container mx-auto p-4">
-        <PlayerStatsView stats={stats} playerName={name} />
+        <PlayerStatsView player={player} />
       </div>
     </Suspense>
   );

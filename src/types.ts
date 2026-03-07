@@ -227,7 +227,7 @@ export const teamsSchema = z.array(z.object({
   id: z.string(),
   name: z.string(),
   teamType: z.string(),
-  players: z.array(playerSchema),
+  players: z.array(playerMetadataSchema),
 }));
 
 export type Teams = z.infer<typeof teamsSchema>;

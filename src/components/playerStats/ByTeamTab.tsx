@@ -1,23 +1,23 @@
 "use client";
 
 import { TEAM_ABBREVIATIONS } from "@/constants";
-import { PlayerAggregatedData, PlayerTeamStats } from "@/stats/playerStat";
+import { PlayerTeamStats } from "@/types";
 import { BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar, ResponsiveContainer, Cell } from "recharts";
 
 interface ByTeamTabProps {
-  data: PlayerAggregatedData;
+  data: PlayerTeamStats[];
 }
 
 const METRICS = [
-  { key: "avgDamage", label: "Average Damage" },
-  { key: "avgKills", label: "Average Kills" },
+  { key: "averageDamage", label: "Average Damage" },
+  { key: "averageKills", label: "Average Kills" },
   { key: "winRate", label: "Win Rate" },
 ];
 
 export default function ByTeamTab({ data }: ByTeamTabProps) {
   const processDataForMetric = (metricKey: string) => {
     // Sort by the specific metric descending
-    const sorted = [...data.data].sort((a, b) => {
+    const sorted = [...data].sort((a, b) => {
       return (b[metricKey as keyof PlayerTeamStats] as number) - (a[metricKey as keyof PlayerTeamStats] as number);
     });
 

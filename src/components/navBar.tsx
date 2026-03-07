@@ -102,7 +102,7 @@ export default function NavBar() {
       label: "Players",
       items: players.map((player) => ({
         label: capitalize(player.name),
-        href: `/player/${capitalize(player.name)}`,
+        href: `/player/${player.id}`,
       })),
     }
   ];

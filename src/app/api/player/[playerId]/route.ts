@@ -81,16 +81,20 @@ async function fetchPlayerTeamStats(playerId: string): Promise<PlayerTeamStats[]
   if (statsError) throw statsError;
   if (winsError) throw winsError;
 
-  if (winsData && statsData) {
-    if (winsData.length !== statsData.length) {
+  //sort winsData and statsData by teamId
+  const sortedWins = winsData.sort((a, b) => a.teamId - b.teamId);
+  const sortedStats = statsData.sort((a, b) => a.teamId - b.teamId);
+
+  if (sortedWins && sortedStats) {
+    if (sortedWins.length !== sortedStats.length) {
       throw new Error("Wins and stats data length mismatch");
     }
-    for (let i = 0; i < winsData.length; i++) {
-      const win = winsData[i];
-      const stat = statsData[i];
+    for (let i = 0; i < sortedWins.length; i++) {
+      const win = sortedWins[i];
+      const stat = sortedStats[i];
       playerTeamStats.push({
-        teamId: win.teamId,
-        teamName: win.teamName,
+        teamId: stat.teamId,
+        teamName: stat.teamName,
         gamesPlayed: stat.gamesPlayed,
         winRate: (win.wins / stat.gamesPlayed) * 100,
         averageKills: stat.avgKills,
