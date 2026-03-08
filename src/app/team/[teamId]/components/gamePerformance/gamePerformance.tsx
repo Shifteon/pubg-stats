@@ -1,9 +1,9 @@
 "use client";
 
-import { StatName, TeamStatTimelinePoint } from "@/types";
+import { StatName, TeamStatTimelinePoint, PlayerMetadata } from "@/types";
 import { useMemo } from "react";
 import StatLineChart from "@/components/charts/statLineChart";
-import { BAR_CHART, GAME_INDEX_KEY, LINE_CHART, PLAYER_COLOR_MAP, TEAM_LOWERCASE } from "@/constants";
+import { BAR_CHART, GAME_INDEX_KEY, LINE_CHART, PERCENTAGE_OF_DATA_TO_REMOVE } from "@/constants";
 import StatBarChart from "@/components/charts/statBarChart";
 import { StatData } from "@/stats/statBase";
 
@@ -11,6 +11,7 @@ export interface GamePerformanceStatProps {
   statName: StatName;
   selectedMembers: string[];
   teamStatsTimeline: TeamStatTimelinePoint[];
+  players: PlayerMetadata[];
 }
 
 // Map the statName prop to its user-friendly display name
@@ -41,15 +42,18 @@ export default function GamePerformanceStat(props: GamePerformanceStatProps) {
   const chartType = STAT_CHART_TYPES[props.statName] || LINE_CHART;
   const hasMembers = !STATS_WITHOUT_MEMBERS.includes(props.statName);
 
-  const statData = useMemo<StatData>(() => {
+  const filteredStatData = useMemo<StatData>(() => {
     if (!props.teamStatsTimeline || props.teamStatsTimeline.length === 0) {
       return { data: [], chartOptions: [] };
     }
 
-    const data: Record<string, number>[] = [];
-
-    // We need to dynamically construct the chart options for however many unique players exist for this stat
     const optionKeys = new Set<string>();
+    let data: Record<string, number>[] = [];
+
+    const allowedIds = [...props.selectedMembers, "win_rate"];
+    if (props.statName !== "kills" && props.statName !== "damage") {
+      allowedIds.push("team");
+    }
 
     props.teamStatsTimeline.forEach(point => {
       const dataObj: Record<string, number> = { [GAME_INDEX_KEY]: point.gameIndex };
@@ -70,9 +74,10 @@ export default function GamePerformanceStat(props: GamePerformanceStatProps) {
         dataObj["win_rate"] = statObject; // Legacy format used "win_rate" for WinRate Chart
         optionKeys.add("win_rate");
       } else if (statObject) {
-        Object.entries(statObject).forEach(([key, value]) => {
-          // If a member exists or it's 'team', use their lowercase name to prefix
-          const fullKey = `${key}_${props.statName}`;
+        Object.entries(statObject).forEach(([playerId, value]) => {
+          if (hasMembers && !allowedIds.includes(playerId)) return;
+
+          const fullKey = `${playerId}_${props.statName}`;
           dataObj[fullKey] = value;
           optionKeys.add(fullKey);
         });
@@ -81,16 +86,25 @@ export default function GamePerformanceStat(props: GamePerformanceStatProps) {
     });
 
     const chartOptions = Array.from(optionKeys).map(fullKey => {
-      const player = fullKey.split('_')[0];
+      const playerKey = fullKey.split('_')[0]; // either an ID, "team", or "win" if "win_rate"
 
-      let color = PLAYER_COLOR_MAP[player] || "#cccccc";
-      let name = player.charAt(0).toUpperCase() + player.slice(1);
+      let color = "#cccccc";
+      let name = "Unknown";
 
       if (fullKey === "win_rate") {
         color = "#F95738";
         name = "Win Rate";
-      } else if (player === TEAM_LOWERCASE) {
+      } else if (playerKey === "team") {
+        color = "#6C3BAA";
         name = "Team";
+      } else {
+        const playerMeta = props.players.find(p => p.id === playerKey);
+        if (playerMeta) {
+          color = playerMeta.color;
+          name = playerMeta.name.charAt(0).toUpperCase() + playerMeta.name.slice(1);
+        } else {
+          name = playerKey.charAt(0).toUpperCase() + playerKey.slice(1);
+        }
       }
 
       return {
@@ -100,45 +114,14 @@ export default function GamePerformanceStat(props: GamePerformanceStatProps) {
         color: color
       };
     });
-
-    return { data, chartOptions };
-  }, [props.teamStatsTimeline, props.statName]);
-
-  const filteredStatData = useMemo<StatData>(() => {
-    if (!statData || statData.data.length === 0 || !hasMembers) {
-      return statData;
+    if (chartType === LINE_CHART) {
+      // remove some of the data to nomralize it
+      const startIndex = Math.ceil(data.length * PERCENTAGE_OF_DATA_TO_REMOVE);
+      data = data.slice(startIndex);
     }
 
-    // Include selected members and "team"
-    const allowedPrefixes = [...props.selectedMembers, TEAM_LOWERCASE];
-
-    const filteredOptions = statData.chartOptions.filter(option => {
-      const prefix = option.key.split('_')[0];
-      // special case
-      if (option.key === 'win_rate' || STATS_WITHOUT_MEMBERS.includes(props.statName)) return true;
-      return allowedPrefixes.includes(prefix);
-    });
-
-    const filteredData = statData.data.map(d => {
-      const row: Record<string, number> = {};
-      Object.keys(d).forEach(k => {
-        if (k === GAME_INDEX_KEY) {
-          row[k] = d[k];
-        } else {
-          const prefix = k.split('_')[0];
-          if (k === 'win_rate' || STATS_WITHOUT_MEMBERS.includes(props.statName) || allowedPrefixes.includes(prefix)) {
-            row[k] = d[k];
-          }
-        }
-      });
-      return row;
-    });
-
-    return {
-      data: filteredData,
-      chartOptions: filteredOptions,
-    };
-  }, [statData, props.selectedMembers, hasMembers, props.statName]);
+    return { data, chartOptions };
+  }, [props.teamStatsTimeline, props.statName, props.selectedMembers, hasMembers, props.players]);
 
   const getChart = () => {
     if (filteredStatData.data.length === 0) {

@@ -83,6 +83,15 @@ BEGIN
             ROW_NUMBER() OVER w AS games_played_by_player
         FROM PlayerGameStats pgs
         WINDOW w AS (PARTITION BY pgs.player_id ORDER BY pgs.team_sort_order ROWS UNBOUNDED PRECEDING)
+    ),
+    TeamAveragesOfPlayerAverages AS (
+        -- Calculate the average of the player running averages for the exact middle
+        SELECT
+            prs2.game_id,
+            AVG(prs2.running_avg_kills) AS running_avg_team_kills,
+            AVG(prs2.running_avg_damage) AS running_avg_team_damage
+        FROM PlayerRunningStats prs2
+        GROUP BY prs2.game_id
     )
     SELECT 
         prs.game_id,
@@ -97,12 +106,14 @@ BEGIN
         prs.running_sum_damage,
         prs.running_avg_damage,
         trs.running_team_kills,
-        trs.running_avg_team_kills,
+        tapa.running_avg_team_kills,
         trs.running_team_damage,
-        trs.running_avg_team_damage,
+        tapa.running_avg_team_damage,
         prs.running_wins,
         trs.games_played
     FROM PlayerRunningStats prs
     JOIN TeamRunningStats trs ON prs.game_id = trs.game_id
+    JOIN TeamAveragesOfPlayerAverages tapa ON prs.game_id = tapa.game_id
     ORDER BY prs.team_sort_order, prs.player_name;
 END;
+$$;

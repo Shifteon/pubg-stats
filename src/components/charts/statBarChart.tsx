@@ -14,14 +14,23 @@ export default function StatBarChart(props: StatBarChartProps) {
   const combinedData = useMemo(() => {
     if (!data.length || !chartOptions.length) return;
     const combined: Record<string, number | string>[] = [];
-    const dataPoint = data[0];
-    const keys = Object.keys(dataPoint).filter(key => key !== 'gameIndex');
-
-    keys.forEach((key, i) => {
-      if (chartOptions[i]) {
-        combined.push({ ...chartOptions[i], [key]: dataPoint[key] });
+    const dataPoint = data[data.length - 1];
+    chartOptions.forEach((option) => {
+      if (dataPoint[option.key] !== undefined) {
+        combined.push({ ...option, [option.key]: dataPoint[option.key] });
       }
     });
+
+    combined.sort((a, b) => {
+      const optionA = chartOptions.find(o => o.key === a.key);
+      const optionB = chartOptions.find(o => o.key === b.key);
+      if (!optionA || !optionB) return 0;
+
+      const valA = Number(a[optionA.key] || 0);
+      const valB = Number(b[optionB.key] || 0);
+      return valB - valA;
+    });
+
     return combined;
   }, [data, chartOptions]);
 
@@ -35,6 +44,7 @@ export default function StatBarChart(props: StatBarChartProps) {
       <XAxis dataKey="displayName" />
       <YAxis width="auto" />
       <Tooltip
+        formatter={(value) => new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(Number(value.valueOf()))}
         contentStyle={{
           backgroundColor: 'hsl(var(--heroui-content1))',
         }}

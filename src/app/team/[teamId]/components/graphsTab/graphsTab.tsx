@@ -47,24 +47,19 @@ export default function GraphsTab({ teamId }: { teamId: string }) {
   const [statsToGraph, setStatsToGraph] = useState<StatName[]>([]);
 
   useEffect(() => {
-    // console.log("Team Overview: ", teamOverview);
     if (teamOverview?.players) {
-      const playerNames = teamOverview.players.map((p: PlayerMetadata) => p.name.toLowerCase());
-      setSelectedMembers(playerNames);
-      setStatsToGraph(initStatsToGraph(playerNames.length) as StatName[]);
+      const playerIds = teamOverview.players.map((p: PlayerMetadata) => p.id);
+      setSelectedMembers(playerIds);
+      setStatsToGraph(initStatsToGraph(playerIds.length) as StatName[]);
     }
   }, [teamOverview]);
 
-  useEffect(() => {
-    console.log("Team Stats Timeline: ", teamStatsTimeline);
-  }, [teamStatsTimeline]);
-
-  const handleMemberSelectionChange = (memberName: string) => {
+  const handleMemberSelectionChange = (memberId: string) => {
     setSelectedMembers(prevSelected => {
-      if (prevSelected.includes(memberName)) {
-        return prevSelected.filter(m => m !== memberName);
+      if (prevSelected.includes(memberId)) {
+        return prevSelected.filter(m => m !== memberId);
       } else {
-        return [...prevSelected, memberName];
+        return [...prevSelected, memberId];
       }
     });
   };
@@ -86,16 +81,16 @@ export default function GraphsTab({ teamId }: { teamId: string }) {
           <p className="text-sm text-gray-500 mb-2">Filter Members</p>
           <div className="flex flex-wrap gap-2">
             {teamOverview.players.map((member: PlayerMetadata) => {
-              const memberNameLower = member.name.toLowerCase();
-              const isSelected = selectedMembers.includes(memberNameLower);
+              const memberId = member.id;
+              const isSelected = selectedMembers.includes(memberId);
               return (
                 <Chip
-                  key={memberNameLower}
+                  key={memberId}
                   variant={isSelected ? "solid" : "bordered"}
                   color={isSelected ? "primary" : "default"}
-                  avatar={<Avatar name={member.name.charAt(0).toUpperCase()} src={AVATAR_SRC_MAP[memberNameLower]?.src} />}
+                  avatar={<Avatar name={member.name.charAt(0).toUpperCase()} src={AVATAR_SRC_MAP[member.name.toLowerCase()]?.src} />}
                   endContent={isSelected ? <CloseIcon /> : <PlusIcon />}
-                  onClick={() => handleMemberSelectionChange(memberNameLower)}
+                  onClick={() => handleMemberSelectionChange(memberId)}
                   className="cursor-pointer"
                 >
                   {member.name.charAt(0).toUpperCase() + member.name.slice(1)}
@@ -112,6 +107,7 @@ export default function GraphsTab({ teamId }: { teamId: string }) {
               statName={statName}
               selectedMembers={selectedMembers}
               teamStatsTimeline={teamStatsTimeline || []}
+              players={teamOverview?.players || []}
             />
           </React.Fragment>
         ))}

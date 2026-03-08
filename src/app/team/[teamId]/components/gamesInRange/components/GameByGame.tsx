@@ -1,6 +1,5 @@
 "use client";
 
-import { TeamName } from "@/types";
 import { Pagination, Accordion, AccordionItem } from "@heroui/react";
 import { useEffect, useMemo, useState } from "react";
 import GameTable from "../../GameTable";
@@ -22,7 +21,7 @@ export default function GameByGame({ gameData }: GameByGameProps) {
   // Extract players dynamically from the first game
   const players = useMemo(() => {
     if (gameData.length === 0 || !gameData[0].stats) return [];
-    return [...gameData[0].stats.map((p: any) => p.playerName.charAt(0).toUpperCase() + p.playerName.slice(1)), "Total"];
+    return [...gameData[0].stats.map((p: Game["stats"][0]) => p.playerName.charAt(0).toUpperCase() + p.playerName.slice(1)), "Total"];
   }, [gameData]);
 
   const filteredGameData = useMemo(() => {
@@ -31,7 +30,7 @@ export default function GameByGame({ gameData }: GameByGameProps) {
       if (filterResult === 'win' && !game.isWin) return false;
       if (filterResult === 'loss' && game.isWin) return false;
 
-      let totalStats: Record<string, number> = { kills: 0, assists: 0, damage: 0, rescues: 0, recalls: 0 };
+      const totalStats: Record<string, number> = { kills: 0, assists: 0, damage: 0, rescues: 0, recalls: 0 };
       const playerStatsMap: Record<string, Record<string, number>> = {};
 
       game.stats.forEach(s => {

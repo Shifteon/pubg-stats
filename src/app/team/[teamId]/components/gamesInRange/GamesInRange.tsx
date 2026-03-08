@@ -78,7 +78,7 @@ export default function GamesInRange({ teamId }: GamesInRangeProps) {
     const playerTotals: Record<string, Record<string, number>> = {};
 
     gamesInRange.forEach((game: Game) => {
-      game.stats.forEach((playerStat: any) => {
+      game.stats.forEach((playerStat: Game["stats"][0]) => {
         const player = playerStat.playerName.toLowerCase();
 
         if (!playerTotals[player]) {

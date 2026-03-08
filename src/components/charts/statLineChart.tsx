@@ -3,7 +3,7 @@
 import { GAME_INDEX_KEY } from '@/constants';
 import { StatData } from '@/stats/statBase';
 import { useTheme } from 'next-themes';
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 interface StatLineChartProps {
@@ -12,7 +12,6 @@ interface StatLineChartProps {
 
 export default function StatLineChart(props: StatLineChartProps) {
   const { data = [], chartOptions = [] } = props.data;
-  const { theme } = useTheme();
 
   const xAxisInterval = useMemo(() => {
     if (data.length > 80) {
@@ -25,7 +24,7 @@ export default function StatLineChart(props: StatLineChartProps) {
   }, [data]);
 
   const yAxisDomain = useMemo(() => {
-     if (!data.length) {
+    if (!data.length) {
       return ['auto', 'auto'];
     }
     const values = data.flatMap(stat =>
@@ -46,7 +45,7 @@ export default function StatLineChart(props: StatLineChartProps) {
 
     // Calculate the range (difference between max and min)
     const range = max - min;
-    
+
     // Calculate the buffer amount (e.g., 5% of the range)
     const bufferAmount = range * bufferPercent;
 
@@ -68,8 +67,8 @@ export default function StatLineChart(props: StatLineChartProps) {
       <CartesianGrid strokeDasharray="3 3" />
       <XAxis interval={xAxisInterval} domain={[20, 'auto']} dataKey={GAME_INDEX_KEY} />
       <YAxis interval="preserveEnd" allowDecimals={false} domain={yAxisDomain} startOffset={3} scale="linear" width="auto" type='number' />
-      <Tooltip 
-        formatter={value => Number(value.valueOf()).toFixed(2)}
+      <Tooltip
+        formatter={(value) => new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(Number(value.valueOf()))}
         contentStyle={{
           backgroundColor: 'hsl(var(--heroui-content1))',
           borderColor: 'hsl(var(--heroui-content1-300))'
