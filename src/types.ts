@@ -196,11 +196,21 @@ export type TeamHallOfFame = z.infer<typeof teamHallOfFameSchema>;
 export const teamPersonalBestSchema = z.record(
   z.string(), // key is the playerId
   z.object({
-    kills: statPairSchema,
-    assists: statPairSchema,
-    damage: statPairSchema,
-    rescues: statPairSchema,
-    recalls: statPairSchema,
+    kills: statPairSchema.extend({
+      gameId: z.string(),
+    }),
+    assists: statPairSchema.extend({
+      gameId: z.string(),
+    }),
+    damage: statPairSchema.extend({
+      gameId: z.string(),
+    }),
+    rescues: statPairSchema.extend({
+      gameId: z.string(),
+    }),
+    recalls: statPairSchema.extend({
+      gameId: z.string(),
+    }),
   })
 );
 

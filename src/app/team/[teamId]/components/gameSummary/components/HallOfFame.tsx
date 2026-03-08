@@ -1,12 +1,11 @@
 "use client";
 
-import { GameSummaryData, TeamHallOfFame, PlayerMetadata } from "@/types";
+import { TeamHallOfFame, PlayerMetadata } from "@/types";
 import { Avatar, Card, CardBody, CardFooter, CardHeader, useDisclosure } from "@heroui/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AVATAR_SRC_MAP } from "@/constants";
-import { processGameData } from "../utils";
 import GameModal from "../../GameModal";
-import { apiService } from "@/services/apiService";
+import { useTeamGame } from "@/hooks/useTeam";
 
 export interface HallOfFameProps {
   hallOfFame: TeamHallOfFame;
@@ -16,7 +15,11 @@ export interface HallOfFameProps {
 
 export default function HallOfFame({ hallOfFame, players, teamId }: HallOfFameProps) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [selectedGame, setSelectedGame] = useState<GameSummaryData | null>(null);
+  const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
+
+  const { game: selectedGame, isLoading: gameIsLoading } = useTeamGame(teamId, selectedGameId);
+
+
 
   const getPlayerName = (playerId: string) => {
     const player = players.find((p) => p.id === playerId);
@@ -32,18 +35,10 @@ export default function HallOfFame({ hallOfFame, players, teamId }: HallOfFamePr
     };
   });
 
-  const handleCardClick = async (gameId: string) => {
+  const handleCardClick = (gameId: string) => {
     if (!gameId || !teamId) return;
-    // We still need to fetch the individual game for the modal, but we use gameId now instead of team/index
-    const url = `/api/game/${gameId}`;
-    const game = await apiService.fetchWithCache<Record<string, unknown>>(url);
-    if (game) {
-      // processGameData might need teamName, or just teamId depending on how it's written.
-      // We will pass teamId for now, but to be 100% compatible we might need to adjust processGameData later
-      // if it strictly requires the union type `TeamName`
-      setSelectedGame(processGameData(game, "any"));
-      onOpen();
-    }
+    setSelectedGameId(gameId);
+    onOpen();
   };
 
   return (
@@ -67,13 +62,12 @@ export default function HallOfFame({ hallOfFame, players, teamId }: HallOfFamePr
           </Card>
         ))}
       </div>
-      {selectedGame && (
-        <GameModal
-          isOpen={isOpen}
-          onOpenChange={onOpenChange}
-          game={selectedGame}
-        />
-      )}
+      <GameModal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        game={selectedGame}
+        isLoading={gameIsLoading}
+      />
     </div>
   );
 }

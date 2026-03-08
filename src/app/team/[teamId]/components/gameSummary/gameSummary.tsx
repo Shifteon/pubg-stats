@@ -50,10 +50,10 @@ export default function GameSummary({ teamId }: GameSummaryProps) {
           />
         </AccordionItem>
         <AccordionItem key="hall-of-fame" title="Hall of Fame">
-          <HallOfFame hallOfFame={teamOverview.hallOfFame} players={teamOverview.players} />
+          <HallOfFame hallOfFame={teamOverview.hallOfFame} players={teamOverview.players} teamId={teamId} />
         </AccordionItem>
         <AccordionItem key="personal-bests" title="Personal Bests">
-          <PersonalBests personalBests={teamOverview.teamPersonalBests} players={teamOverview.players} />
+          <PersonalBests personalBests={teamOverview.teamPersonalBests} players={teamOverview.players} teamId={teamId} />
         </AccordionItem>
       </Accordion>
     </div>

@@ -121,40 +121,47 @@ async function getHallOfFame(teamId: string): Promise<TeamHallOfFame> {
 
 async function getTeamPersonalBests(teamId: string, players: PlayerMetadata[]): Promise<TeamPersonalBest> {
   const teamPersonalBests: TeamPersonalBest = {};
+  const stats = ["kills", "assists", "damage", "rescues", "recalls"] as const;
 
   await Promise.all(
     players.map(async (player) => {
-      const { data, error } = await supabase
-        .from("game_player_stats")
-        .select(`
-          max_kills:kills.max(),
-          max_assists:assists.max(),
-          max_damage:damage.max(),
-          max_rescues:rescues.max(),
-          max_recalls:recalls.max(),
-          games!inner(team_id)
-        `)
-        .eq("games.team_id", teamId)
-        .eq("player_id", player.id)
-        .single();
+      const playerBests: Record<string, { stat: "kills" | "assists" | "damage" | "rescues" | "recalls"; statValue: number; gameId: string }> = {};
 
-      if (!error && data) {
-        teamPersonalBests[player.id] = {
-          kills: { stat: "kills", statValue: data.max_kills || 0 },
-          assists: { stat: "assists", statValue: data.max_assists || 0 },
-          damage: { stat: "damage", statValue: data.max_damage || 0 },
-          rescues: { stat: "rescues", statValue: data.max_rescues || 0 },
-          recalls: { stat: "recalls", statValue: data.max_recalls || 0 },
-        };
-      } else {
-        teamPersonalBests[player.id] = {
-          kills: { stat: "kills", statValue: 0 },
-          assists: { stat: "assists", statValue: 0 },
-          damage: { stat: "damage", statValue: 0 },
-          rescues: { stat: "rescues", statValue: 0 },
-          recalls: { stat: "recalls", statValue: 0 },
-        };
-      }
+      await Promise.all(
+        stats.map(async (stat) => {
+          const { data, error } = await supabase
+            .from("game_player_stats")
+            .select(`game_id, ${stat}, games!inner(team_id)`)
+            .eq("games.team_id", teamId)
+            .eq("player_id", player.id)
+            .order(stat, { ascending: false, nullsFirst: false })
+            .limit(1)
+            .single();
+
+          if (!error && data) {
+            const row = data as Record<string, unknown>;
+            playerBests[stat] = {
+              stat: stat,
+              statValue: (row[stat] as number) || 0,
+              gameId: (row.game_id as string) || "",
+            };
+          } else {
+            playerBests[stat] = {
+              stat: stat,
+              statValue: 0,
+              gameId: "",
+            };
+          }
+        })
+      );
+
+      teamPersonalBests[player.id] = {
+        kills: playerBests.kills,
+        assists: playerBests.assists,
+        damage: playerBests.damage,
+        rescues: playerBests.rescues,
+        recalls: playerBests.recalls,
+      };
     })
   );
 

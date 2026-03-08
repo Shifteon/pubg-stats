@@ -41,3 +41,17 @@ export function useTeamOverview(teamId: string) {
     isError: error
   };
 }
+
+export function useTeamGame(teamId: string | undefined, gameId: string | null) {
+  const shouldFetch = teamId && gameId;
+  const { data, error, isLoading } = useSWR<Game>(
+    shouldFetch ? `/api/team/${teamId}/new/game/${gameId}` : null,
+    fetcher
+  );
+
+  return {
+    game: data,
+    isLoading,
+    isError: error
+  };
+}

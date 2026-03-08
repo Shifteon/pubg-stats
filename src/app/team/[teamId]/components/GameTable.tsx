@@ -1,18 +1,17 @@
 "use client";
 
 import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/react";
-import { PlayerGameStat } from "@/types";
+import { Game } from "@/types";
+import { statKeys } from "./gameSummary/utils";
 
 interface GameTableProps {
-  data: PlayerGameStat[];
+  data: Game["stats"];
   gameIndex: number;
 }
 
-import { statKeys } from "./gameSummary/utils";
-
 export default function GameTable({ data, gameIndex }: GameTableProps) {
   const gameTableColumns = [
-    { key: 'player', label: 'Player' }, ...statKeys.map(stat => ({ key: stat, label: stat.charAt(0).toUpperCase() + stat.slice(1) }))
+    { key: 'playerName', label: 'Player' }, ...statKeys.map(stat => ({ key: stat, label: stat.charAt(0).toUpperCase() + stat.slice(1) }))
   ];
 
   return (
@@ -24,7 +23,7 @@ export default function GameTable({ data, gameIndex }: GameTableProps) {
         {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
       </TableHeader>
       <TableBody items={data}>
-        {(item) => (<TableRow key={item.player}>{(columnKey) => <TableCell>{item[columnKey as keyof typeof item]}</TableCell>}</TableRow>)}
+        {(item) => (<TableRow key={item.playerId}>{(columnKey) => <TableCell>{item[columnKey as keyof typeof item]}</TableCell>}</TableRow>)}
       </TableBody>
     </Table>
   );

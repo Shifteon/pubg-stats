@@ -5,10 +5,10 @@ import { Avatar, Card, CardBody, CardHeader, Table, TableBody, TableCell, TableC
 
 export interface PlayerStatCardProps {
   player: string;
-  // stat to value OR stat to { value: number, game: any } mapping
-  stats: Record<string, number | { value: number; game?: Record<string, unknown> | null }>;
+  // stat to value OR stat to { value: number, game: string } mapping
+  stats: Record<string, number | { value: number; game?: string | null }>;
   valueFormatter?: (value: number) => string;
-  onGameClick?: (game: Record<string, unknown>) => void;
+  onGameClick?: (gameId: string) => void;
 }
 
 const defaultFormatter = (value: number) => value.toString();
@@ -37,7 +37,16 @@ export default function PlayerStatCard({ player, stats, valueFormatter = default
         <h2 className="text-2xl font-semibold capitalize ml-1">{player}</h2>
       </CardHeader>
       <CardBody>
-        <Table aria-label={`${player}'s stats`} selectionMode="none">
+        <Table
+          aria-label={`${player}'s stats`}
+          selectionMode="none"
+          onRowAction={(key) => {
+            const item = tableData.find((i) => i.stat === key);
+            if (item && typeof item.game === 'string' && onGameClick) {
+              onGameClick(item.game);
+            }
+          }}
+        >
           <TableHeader columns={[{ key: 'stat', label: 'Stat' }, { key: 'value', label: 'Value' }]}>
             {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
           </TableHeader>
@@ -46,7 +55,6 @@ export default function PlayerStatCard({ player, stats, valueFormatter = default
               <TableRow
                 key={item.stat}
                 className={item.game && onGameClick ? "cursor-pointer hover:bg-default-100" : ""}
-                onClick={() => item.game && onGameClick && onGameClick(item.game)}
               >
                 {(columnKey) => <TableCell>{item[columnKey as 'stat' | 'value']}</TableCell>}
               </TableRow>
