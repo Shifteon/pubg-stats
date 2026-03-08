@@ -6,7 +6,7 @@ import GameTable from "../../GameTable";
 import GameSort, { SortConfig } from "./GameSort";
 import { statKeys } from "../../gameSummary/utils";
 import GameFilter, { Filter } from "./GameFilter";
-import { Game, PlayerGameStat, GameSummaryData } from "@/types";
+import { Game } from "@/types";
 
 export interface GameByGameProps {
   gameData: Game[];
@@ -92,9 +92,10 @@ export default function GameByGame({ gameData }: GameByGameProps) {
       dataToSort = dataToSort.reverse();
     }
 
-    return dataToSort.map((game: Game): GameSummaryData => {
-      const gamePlayerData: PlayerGameStat[] = game.stats.map(s => ({
-        player: s.playerName.charAt(0).toUpperCase() + s.playerName.slice(1),
+    return dataToSort.map((game: Game) => {
+      const gamePlayerData: Game["stats"] = game.stats.map(s => ({
+        playerId: s.playerId,
+        playerName: s.playerName.charAt(0).toUpperCase() + s.playerName.slice(1),
         kills: s.kills,
         assists: s.assists,
         damage: s.damage,
@@ -102,8 +103,9 @@ export default function GameByGame({ gameData }: GameByGameProps) {
         recalls: s.recalls,
       }));
 
-      const totalRow: PlayerGameStat = {
-        player: 'Total',
+      const totalRow: Game["stats"][0] = {
+        playerId: 'total',
+        playerName: 'Total',
         kills: game.stats.reduce((acc, s) => acc + s.kills, 0),
         assists: game.stats.reduce((acc, s) => acc + s.assists, 0),
         damage: game.stats.reduce((acc, s) => acc + s.damage, 0),
