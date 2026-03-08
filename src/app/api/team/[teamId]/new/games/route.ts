@@ -97,9 +97,6 @@ export async function GET(
       };
     });
 
-    // Reverse the array so the most recent games come first in the response
-    games.reverse();
-
     const parsedGames = z.array(gameSchema).parse(games);
 
     return NextResponse.json(parsedGames);

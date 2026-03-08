@@ -95,7 +95,7 @@ export default function NavBar() {
       label: "Teams",
       items: teams.map((team) => ({
         label: team.name,
-        href: `/team/${team.name}`,
+        href: `/team/${team.id}`,
       })),
     },
     {

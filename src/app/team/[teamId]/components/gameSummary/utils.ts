@@ -22,7 +22,7 @@ export interface HighestStat {
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export const processGameData = (game: any, team: TeamName): GameSummaryData => {
+export const processGameData = (game: any, team: string): GameSummaryData => {
   const players = playerMapping[team] || [];
 
   const gamePlayerData: PlayerGameStat[] = players.map(player => {

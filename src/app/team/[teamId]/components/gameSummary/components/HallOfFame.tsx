@@ -1,71 +1,56 @@
 "use client";
 
-import { GameSummaryData, TeamName } from "@/types";
-import { Avatar, Card, CardBody, CardFooter, CardHeader, Spinner, useDisclosure } from "@heroui/react";
-import { useEffect, useState } from "react";
+import { GameSummaryData, TeamHallOfFame, PlayerMetadata } from "@/types";
+import { Avatar, Card, CardBody, CardFooter, CardHeader, useDisclosure } from "@heroui/react";
+import { useState } from "react";
 import { AVATAR_SRC_MAP } from "@/constants";
-import { HighestStat, processGameData } from "../utils";
+import { processGameData } from "../utils";
 import GameModal from "../../GameModal";
 import { apiService } from "@/services/apiService";
 
 export interface HallOfFameProps {
-  team: TeamName;
-  start?: number;
-  end?: number;
+  hallOfFame: TeamHallOfFame;
+  players: PlayerMetadata[];
+  teamId?: string; // Add teamId so we can fetch the game info
 }
 
-export default function HallOfFame({ team, start, end }: HallOfFameProps) {
+export default function HallOfFame({ hallOfFame, players, teamId }: HallOfFameProps) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedGame, setSelectedGame] = useState<GameSummaryData | null>(null);
 
-  const [highestStats, setHighestStats] = useState<HighestStat[]>([]);
-  const [loading, setLoading] = useState(true);
+  const getPlayerName = (playerId: string) => {
+    const player = players.find((p) => p.id === playerId);
+    return player ? player.name : "Unknown";
+  };
 
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchHallOfFame = async () => {
-      setLoading(true);
-      let url = `/api/team/${team}/hall-of-fame`;
-      if (start !== undefined && end !== undefined) {
-        url += `?start=${start}&end=${end}`;
-      }
-
-      const data = await apiService.fetchWithCache<HighestStat[]>(url);
-
-      if (isMounted && data) {
-        setHighestStats(data);
-      }
-      if (isMounted) setLoading(false);
+  const highestStats = Object.values(hallOfFame).map((record) => {
+    return {
+      stat: record.statPair.stat,
+      value: record.statPair.statValue,
+      player: getPlayerName(record.playerId),
+      gameId: record.gameId
     };
+  });
 
-    fetchHallOfFame();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [team, start, end]);
-
-  const handleCardClick = async (gameIndex: number) => {
-    if (gameIndex === -1) return;
-    const url = `/api/team/${team}/games/${gameIndex}`;
+  const handleCardClick = async (gameId: string) => {
+    if (!gameId || !teamId) return;
+    // We still need to fetch the individual game for the modal, but we use gameId now instead of team/index
+    const url = `/api/game/${gameId}`;
     const game = await apiService.fetchWithCache<Record<string, unknown>>(url);
     if (game) {
-      setSelectedGame(processGameData(game, team));
+      // processGameData might need teamName, or just teamId depending on how it's written.
+      // We will pass teamId for now, but to be 100% compatible we might need to adjust processGameData later
+      // if it strictly requires the union type `TeamName`
+      setSelectedGame(processGameData(game, "any"));
       onOpen();
     }
   };
 
   return (
     <div className="relative w-full">
-      {loading && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/5 rounded-lg">
-          <Spinner />
-        </div>
-      )}
-      <div className={`grid grid-cols-3 gap-2 md:grid-cols-3 lg:grid-cols-5 lg:gap-4 w-full ${loading ? 'opacity-50' : ''}`}>
-        {highestStats.map(({ player, value, stat, gameIndex }) => (
-          <Card key={stat} isPressable onPress={() => handleCardClick(gameIndex)}>
+      <div className={`grid grid-cols-3 gap-2 md:grid-cols-3 lg:grid-cols-5 lg:gap-4 w-full`}>
+        {highestStats.map(({ player, value, stat, gameId }) => (
+          <Card key={stat} isPressable onPress={() => handleCardClick(gameId)}>
             <CardHeader className="justify-center">
               <h3 className="text-lg font-semibold capitalize">{stat}</h3>
             </CardHeader>

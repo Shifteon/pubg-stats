@@ -5,37 +5,54 @@ import { Pagination, Accordion, AccordionItem } from "@heroui/react";
 import { useEffect, useMemo, useState } from "react";
 import GameTable from "../../GameTable";
 import GameSort, { SortConfig } from "./GameSort";
-import { playerMapping, statKeys, processGameData } from "../../gameSummary/utils";
+import { statKeys } from "../../gameSummary/utils";
 import GameFilter, { Filter } from "./GameFilter";
+import { Game, PlayerGameStat, GameSummaryData } from "@/types";
 
 export interface GameByGameProps {
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
-  gameData: any[];
-  team: TeamName;
+  gameData: Game[];
 }
 
-export default function GameByGame({ gameData, team }: GameByGameProps) {
+export default function GameByGame({ gameData }: GameByGameProps) {
   const [gameByGamePage, setGameByGamePage] = useState(1);
   const [filters, setFilters] = useState<Filter[]>([]);
   const [filterResult, setFilterResult] = useState<string>("all");
   const [sortConfig, setSortConfig] = useState<SortConfig | null>(null);
 
+  // Extract players dynamically from the first game
   const players = useMemo(() => {
-    const teamPlayers = playerMapping[team] || [];
-    return [...teamPlayers.map(p => p.charAt(0).toUpperCase() + p.slice(1)), "Total"];
-  }, [team]);
+    if (gameData.length === 0 || !gameData[0].stats) return [];
+    return [...gameData[0].stats.map((p: any) => p.playerName.charAt(0).toUpperCase() + p.playerName.slice(1)), "Total"];
+  }, [gameData]);
 
   const filteredGameData = useMemo(() => {
-    return gameData.filter(game => {
+    return gameData.filter((game: Game) => {
       // Filter by Result
-      if (filterResult === 'win' && game.win !== 1) return false;
-      if (filterResult === 'loss' && game.win !== 0) return false;
+      if (filterResult === 'win' && !game.isWin) return false;
+      if (filterResult === 'loss' && game.isWin) return false;
 
-      return filters.every(filter => {
-        const key = filter.player === 'Total'
-          ? `total_${filter.stat}`
-          : `${filter.player.toLowerCase()}_${filter.stat}`;
-        const gameValue = game[key] || 0;
+      let totalStats: Record<string, number> = { kills: 0, assists: 0, damage: 0, rescues: 0, recalls: 0 };
+      const playerStatsMap: Record<string, Record<string, number>> = {};
+
+      game.stats.forEach(s => {
+        const pName = s.playerName.toLowerCase();
+        playerStatsMap[pName] = {
+          kills: s.kills, assists: s.assists, damage: s.damage, rescues: s.rescues, recalls: s.recalls
+        };
+        totalStats.kills += s.kills;
+        totalStats.assists += s.assists;
+        totalStats.damage += s.damage;
+        totalStats.rescues += s.rescues;
+        totalStats.recalls += s.recalls;
+      });
+
+      return filters.every((filter: Filter) => {
+        let gameValue = 0;
+        if (filter.player === 'Total') {
+          gameValue = totalStats[filter.stat] || 0;
+        } else {
+          gameValue = playerStatsMap[filter.player.toLowerCase()]?.[filter.stat] || 0;
+        }
 
         switch (filter.operator) {
           case '>=': return gameValue >= filter.value;
@@ -56,12 +73,16 @@ export default function GameByGame({ gameData, team }: GameByGameProps) {
 
     if (sortConfig) {
       dataToSort.sort((a, b) => {
-        const key = sortConfig.player === 'Total'
-          ? `total_${sortConfig.stat}`
-          : `${sortConfig.player.toLowerCase()}_${sortConfig.stat}`;
+        let valA = 0;
+        let valB = 0;
 
-        const valA = a[key] || 0;
-        const valB = b[key] || 0;
+        if (sortConfig.player === 'Total') {
+          valA = a.stats.reduce((acc, s) => acc + (s[sortConfig.stat as keyof typeof s] as number || 0), 0);
+          valB = b.stats.reduce((acc, s) => acc + (s[sortConfig.stat as keyof typeof s] as number || 0), 0);
+        } else {
+          valA = a.stats.find(s => s.playerName.toLowerCase() === sortConfig.player.toLowerCase())?.[sortConfig.stat as keyof typeof a.stats[0]] as number || 0;
+          valB = b.stats.find(s => s.playerName.toLowerCase() === sortConfig.player.toLowerCase())?.[sortConfig.stat as keyof typeof b.stats[0]] as number || 0;
+        }
 
         if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
         if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
@@ -72,8 +93,32 @@ export default function GameByGame({ gameData, team }: GameByGameProps) {
       dataToSort = dataToSort.reverse();
     }
 
-    return dataToSort.map(game => processGameData(game, team));
-  }, [filteredGameData, team, sortConfig]);
+    return dataToSort.map((game: Game): GameSummaryData => {
+      const gamePlayerData: PlayerGameStat[] = game.stats.map(s => ({
+        player: s.playerName.charAt(0).toUpperCase() + s.playerName.slice(1),
+        kills: s.kills,
+        assists: s.assists,
+        damage: s.damage,
+        rescues: s.rescues,
+        recalls: s.recalls,
+      }));
+
+      const totalRow: PlayerGameStat = {
+        player: 'Total',
+        kills: game.stats.reduce((acc, s) => acc + s.kills, 0),
+        assists: game.stats.reduce((acc, s) => acc + s.assists, 0),
+        damage: game.stats.reduce((acc, s) => acc + s.damage, 0),
+        rescues: game.stats.reduce((acc, s) => acc + s.rescues, 0),
+        recalls: game.stats.reduce((acc, s) => acc + s.recalls, 0),
+      };
+
+      return {
+        win: game.isWin ? 1 : 0,
+        gameIndex: game.gameNumber,
+        data: [...gamePlayerData, totalRow]
+      };
+    });
+  }, [filteredGameData, sortConfig]);
 
   const gamesPerPage = 10;
   const totalGamePages = Math.ceil(gameTablesData.length / gamesPerPage);

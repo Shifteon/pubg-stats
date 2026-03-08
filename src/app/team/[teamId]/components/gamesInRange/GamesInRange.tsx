@@ -1,98 +1,95 @@
 "use client";
 
-import { TeamName } from "@/types";
 import { Slider, Tab, Tabs, Spinner } from "@heroui/react";
 import { useEffect, useMemo, useState } from "react";
 import Overview from "../gameSummary/components/overview";
 import PlayerStatCard from "../gameSummary/components/PlayerStatCard";
 import GameByGame from "./components/GameByGame";
-import { playerMapping, statKeys } from "../gameSummary/utils";
-import { apiService } from "@/services/apiService";
+import { statKeys } from "../gameSummary/utils";
+import { useTeamGames } from "../../../../../hooks/useTeam";
+import { Game } from "@/types";
 
 export interface GamesInRangeProps {
-  team: TeamName;
+  teamId: string;
 }
 
-export default function GamesInRange({ team }: GamesInRangeProps) {
-  const [totalGamesCount, setTotalGamesCount] = useState<number>(0);
+export default function GamesInRange({ teamId }: GamesInRangeProps) {
+  const { teamGames, isLoading } = useTeamGames(teamId);
+
   const [visualGameRange, setVisualGameRange] = useState<number[]>([0, 0]);
   const [gameRange, setGameRange] = useState<number[]>([0, 0]);
-  const [gamesInRange, setGamesInRange] = useState<Record<string, unknown>[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (totalGamesCount > 0) {
-      setVisualGameRange([Math.max(0, totalGamesCount - 10), totalGamesCount]);
-      setGameRange([Math.max(0, totalGamesCount - 10), totalGamesCount]);
+    if (teamGames && teamGames.length > 0) {
+      setVisualGameRange([Math.max(0, teamGames.length - 10), teamGames.length]);
+      setGameRange([Math.max(0, teamGames.length - 10), teamGames.length]);
     }
-  }, [totalGamesCount]);
+  }, [teamGames]);
 
-  useEffect(() => {
-    let isMounted = true;
-    const fetchRange = async () => {
-      setLoading(true);
+  // Use the local slice from the already fetched teamGames
+  const gamesInRange = useMemo(() => {
+    if (!teamGames) return [];
+    return teamGames.slice(gameRange[0], gameRange[1]);
+  }, [teamGames, gameRange]);
 
-      // Fetch total games count to determine bounds
-      const allGamesUrl = `/api/team/${team}/games`;
-      const allData = await apiService.fetchWithCache<unknown[]>(allGamesUrl);
+  // Derive stats for Overview component natively
+  const overviewStats = useMemo(() => {
+    let wins = 0;
+    let losses = 0;
+    let currentWinStreak = 0;
+    let winStreak = 0;
+    let longestWinStreak = 0;
 
-      if (isMounted && allData) {
-        const count = allData.length;
-        setTotalGamesCount(count);
-
-        if (count > 0) {
-          const start = Math.max(0, count - 10);
-          const end = count;
-
-          if (gameRange[0] === 0 && gameRange[1] === 0) {
-            setVisualGameRange([start, end]);
-            setGameRange([start, end]);
-            // Use these new bounds for the fetch
-            const url = `/api/team/${team}/games?start=${start}&end=${end}`;
-            const data = await apiService.fetchWithCache<Record<string, unknown>[]>(url);
-            if (isMounted && data) {
-              setGamesInRange(data);
-            }
-          } else {
-            const url = `/api/team/${team}/games?start=${gameRange[0]}&end=${gameRange[1]}`;
-            const data = await apiService.fetchWithCache<Record<string, unknown>[]>(url);
-            if (isMounted && data) {
-              setGamesInRange(data);
-            }
-          }
-        }
+    gamesInRange.forEach((game: Game) => {
+      if (game.isWin) {
+        wins++;
+        currentWinStreak++;
+        if (currentWinStreak > longestWinStreak) longestWinStreak = currentWinStreak;
+      } else {
+        losses++;
+        currentWinStreak = 0;
       }
-      if (isMounted) setLoading(false);
-    };
+    });
 
-    fetchRange();
+    // Determine final current win streak
+    if (gamesInRange.length > 0) {
+      winStreak = currentWinStreak;
+    }
 
-    return () => {
-      isMounted = false;
+    const winRate = gamesInRange.length > 0 ? (wins / gamesInRange.length) * 100 : 0;
+
+    return {
+      wins,
+      losses,
+      winRate,
+      winStreak,
+      longestWinStreak,
+      totalGames: gamesInRange.length,
     };
-  }, [team, gameRange, totalGamesCount]);
+  }, [gamesInRange]);
 
   const playerAvgsInRange = useMemo(() => {
     if (gamesInRange.length === 0) {
       return {};
     }
 
-    const players = playerMapping[team] || [];
+    // Since we don't have teamName statically anymore to use `playerMapping`, we can dynamically
+    // extract players from the game data itself!
     const playerTotals: Record<string, Record<string, number>> = {};
 
-    players.forEach(player => {
-      playerTotals[player] = {};
-      statKeys.forEach(stat => {
-        playerTotals[player][stat] = 0;
-      });
-    });
+    gamesInRange.forEach((game: Game) => {
+      game.stats.forEach((playerStat: any) => {
+        const player = playerStat.playerName.toLowerCase();
 
-    gamesInRange.forEach(game => {
-      players.forEach(player => {
+        if (!playerTotals[player]) {
+          playerTotals[player] = {};
+          statKeys.forEach(stat => {
+            playerTotals[player][stat] = 0;
+          });
+        }
+
         statKeys.forEach(stat => {
-          const playerStatKey = `${player}_${stat}`;
-          const rawVal = game[playerStatKey];
-          playerTotals[player][stat] += parseFloat(typeof rawVal === 'string' ? rawVal : String(rawVal)) || 0;
+          playerTotals[player][stat] += (playerStat[stat as keyof typeof playerStat] as number) || 0;
         });
       });
     });
@@ -104,20 +101,29 @@ export default function GamesInRange({ team }: GamesInRangeProps) {
     });
 
     return playerTotals;
-  }, [gamesInRange, team]);
+  }, [gamesInRange]);
 
   return (
     <div className="relative w-full">
-      {loading && (
+      {isLoading && (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/5 rounded-lg">
           <Spinner />
         </div>
       )}
-      <div className={`mb-8 ${loading ? 'opacity-50' : ''}`}>
+      <div className={`mb-8 ${isLoading ? 'opacity-50' : ''}`}>
         <h3 className="text-xl font-semibold mb-2">Overview</h3>
-        <Overview team={team} start={gameRange[0]} end={gameRange[1]} />
+        {teamGames && teamGames.length > 0 && (
+          <Overview
+            wins={overviewStats.wins}
+            losses={overviewStats.losses}
+            winRate={overviewStats.winRate}
+            winStreak={overviewStats.winStreak}
+            longestWinStreak={overviewStats.longestWinStreak}
+            totalGames={overviewStats.totalGames}
+          />
+        )}
       </div>
-      {totalGamesCount > 10 && (
+      {teamGames && teamGames.length > 10 && (
         <div className="w-full md:w-1/2 mb-4 px-4">
           <Slider
             label="Game Range"
@@ -125,16 +131,16 @@ export default function GamesInRange({ team }: GamesInRangeProps) {
             onChange={(value) => setVisualGameRange(value as number[])}
             onChangeEnd={(value) => setGameRange(value as number[])}
             minValue={0}
-            maxValue={totalGamesCount}
+            maxValue={teamGames.length}
             step={1}
             color="secondary"
           />
         </div>
       )}
-      <div className={loading ? 'opacity-50' : ''}>
+      <div className={isLoading ? 'opacity-50' : ''}>
         <Tabs aria-label={`Games ${gameRange[0] + 1} - ${gameRange[1]} Details`} color="secondary">
           <Tab key="game-by-game" title="Game by Game">
-            <GameByGame gameData={gamesInRange} team={team} />
+            <GameByGame gameData={gamesInRange} />
           </Tab>
           <Tab key="player-avgs" title="Player Averages">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">

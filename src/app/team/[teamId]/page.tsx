@@ -1,10 +1,9 @@
 import TeamView from "@/app/team/[teamId]/components/teamView";
 
-type Params = Promise<{ teamName: string }>;
+type Params = Promise<{ teamId: string }>;
 
 export default async function TeamPage({ params }: { params: Params }) {
-  const { teamName } = await params;
-  const decodedTeamName = decodeURIComponent(teamName);
+  const { teamId } = await params;
 
-  return <TeamView teamName={decodedTeamName} />;
+  return <TeamView teamId={teamId} />;
 }

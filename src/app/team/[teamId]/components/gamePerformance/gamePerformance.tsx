@@ -1,18 +1,16 @@
 "use client";
 
-import { TeamName, StatName, IndividualName } from "@/types";
-import { useEffect, useMemo, useState } from "react";
+import { StatName, TeamStatTimelinePoint } from "@/types";
+import { useMemo } from "react";
 import StatLineChart from "@/components/charts/statLineChart";
-import { BAR_CHART, GAME_INDEX_KEY, LINE_CHART, TEAM_MEMBER_MAP } from "@/constants";
-import { Spinner } from "@heroui/react";
+import { BAR_CHART, GAME_INDEX_KEY, LINE_CHART, PLAYER_COLOR_MAP, TEAM_LOWERCASE } from "@/constants";
 import StatBarChart from "@/components/charts/statBarChart";
 import { StatData } from "@/stats/statBase";
-import { apiService } from "@/services/apiService";
 
-export interface AvgKillsProps {
-  team: TeamName;
+export interface GamePerformanceStatProps {
   statName: StatName;
-  selectedMembers: IndividualName[];
+  selectedMembers: string[];
+  teamStatsTimeline: TeamStatTimelinePoint[];
 }
 
 // Map the statName prop to its user-friendly display name
@@ -38,67 +36,115 @@ const STAT_CHART_TYPES: Record<string, string> = {
 // Based on legacy logic, Kill Stealing & Win Rate don't support individual member filtering because they calculate off the team natively or compare internally
 const STATS_WITHOUT_MEMBERS = ["killStealing", "winRate"];
 
-export default function GamePerformanceStat(props: AvgKillsProps) {
-  const [statData, setStatData] = useState<StatData>({ data: [], chartOptions: [] });
-  const [loading, setLoading] = useState(true);
-  const [loadingError, setLoadingError] = useState(false);
-
-  const statDisplayName = STAT_DISPLAY_NAMES[props.statName] || "Unknown Stat";
+export default function GamePerformanceStat(props: GamePerformanceStatProps) {
+  const statDisplayName = STAT_DISPLAY_NAMES[props.statName] || props.statName;
   const chartType = STAT_CHART_TYPES[props.statName] || LINE_CHART;
   const hasMembers = !STATS_WITHOUT_MEMBERS.includes(props.statName);
 
-  const loadStats = async () => {
-    setLoading(true);
-    setLoadingError(false);
-
-    // Fetch the stat data from the new dynamic API endpoint!
-    // Output structure mimics the old StatClass.getStats payload: { data: [], chartOptions: [] }
-    const url = `/api/team/${props.team}/stats/${props.statName}`;
-    const stats = await apiService.fetchWithCache<StatData>(url);
-
-    if (!stats || !stats.data) {
-      setLoadingError(true);
-      setLoading(false);
-      return;
+  const statData = useMemo<StatData>(() => {
+    if (!props.teamStatsTimeline || props.teamStatsTimeline.length === 0) {
+      return { data: [], chartOptions: [] };
     }
 
-    setStatData(stats);
-    setLoading(false);
-  }
+    const data: Record<string, number>[] = [];
 
-  // fetch stats from api on load
-  useEffect(() => {
-    loadStats();
-  }, [props.team, props.statName]);
+    // We need to dynamically construct the chart options for however many unique players exist for this stat
+    const optionKeys = new Set<string>();
+
+    props.teamStatsTimeline.forEach(point => {
+      const dataObj: Record<string, number> = { [GAME_INDEX_KEY]: point.gameIndex };
+
+      let statObject: Record<string, number> | number = {};
+
+      switch (props.statName) {
+        case "avgKills": statObject = point.avgKills || {}; break;
+        case "avgDamage": statObject = point.avgDamage || {}; break;
+        case "kills": statObject = point.kills || {}; break;
+        case "damage": statObject = point.damage || {}; break;
+        case "killStealing": statObject = point.killStealing || {}; break;
+        case "winRate": statObject = point.winRate || 0; break;
+        default: break;
+      }
+
+      if (typeof statObject === 'number') {
+        dataObj["win_rate"] = statObject; // Legacy format used "win_rate" for WinRate Chart
+        optionKeys.add("win_rate");
+      } else if (statObject) {
+        Object.entries(statObject).forEach(([key, value]) => {
+          // If a member exists or it's 'team', use their lowercase name to prefix
+          const fullKey = `${key}_${props.statName}`;
+          dataObj[fullKey] = value;
+          optionKeys.add(fullKey);
+        });
+      }
+      data.push(dataObj);
+    });
+
+    const chartOptions = Array.from(optionKeys).map(fullKey => {
+      const player = fullKey.split('_')[0];
+
+      let color = PLAYER_COLOR_MAP[player] || "#cccccc";
+      let name = player.charAt(0).toUpperCase() + player.slice(1);
+
+      if (fullKey === "win_rate") {
+        color = "#F95738";
+        name = "Win Rate";
+      } else if (player === TEAM_LOWERCASE) {
+        name = "Team";
+      }
+
+      return {
+        key: fullKey,
+        name: name,
+        displayName: name,
+        color: color
+      };
+    });
+
+    return { data, chartOptions };
+  }, [props.teamStatsTimeline, props.statName]);
 
   const filteredStatData = useMemo<StatData>(() => {
-    if (!statData || props.selectedMembers.length === TEAM_MEMBER_MAP[props.team].length || !hasMembers) {
+    if (!statData || statData.data.length === 0 || !hasMembers) {
       return statData;
     }
 
-    const filteredOptions = statData.chartOptions.filter(option =>
-      props.selectedMembers.some(member => option.key.startsWith(member))
-    );
+    // Include selected members and "team"
+    const allowedPrefixes = [...props.selectedMembers, TEAM_LOWERCASE];
 
-    const dataKeys = Object.keys(statData.data[0] || {});
+    const filteredOptions = statData.chartOptions.filter(option => {
+      const prefix = option.key.split('_')[0];
+      // special case
+      if (option.key === 'win_rate' || STATS_WITHOUT_MEMBERS.includes(props.statName)) return true;
+      return allowedPrefixes.includes(prefix);
+    });
 
-    const filteredData = statData.data.map(data => {
-      const filteredDataObj: Record<string, number> = {};
-      dataKeys.forEach(key => {
-        if (props.selectedMembers.some(member => key.startsWith(member)) || key === GAME_INDEX_KEY) {
-          filteredDataObj[key] = data[key];
+    const filteredData = statData.data.map(d => {
+      const row: Record<string, number> = {};
+      Object.keys(d).forEach(k => {
+        if (k === GAME_INDEX_KEY) {
+          row[k] = d[k];
+        } else {
+          const prefix = k.split('_')[0];
+          if (k === 'win_rate' || STATS_WITHOUT_MEMBERS.includes(props.statName) || allowedPrefixes.includes(prefix)) {
+            row[k] = d[k];
+          }
         }
       });
-      return filteredDataObj;
+      return row;
     });
 
     return {
       data: filteredData,
       chartOptions: filteredOptions,
     };
-  }, [statData, props.selectedMembers, props.team, hasMembers]);
+  }, [statData, props.selectedMembers, hasMembers, props.statName]);
 
   const getChart = () => {
+    if (filteredStatData.data.length === 0) {
+      return <div>No Data Available</div>;
+    }
+
     switch (chartType) {
       case LINE_CHART:
         return <StatLineChart data={filteredStatData} />;
@@ -111,16 +157,6 @@ export default function GamePerformanceStat(props: AvgKillsProps) {
 
   return (
     <div className="relative mt-2">
-      {loading &&
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/10 w-full h-full rounded-lg p-5">
-          <Spinner size="lg" label="Loading" labelColor="primary"></Spinner>
-        </div>
-      }
-      {loadingError &&
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/10 w-full h-full rounded-lg p-5">
-          <h2 className="text-red-950 text-4xl text-shadow-md">Error loading stats</h2>
-        </div>
-      }
       <div className="w-full flex flex-col items-center">
         <h2 className="p-2 self-start">{statDisplayName}</h2>
         {getChart()}

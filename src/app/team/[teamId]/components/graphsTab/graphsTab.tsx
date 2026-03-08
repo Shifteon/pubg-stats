@@ -1,11 +1,12 @@
 "use client";
 
-import { Avatar, Chip } from "@heroui/react";
+import { Avatar, Chip, Spinner } from "@heroui/react";
 import GamePerformanceStat from "@/app/team/[teamId]/components/gamePerformance/gamePerformance";
-import { AVATAR_SRC_MAP, GAME_SUMMARY_STAT_NAME, KILL_STEALING_STAT_NAME, SUPPORTED_STATS, TEAM_MEMBER_MAP, TWO_MAN_TEAMS } from "@/constants";
+import { AVATAR_SRC_MAP, GAME_SUMMARY_STAT_NAME, KILL_STEALING_STAT_NAME, SUPPORTED_STATS } from "@/constants";
 import { useState, useEffect } from "react";
-import { IndividualName, StatName, TeamName } from "@/types";
+import { StatName, PlayerMetadata } from "@/types";
 import React from "react";
+import { useTeamOverview, useTeamStatsTimeline } from "../../../../../hooks/useTeam";
 
 const CloseIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -30,26 +31,35 @@ const PlusIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-export default function GraphsTab({ team }: { team: TeamName }) {
-  const initStatsToGraph = (teamName: TeamName) => {
-    if (TWO_MAN_TEAMS.includes(teamName)) {
+export default function GraphsTab({ teamId }: { teamId: string }) {
+  const { teamOverview, isLoading: overviewLoading } = useTeamOverview(teamId);
+  const { teamStatsTimeline, isLoading: timelineLoading } = useTeamStatsTimeline(teamId);
+
+  const initStatsToGraph = (playerCount: number) => {
+    if (playerCount === 2) {
       // Two man teams don't have kill stealing stat
       return [...SUPPORTED_STATS.filter(stat => stat !== GAME_SUMMARY_STAT_NAME && stat !== KILL_STEALING_STAT_NAME)];
     }
     return [...SUPPORTED_STATS.filter(stat => stat !== GAME_SUMMARY_STAT_NAME)];
   };
 
-  const [selectedMembers, setSelectedMembers] = useState<IndividualName[]>(
-    () => (TEAM_MEMBER_MAP[team] as IndividualName[]) || []
-  );
-  const [statsToGraph, setStatsToGraph] = useState<StatName[]>(() => initStatsToGraph(team));
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [statsToGraph, setStatsToGraph] = useState<StatName[]>([]);
 
   useEffect(() => {
-    setSelectedMembers((TEAM_MEMBER_MAP[team] as IndividualName[]) || []);
-    setStatsToGraph(initStatsToGraph(team));
-  }, [team]);
+    // console.log("Team Overview: ", teamOverview);
+    if (teamOverview?.players) {
+      const playerNames = teamOverview.players.map((p: PlayerMetadata) => p.name.toLowerCase());
+      setSelectedMembers(playerNames);
+      setStatsToGraph(initStatsToGraph(playerNames.length) as StatName[]);
+    }
+  }, [teamOverview]);
 
-  const handleMemberSelectionChange = (memberName: IndividualName) => {
+  useEffect(() => {
+    console.log("Team Stats Timeline: ", teamStatsTimeline);
+  }, [teamStatsTimeline]);
+
+  const handleMemberSelectionChange = (memberName: string) => {
     setSelectedMembers(prevSelected => {
       if (prevSelected.includes(memberName)) {
         return prevSelected.filter(m => m !== memberName);
@@ -59,33 +69,50 @@ export default function GraphsTab({ team }: { team: TeamName }) {
     });
   };
 
+  const isLoading = overviewLoading || timelineLoading;
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-10">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
   return (
     <>
-      <div className="p-2 mt-2">
-        <p className="text-sm text-gray-500 mb-2">Filter Members</p>
-        <div className="flex flex-wrap gap-2">
-          {TEAM_MEMBER_MAP[team]?.map((member) => {
-            const isSelected = selectedMembers.includes(member as IndividualName);
-            return (
-              <Chip
-                key={member}
-                variant={isSelected ? "solid" : "bordered"}
-                color={isSelected ? "primary" : "default"}
-                avatar={<Avatar name={member.charAt(0).toUpperCase()} src={AVATAR_SRC_MAP[member]?.src} />}
-                endContent={isSelected ? <CloseIcon /> : <PlusIcon />}
-                onClick={() => handleMemberSelectionChange(member as IndividualName)}
-                className="cursor-pointer"
-              >
-                {member.charAt(0).toUpperCase() + member.slice(1)}
-              </Chip>
-            );
-          })}
+      {teamOverview && teamOverview.players.length > 0 && (
+        <div className="p-2 mt-2">
+          <p className="text-sm text-gray-500 mb-2">Filter Members</p>
+          <div className="flex flex-wrap gap-2">
+            {teamOverview.players.map((member: PlayerMetadata) => {
+              const memberNameLower = member.name.toLowerCase();
+              const isSelected = selectedMembers.includes(memberNameLower);
+              return (
+                <Chip
+                  key={memberNameLower}
+                  variant={isSelected ? "solid" : "bordered"}
+                  color={isSelected ? "primary" : "default"}
+                  avatar={<Avatar name={member.name.charAt(0).toUpperCase()} src={AVATAR_SRC_MAP[memberNameLower]?.src} />}
+                  endContent={isSelected ? <CloseIcon /> : <PlusIcon />}
+                  onClick={() => handleMemberSelectionChange(memberNameLower)}
+                  className="cursor-pointer"
+                >
+                  {member.name.charAt(0).toUpperCase() + member.name.slice(1)}
+                </Chip>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
       <div className="lg:grid lg:grid-cols-2 gap-1">
         {statsToGraph.map((statName, index) => (
           <React.Fragment key={index}>
-            <GamePerformanceStat team={team} statName={statName} selectedMembers={selectedMembers}></GamePerformanceStat>
+            <GamePerformanceStat
+              statName={statName}
+              selectedMembers={selectedMembers}
+              teamStatsTimeline={teamStatsTimeline || []}
+            />
           </React.Fragment>
         ))}
       </div>
