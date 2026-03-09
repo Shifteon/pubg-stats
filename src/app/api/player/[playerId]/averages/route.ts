@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import { playerAveragesSchema } from "@/types";
 
@@ -11,6 +11,8 @@ export async function GET(
   if (!playerId) {
     return NextResponse.json({ error: "Player ID is required" }, { status: 400 });
   }
+
+  const supabase = await createClient();
 
   const { data: averages, error } = await supabase
     .from("game_player_stats")

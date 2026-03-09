@@ -1,8 +1,9 @@
 'use client';
 
 import { HeroUIProvider } from "@heroui/react";
-import {ThemeProvider as NextThemesProvider} from "next-themes";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 import React from 'react';
+import { UserProvider } from '@/contexts/UserContext';
 
 /**
  * Providers wrapper component for the Next.js App Router.
@@ -14,7 +15,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
     // The HeroUIProvider wraps your entire application.
     <HeroUIProvider>
       <NextThemesProvider attribute="class">
-        {children}
+        <UserProvider>
+          {children}
+        </UserProvider>
       </NextThemesProvider>
     </HeroUIProvider>
   );

@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import { Game, gameSchema } from "@/types";
 import { z } from "zod";
@@ -44,6 +44,8 @@ export async function GET(
     if (matchType !== "squad" && matchType !== "duo") {
       return NextResponse.json({ error: "Invalid matchType, must be 'squad' or 'duo'" }, { status: 400 });
     }
+
+    const supabase = await createClient();
 
     // Step 1: Find all game IDs this player participated in
     const { data: pgData, error: pgError } = await supabase

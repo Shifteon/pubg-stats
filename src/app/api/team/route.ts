@@ -1,8 +1,9 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 import { teamsSchema } from "@/types";
 import { NextResponse } from "next/server";
 
 export async function GET() {
+  const supabase = await createClient();
   const { data: teams, error } = await supabase.from("teams").select(`
     id,
     name,

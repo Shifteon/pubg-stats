@@ -7,6 +7,9 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Teams, Player } from "@/types";
 import { capitalize } from "@/utils/stringUtils";
+import { useUser } from "@/contexts/UserContext";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 
 export const Logo = () => {
   return (
@@ -77,6 +80,14 @@ export default function NavBar() {
 
   const [teams, setTeams] = useState<Teams>([]);
   const [players, setPlayers] = useState<Player[]>([]);
+  const { user } = useUser();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.refresh();
+  };
 
   useEffect(() => {
     fetch('/api/team')
@@ -88,7 +99,7 @@ export default function NavBar() {
       .then((res) => res.json())
       .then((data) => setPlayers(data))
       .catch((err) => console.error("Error fetching players:", err));
-  }, []);
+  }, [user]);
 
   const menuItems = [
     {
@@ -119,12 +130,14 @@ export default function NavBar() {
 
   const navLinks = (
     <>
-      <NavbarItem isActive={isActivePath("/")}>
-        <Link href="/" color={isActivePath("/") ? "primary" : "foreground"}>
-          Home
-        </Link>
-      </NavbarItem>
-      {menuItems.map((menu) => (
+      {user &&
+        <NavbarItem isActive={isActivePath("/")}>
+          <Link href="/" color={isActivePath("/") ? "primary" : "foreground"}>
+            Home
+          </Link>
+        </NavbarItem>
+      }
+      {user && menuItems.map((menu) => (
         <Dropdown key={menu.label}>
           <NavbarItem>
             <DropdownTrigger>
@@ -192,6 +205,19 @@ export default function NavBar() {
         <NavbarItem>
           <ThemeSwitcher />
         </NavbarItem>
+        {user ? (
+          <NavbarItem>
+            <Button color="danger" variant="flat" onPress={handleLogout}>
+              Log out
+            </Button>
+          </NavbarItem>
+        ) : (
+          <NavbarItem>
+            <Button as={Link} href="/login" color="primary" variant="flat">
+              Log in
+            </Button>
+          </NavbarItem>
+        )}
       </NavbarContent>
     </Navbar>
   );

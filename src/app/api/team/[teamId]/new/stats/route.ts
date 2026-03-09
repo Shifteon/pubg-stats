@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { TeamStatTimelinePoint } from "@/types";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 
 export async function GET(
   request: NextRequest,
@@ -14,6 +14,8 @@ export async function GET(
       { status: 400 }
     );
   }
+
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .rpc('get_team_stats_over_time', { p_team_id: teamId });

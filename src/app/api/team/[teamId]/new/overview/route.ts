@@ -1,8 +1,9 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import { teamOverviewSchema, TeamHallOfFame, TeamPersonalBest, PlayerMetadata, playerMetadataSchema } from "@/types";
+import { SupabaseClient } from "@supabase/supabase-js";
 
-async function getTeamAndPlayers(teamId: string) {
+async function getTeamAndPlayers(supabase: SupabaseClient, teamId: string) {
   const { data: teamData, error: teamError } = await supabase
     .from("teams")
     .select(`
@@ -14,7 +15,7 @@ async function getTeamAndPlayers(teamId: string) {
       )
     `)
     .eq("id", teamId)
-    .single();
+    .maybeSingle();
 
   if (teamError) {
     throw new Error("Failed to fetch team data: " + teamError.message);
@@ -40,7 +41,7 @@ async function getTeamAndPlayers(teamId: string) {
   return { teamData, players };
 }
 
-async function getGameStats(teamId: string) {
+async function getGameStats(supabase: SupabaseClient, teamId: string) {
   const { data: gamesData, error: gamesError } = await supabase
     .from("games")
     .select("id, is_win, team_sort_order")
@@ -82,7 +83,7 @@ async function getGameStats(teamId: string) {
   return { totalGames, totalWins, totalLosses, winStreak, longestWinStreak, winRate };
 }
 
-async function getHallOfFame(teamId: string): Promise<TeamHallOfFame> {
+async function getHallOfFame(supabase: SupabaseClient, teamId: string): Promise<TeamHallOfFame> {
   const stats = ["kills", "assists", "damage", "rescues", "recalls"] as const;
   const hallOfFame: TeamHallOfFame = {};
 
@@ -94,7 +95,7 @@ async function getHallOfFame(teamId: string): Promise<TeamHallOfFame> {
         .eq("games.team_id", teamId)
         .order(stat, { ascending: false, nullsFirst: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (!error && data) {
         const row = data as Record<string, unknown>;
@@ -119,7 +120,7 @@ async function getHallOfFame(teamId: string): Promise<TeamHallOfFame> {
   return hallOfFame;
 }
 
-async function getTeamPersonalBests(teamId: string, players: PlayerMetadata[]): Promise<TeamPersonalBest> {
+async function getTeamPersonalBests(supabase: SupabaseClient, teamId: string, players: PlayerMetadata[]): Promise<TeamPersonalBest> {
   const teamPersonalBests: TeamPersonalBest = {};
   const stats = ["kills", "assists", "damage", "rescues", "recalls"] as const;
 
@@ -136,7 +137,7 @@ async function getTeamPersonalBests(teamId: string, players: PlayerMetadata[]): 
             .eq("player_id", player.id)
             .order(stat, { ascending: false, nullsFirst: false })
             .limit(1)
-            .single();
+            .maybeSingle();
 
           if (!error && data) {
             const row = data as Record<string, unknown>;
@@ -179,13 +180,15 @@ export async function GET(
       return NextResponse.json({ error: "Team ID is required" }, { status: 400 });
     }
 
-    const { teamData, players } = await getTeamAndPlayers(teamId);
+    const supabase = await createClient();
+
+    const { teamData, players } = await getTeamAndPlayers(supabase, teamId);
 
     // Run the remaining independent queries in parallel
     const [stats, hallOfFame, teamPersonalBests] = await Promise.all([
-      getGameStats(teamId),
-      getHallOfFame(teamId),
-      getTeamPersonalBests(teamId, players)
+      getGameStats(supabase, teamId),
+      getHallOfFame(supabase, teamId),
+      getTeamPersonalBests(supabase, teamId, players)
     ]);
 
     const overviewData = {

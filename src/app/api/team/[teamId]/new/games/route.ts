@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import { Game, gameSchema } from "@/types";
 import { z } from "zod";
@@ -36,6 +36,8 @@ export async function GET(
     if (!teamId) {
       return NextResponse.json({ error: "Team ID is required" }, { status: 400 });
     }
+
+    const supabase = await createClient();
 
     const { data: gamesData, error: gamesError } = await supabase
       .from("games")

@@ -1,11 +1,12 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import { playerSchema, PlayerTeamStats } from "@/types";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 export const dynamic = 'force-dynamic';
 
 /** Fetch player base information */
-async function fetchPlayerBase(playerId: string) {
+async function fetchPlayerBase(supabase: SupabaseClient, playerId: string) {
   const { data: player, error } = await supabase
     .from("players")
     .select("id, name, color, designation")
@@ -17,7 +18,7 @@ async function fetchPlayerBase(playerId: string) {
 }
 
 /** Fetch global averages and total games */
-async function fetchPlayerAverages(playerId: string) {
+async function fetchPlayerAverages(supabase: SupabaseClient, playerId: string) {
   const { data: globalStats, error } = await supabase
     .from("game_player_stats")
     .select(`
@@ -43,7 +44,7 @@ async function fetchPlayerAverages(playerId: string) {
 }
 
 /** Fetch total wins by joining `games` table to check is_win = true */
-async function fetchTotalWins(playerId: string) {
+async function fetchTotalWins(supabase: SupabaseClient, playerId: string) {
   const { data: winsData, error } = await supabase
     .from("game_player_stats")
     .select("id, games!inner(is_win)")
@@ -55,7 +56,7 @@ async function fetchTotalWins(playerId: string) {
 }
 
 /** Fetch and aggregate stats grouped for each team a player is in */
-async function fetchPlayerTeamStats(playerId: string): Promise<PlayerTeamStats[]> {
+async function fetchPlayerTeamStats(supabase: SupabaseClient, playerId: string): Promise<PlayerTeamStats[]> {
   const playerTeamStats: PlayerTeamStats[] = [];
 
   const { data: statsData, error: statsError } = await supabase
@@ -117,10 +118,12 @@ export async function GET(
   }
 
   try {
+    const supabase = await createClient();
+
     const [player, playerAverages, wins] = await Promise.all([
-      fetchPlayerBase(playerId),
-      fetchPlayerAverages(playerId),
-      fetchTotalWins(playerId),
+      fetchPlayerBase(supabase, playerId),
+      fetchPlayerAverages(supabase, playerId),
+      fetchTotalWins(supabase, playerId),
     ]);
 
     if (!player) {
@@ -130,7 +133,7 @@ export async function GET(
     const totalLosses = playerAverages.totalGamesPlayed - wins;
     const winRate = playerAverages.totalGamesPlayed > 0 ? (wins / playerAverages.totalGamesPlayed) * 100 : 0;
 
-    const playerTeamStats = await fetchPlayerTeamStats(playerId);
+    const playerTeamStats = await fetchPlayerTeamStats(supabase, playerId);
 
     // Determine the most played team
     let mostPlayedTeam = "Unknown";
