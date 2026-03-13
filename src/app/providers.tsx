@@ -1,6 +1,6 @@
 'use client';
 
-import { HeroUIProvider } from "@heroui/react";
+import { HeroUIProvider, ToastProvider } from "@heroui/react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import React from 'react';
 import { UserProvider } from '@/contexts/UserContext';
@@ -16,6 +16,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <HeroUIProvider>
       <NextThemesProvider attribute="class">
         <UserProvider>
+          <ToastProvider />
           {children}
         </UserProvider>
       </NextThemesProvider>

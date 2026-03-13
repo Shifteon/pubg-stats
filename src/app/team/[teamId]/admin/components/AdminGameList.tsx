@@ -6,6 +6,7 @@ import AdminForm from "./AdminForm";
 import GameByGame from "@/components/GameByGame";
 import { useEffect, useState } from "react";
 import { Game } from "@/types";
+import DeleteConfirmationModal from "./DeleteConfirmationModal";
 
 export interface AdminGameListProps {
   teamId: string;
@@ -14,9 +15,15 @@ export interface AdminGameListProps {
 export default function AdminGameList({ teamId }: AdminGameListProps) {
   const { teamGames, isLoading } = useTeamGames(teamId);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const {
+    isOpen: isDeleteModalOpen,
+    onOpen: onDeleteModalOpen,
+    onOpenChange: onDeleteModalOpenChange
+  } = useDisclosure();
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedGame, setSelectedGame] = useState<Game | undefined>(undefined);
+  const [gameToDelete, setGameToDelete] = useState<Game | undefined>(undefined);
 
   const handleAddClick = () => {
     setSelectedGame(undefined);
@@ -28,6 +35,11 @@ export default function AdminGameList({ teamId }: AdminGameListProps) {
     setSelectedGame(game);
     setIsEditMode(true);
     onOpen();
+  };
+
+  const handleDeleteClick = (game: Game) => {
+    setGameToDelete(game);
+    onDeleteModalOpen();
   };
 
   // Filter for games that have playedAt
@@ -52,7 +64,7 @@ export default function AdminGameList({ teamId }: AdminGameListProps) {
             <div>Loading games...</div>
           </div>
         ) : playedGames.length > 0 ? (
-          <GameByGame gameData={playedGames} hideFilters={true} onEditGame={handleEditClick} />
+          <GameByGame gameData={playedGames} hideFilters={true} onEditGame={handleEditClick} onDeleteGame={handleDeleteClick} />
         ) : (
           <div className="text-center text-gray-500 py-8 border rounded-lg">
             No games recorded yet. Click &quot;Add New Game&quot; to get started.
@@ -66,6 +78,12 @@ export default function AdminGameList({ teamId }: AdminGameListProps) {
         onOpenChange={onOpenChange}
         isEdit={isEditMode}
         initialGame={selectedGame}
+      />
+
+      <DeleteConfirmationModal // Added DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onOpenChange={onDeleteModalOpenChange}
+        game={gameToDelete}
       />
     </div>
   );

@@ -88,3 +88,37 @@ export async function PUT(
     );
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ gameId: string }> }
+) {
+  try {
+    const { gameId } = await params;
+
+    if (!gameId) {
+      return NextResponse.json({ error: "Game ID is required" }, { status: 400 });
+    }
+
+    const supabase = await createClient();
+
+    const { error: gameError } = await supabase
+      .from("games")
+      .delete()
+      .eq("id", gameId);
+
+    if (gameError) {
+      console.error("Error deleting game:", gameError);
+      return NextResponse.json({ error: "Failed to delete game" }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, id: gameId }, { status: 200 });
+
+  } catch (error) {
+    console.error("Error in Game DELETE API:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error", details: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 }
+    );
+  }
+}

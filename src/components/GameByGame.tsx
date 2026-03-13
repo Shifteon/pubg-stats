@@ -12,9 +12,10 @@ export interface GameByGameProps {
   gameData: Game[];
   hideFilters?: boolean;
   onEditGame?: (game: Game) => void;
+  onDeleteGame?: (game: Game) => void;
 }
 
-export default function GameByGame({ gameData, hideFilters, onEditGame }: GameByGameProps) {
+export default function GameByGame({ gameData, hideFilters, onEditGame, onDeleteGame }: GameByGameProps) {
   const [gameByGamePage, setGameByGamePage] = useState(1);
   const [filters, setFilters] = useState<Filter[]>([]);
   const [filterResult, setFilterResult] = useState<string>("all");
@@ -189,18 +190,32 @@ export default function GameByGame({ gameData, hideFilters, onEditGame }: GameBy
           <div key={index} className="w-full">
             <div className="flex justify-between items-center mb-2">
               <h3 className="text-xl font-semibold">Game {game.gameIndex} - {game.win === 1 ? "🏆 Win" : "❌ Loss"}</h3>
-              {onEditGame && (
-                <Button
-                  onPress={() => {
-                    const originalGame = gameData.find(g => g.gameNumber === game.gameIndex);
-                    if (originalGame) onEditGame(originalGame);
-                  }}
-                  color="primary"
-                  variant="bordered"
-                >
-                  Edit Game
-                </Button>
-              )}
+              <div className="flex gap-2">
+                {onEditGame && (
+                  <Button
+                    onPress={() => {
+                      const originalGame = gameData.find(g => g.gameNumber === game.gameIndex);
+                      if (originalGame) onEditGame(originalGame);
+                    }}
+                    color="primary"
+                    variant="solid"
+                  >
+                    Edit
+                  </Button>
+                )}
+                {onDeleteGame && (
+                  <Button
+                    onPress={() => {
+                      const originalGame = gameData.find(g => g.gameNumber === game.gameIndex);
+                      if (originalGame) onDeleteGame(originalGame);
+                    }}
+                    color="danger"
+                    variant="bordered"
+                  >
+                    Delete
+                  </Button>
+                )}
+              </div>
             </div>
             <GameTable data={game.data} gameIndex={game.gameIndex} />
           </div>

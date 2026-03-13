@@ -24,6 +24,17 @@ export async function signup(formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
 
+  const allowedEmails = [
+    'y4cody@gmail.com',
+    'isaacl1698@gmail.com',
+    'bpwyatt04@gmail.com',
+    'britishshrimp@gmail.com',
+  ]
+
+  if (!allowedEmails.includes(email.toLowerCase())) {
+    redirect('/login?error=Email not authorized to sign up')
+  }
+
   const { error } = await supabase.auth.signUp({ email, password })
 
   if (error) {
