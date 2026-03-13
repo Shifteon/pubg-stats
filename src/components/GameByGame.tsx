@@ -1,18 +1,20 @@
 "use client";
 
-import { Pagination, Accordion, AccordionItem } from "@heroui/react";
+import { Pagination, Accordion, AccordionItem, Button } from "@heroui/react";
 import { useEffect, useMemo, useState } from "react";
-import GameTable from "../../GameTable";
+import GameTable from "../app/team/[teamId]/components/GameTable";
 import GameSort, { SortConfig } from "./GameSort";
-import { statKeys } from "../../gameSummary/utils";
+import { statKeys } from "../app/team/[teamId]/components/gameSummary/utils";
 import GameFilter, { Filter } from "./GameFilter";
 import { Game } from "@/types";
 
 export interface GameByGameProps {
   gameData: Game[];
+  hideFilters?: boolean;
+  onEditGame?: (game: Game) => void;
 }
 
-export default function GameByGame({ gameData }: GameByGameProps) {
+export default function GameByGame({ gameData, hideFilters, onEditGame }: GameByGameProps) {
   const [gameByGamePage, setGameByGamePage] = useState(1);
   const [filters, setFilters] = useState<Filter[]>([]);
   const [filterResult, setFilterResult] = useState<string>("all");
@@ -155,35 +157,51 @@ export default function GameByGame({ gameData }: GameByGameProps) {
 
   return (
     <>
-      <Accordion variant="bordered">
-        <AccordionItem key="1" aria-label="Filter and Sort" title="Filter and Sort">
-          <GameFilter
-            players={players}
-            stats={statKeys}
-            onAddFilter={handleAddFilter}
-            activeFilters={filters}
-            onRemoveFilter={handleRemoveFilter}
-            filterResult={filterResult}
-            onFilterResultChange={(value) => {
-              setFilterResult(value);
-              setGameByGamePage(1);
-            }}
-          />
-          <GameSort
-            players={players}
-            stats={statKeys}
-            sortConfig={sortConfig}
-            onSortChange={(config) => {
-              setSortConfig(config);
-              setGameByGamePage(1);
-            }}
-          />
-        </AccordionItem>
-      </Accordion>
+      {!hideFilters && (
+        <Accordion variant="bordered">
+          <AccordionItem key="1" aria-label="Filter and Sort" title="Filter and Sort">
+            <GameFilter
+              players={players}
+              stats={statKeys}
+              onAddFilter={handleAddFilter}
+              activeFilters={filters}
+              onRemoveFilter={handleRemoveFilter}
+              filterResult={filterResult}
+              onFilterResultChange={(value) => {
+                setFilterResult(value);
+                setGameByGamePage(1);
+              }}
+            />
+            <GameSort
+              players={players}
+              stats={statKeys}
+              sortConfig={sortConfig}
+              onSortChange={(config) => {
+                setSortConfig(config);
+                setGameByGamePage(1);
+              }}
+            />
+          </AccordionItem>
+        </Accordion>
+      )}
       <div className="w-full grid grid-cols-1 lg:grid-cols-2 items-start gap-8 mt-4">
         {paginatedGameTables.map((game, index) => (
           <div key={index} className="w-full">
-            <h3 className="text-xl font-semibold mb-2">Game {game.gameIndex} - {game.win === 1 ? "🏆 Win" : "❌ Loss"}</h3>
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-xl font-semibold">Game {game.gameIndex} - {game.win === 1 ? "🏆 Win" : "❌ Loss"}</h3>
+              {onEditGame && (
+                <Button
+                  onPress={() => {
+                    const originalGame = gameData.find(g => g.gameNumber === game.gameIndex);
+                    if (originalGame) onEditGame(originalGame);
+                  }}
+                  color="primary"
+                  variant="bordered"
+                >
+                  Edit Game
+                </Button>
+              )}
+            </div>
             <GameTable data={game.data} gameIndex={game.gameIndex} />
           </div>
         ))}

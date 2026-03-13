@@ -5,7 +5,7 @@ import { z } from "zod";
 export const editGamePayloadSchema = z.object({
   isWin: z.boolean(),
   matchType: z.enum(["duo", "squad"]),
-  playedAt: z.date(),
+  playedAt: z.string().transform((value) => new Date(value)),
   stats: z.array(z.object({
     playerId: z.string(),
     kills: z.number().default(0),
@@ -36,6 +36,7 @@ export async function PUT(
     const updateData = {
       is_win: parsedBody.isWin,
       match_type: parsedBody.matchType,
+      played_at: parsedBody.playedAt,
     };
 
     const { error: gameError } = await supabase
@@ -48,36 +49,28 @@ export async function PUT(
       return NextResponse.json({ error: "Failed to update game" }, { status: 500 });
     }
 
-    // 2. We do a full replacement of the game_player_stats for this game
-    const { error: deleteError } = await supabase
-      .from("game_player_stats")
-      .delete()
-      .eq("game_id", gameId);
-
-    if (deleteError) {
-      console.error("Error deleting old player stats:", deleteError);
-      return NextResponse.json({ error: "Failed to clear old player stats" }, { status: 500 });
-    }
-
-    // 3. Insert the new stats
+    // 2. Update individual player stats
     if (parsedBody.stats && parsedBody.stats.length > 0) {
-      const statsToInsert = parsedBody.stats.map(stat => ({
-        game_id: gameId,
-        player_id: stat.playerId,
-        kills: stat.kills,
-        assists: stat.assists,
-        damage: stat.damage,
-        rescues: stat.rescues,
-        recalls: stat.recalls,
-      }));
+      const updatePromises = parsedBody.stats.map(stat =>
+        supabase
+          .from("game_player_stats")
+          .update({
+            kills: stat.kills,
+            assists: stat.assists,
+            damage: stat.damage,
+            rescues: stat.rescues,
+            recalls: stat.recalls,
+          })
+          .eq("game_id", gameId)
+          .eq("player_id", stat.playerId)
+      );
 
-      const { error: statsError } = await supabase
-        .from("game_player_stats")
-        .insert(statsToInsert);
+      const results = await Promise.all(updatePromises);
 
-      if (statsError) {
-        console.error("Error inserting updated player stats:", statsError);
-        return NextResponse.json({ error: "Failed to insert updated player stats" }, { status: 500 });
+      const errorResult = results.find(r => r.error);
+      if (errorResult) {
+        console.error("Error updating player stats:", errorResult.error);
+        return NextResponse.json({ error: "Failed to update player stats" }, { status: 500 });
       }
     }
 
@@ -85,6 +78,7 @@ export async function PUT(
 
   } catch (error) {
     if (error instanceof z.ZodError) {
+      console.error("Error in Game PUT API:", error);
       return NextResponse.json({ error: "Invalid payload", details: error }, { status: 400 });
     }
     console.error("Error in Game PUT API:", error);

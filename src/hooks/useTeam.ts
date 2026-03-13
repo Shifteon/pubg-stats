@@ -23,12 +23,13 @@ export function useTeamStatsTimeline(teamId: string) {
 }
 
 export function useTeamGames(teamId: string) {
-  const { data, error, isLoading } = useSWR<Game[]>(`/api/team/${teamId}/new/games`, fetcher);
+  const { data, error, isLoading, mutate } = useSWR<Game[]>(`/api/team/${teamId}/new/games`, fetcher);
 
   return {
     teamGames: data,
     isLoading,
-    isError: error
+    isError: error,
+    mutate
   };
 }
 
@@ -44,7 +45,7 @@ export function useTeamOverview(teamId: string) {
 
 export function useTeamGame(teamId: string | undefined, gameId: string | null) {
   const shouldFetch = teamId && gameId;
-  const { data, error, isLoading } = useSWR<Game>(
+  const { data, error, isLoading, mutate } = useSWR<Game>(
     shouldFetch ? `/api/team/${teamId}/new/game/${gameId}` : null,
     fetcher
   );
@@ -52,6 +53,7 @@ export function useTeamGame(teamId: string | undefined, gameId: string | null) {
   return {
     game: data,
     isLoading,
-    isError: error
+    isError: error,
+    mutate
   };
 }

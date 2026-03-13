@@ -23,7 +23,7 @@ interface RawGame {
   is_win: boolean | null;
   match_type: string;
   game_player_stats: RawGamePlayerStat[] | null;
-  played_at: string;
+  played_at: string | null;
 }
 
 export async function GET(
@@ -72,20 +72,22 @@ export async function GET(
       return NextResponse.json({ error: "Game not found or not associated with this team" }, { status: 404 });
     }
 
-    // Calculate gameNumber by counting games for this team that occurred on or before this game's sort order
-    const { count, error: countError } = await supabase
+    // Calculate gameNumber by fetching all game IDs sorted correctly and finding the index
+    const { data: allGames, error: allGamesError } = await supabase
       .from("games")
-      .select("*", { count: 'exact', head: true })
+      .select("id")
       .eq("team_id", teamId)
-      .lte("team_sort_order", gameData.team_sort_order);
+      .order("played_at", { ascending: true, nullsFirst: true })
+      .order("team_sort_order", { ascending: true });
 
-    if (countError) {
-      throw new Error("Failed to calculate game number: " + countError.message);
+    if (allGamesError) {
+      throw new Error("Failed to calculate game number: " + allGamesError.message);
     }
 
     const rawGame = gameData as unknown as RawGame;
 
-    const gameNumber = count || 1;
+    const gameIndex = allGames.findIndex(g => g.id === gameId);
+    const gameNumber = gameIndex !== -1 ? gameIndex + 1 : 1;
 
     const game: Game = {
       id: rawGame.id,
@@ -93,26 +95,28 @@ export async function GET(
       gameNumber: gameNumber,
       isWin: rawGame.is_win ?? false,
       matchType: (rawGame.match_type as "duo" | "squad"),
-      playedAt: new Date(rawGame.played_at),
-      stats: (rawGame.game_player_stats || []).map(stat => {
-        let playerName = "Unknown";
-        if (stat.players) {
-          if (Array.isArray(stat.players)) {
-            playerName = stat.players[0]?.name || "Unknown";
-          } else {
-            playerName = stat.players.name || "Unknown";
+      playedAt: rawGame.played_at ? new Date(rawGame.played_at) : undefined,
+      stats: (rawGame.game_player_stats || [])
+        .map(stat => {
+          let playerName = "Unknown";
+          if (stat.players) {
+            if (Array.isArray(stat.players)) {
+              playerName = stat.players[0]?.name || "Unknown";
+            } else {
+              playerName = stat.players.name || "Unknown";
+            }
           }
-        }
-        return {
-          playerId: stat.player_id,
-          playerName: playerName,
-          kills: stat.kills || 0,
-          assists: stat.assists || 0,
-          damage: stat.damage || 0,
-          rescues: stat.rescues || 0,
-          recalls: stat.recalls || 0,
-        };
-      }),
+          return {
+            playerId: stat.player_id,
+            playerName: playerName,
+            kills: stat.kills || 0,
+            assists: stat.assists || 0,
+            damage: stat.damage || 0,
+            rescues: stat.rescues || 0,
+            recalls: stat.recalls || 0,
+          };
+        })
+        .sort((a, b) => a.playerName.localeCompare(b.playerName)),
     };
 
     const parsedGame = gameSchema.parse(game);
