@@ -1,6 +1,6 @@
 "use client";
 
-import { Accordion, AccordionItem } from "@heroui/react";
+import { Divider } from "@heroui/react";
 import Overview from "./components/overview";
 import LoadingSpinner from "../../../../../components/loadingSpinner";
 import HallOfFame from "./components/HallOfFame";
@@ -32,30 +32,32 @@ export default function GameSummary({ teamId }: GameSummaryProps) {
   }
 
   return (
-    <div className="w-full flex flex-col items-center mt-4">
-      <Accordion
-        selectionMode="multiple"
-        className="w-full mt-4"
-        defaultExpandedKeys="all"
-        variant="bordered"
-      >
-        <AccordionItem key="overview" title="Overview">
-          <Overview
-            totalGames={teamOverview.totalGames}
-            wins={teamOverview.totalWins}
-            losses={teamOverview.totalLosses}
-            winRate={teamOverview.winRate}
-            winStreak={teamOverview.winStreak}
-            longestWinStreak={teamOverview.longestWinStreak}
-          />
-        </AccordionItem>
-        <AccordionItem key="hall-of-fame" title="Hall of Fame">
-          <HallOfFame hallOfFame={teamOverview.hallOfFame} players={teamOverview.players} teamId={teamId} />
-        </AccordionItem>
-        <AccordionItem key="personal-bests" title="Personal Bests">
-          <PersonalBests personalBests={teamOverview.teamPersonalBests} players={teamOverview.players} teamId={teamId} />
-        </AccordionItem>
-      </Accordion>
+    <div className="w-full flex flex-col items-center mt-6 space-y-8">
+      <section className="w-full">
+        <h2 className="text-2xl font-bold mb-4 ml-1">Overview</h2>
+        <Overview
+          totalGames={teamOverview.totalGames}
+          wins={teamOverview.totalWins}
+          losses={teamOverview.totalLosses}
+          winRate={teamOverview.winRate}
+          winStreak={teamOverview.winStreak}
+          longestWinStreak={teamOverview.longestWinStreak}
+        />
+      </section>
+
+      <Divider />
+
+      <section className="w-full">
+        <h2 className="text-2xl font-bold mb-4 ml-1">Hall of Fame</h2>
+        <HallOfFame hallOfFame={teamOverview.hallOfFame} players={teamOverview.players} teamId={teamId} />
+      </section>
+
+      <Divider />
+
+      <section className="w-full">
+        <h2 className="text-2xl font-bold mb-4 ml-1">Personal Bests</h2>
+        <PersonalBests personalBests={teamOverview.teamPersonalBests} players={teamOverview.players} teamId={teamId} />
+      </section>
     </div>
   );
 }

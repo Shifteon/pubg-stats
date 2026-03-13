@@ -1,7 +1,7 @@
 "use client";
 
-import { useTeamGames } from "@/hooks/useTeam";
-import { Button, Spinner, useDisclosure } from "@heroui/react";
+import { useTeamGames, useTeamOverview } from "@/hooks/useTeam";
+import { Button, Spinner, useDisclosure, Skeleton } from "@heroui/react";
 import AdminForm from "./AdminForm";
 import GameByGame from "@/components/GameByGame";
 import { useEffect, useState } from "react";
@@ -14,6 +14,7 @@ export interface AdminGameListProps {
 
 export default function AdminGameList({ teamId }: AdminGameListProps) {
   const { teamGames, isLoading } = useTeamGames(teamId);
+  const { teamOverview, isLoading: isOverviewLoading } = useTeamOverview(teamId);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const {
     isOpen: isDeleteModalOpen,
@@ -47,9 +48,13 @@ export default function AdminGameList({ teamId }: AdminGameListProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold">Manage Games</h2>
+          {isOverviewLoading ? (
+            <Skeleton className="h-8 w-48 rounded-lg mb-2" />
+          ) : (
+            <h2 className="text-3xl font-bold">{teamOverview?.teamName}: Admin</h2>
+          )}
           <p className="text-gray-500 text-sm mt-1">Add new games or edit existing ones.</p>
         </div>
         <Button color="primary" onPress={handleAddClick}>
