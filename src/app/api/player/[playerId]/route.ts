@@ -83,8 +83,8 @@ async function fetchPlayerTeamStats(supabase: SupabaseClient, playerId: string):
   if (winsError) throw winsError;
 
   //sort winsData and statsData by teamId
-  const sortedWins = winsData.sort((a, b) => a.teamId - b.teamId);
-  const sortedStats = statsData.sort((a, b) => a.teamId - b.teamId);
+  const sortedWins = winsData.sort((a, b) => a.teamId.localeCompare(b.teamId));
+  const sortedStats = statsData.sort((a, b) => a.teamId.localeCompare(b.teamId));
 
   if (sortedWins && sortedStats) {
     if (sortedWins.length !== sortedStats.length) {

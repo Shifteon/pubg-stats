@@ -23,6 +23,7 @@ interface RawGame {
   is_win: boolean | null;
   match_type: string;
   game_player_stats: RawGamePlayerStat[] | null;
+  played_at: string;
 }
 
 export async function GET(
@@ -46,6 +47,7 @@ export async function GET(
         team_sort_order,
         is_win,
         match_type,
+        played_at,
         game_player_stats (
           player_id,
           kills,
@@ -91,6 +93,7 @@ export async function GET(
       gameNumber: gameNumber,
       isWin: rawGame.is_win ?? false,
       matchType: (rawGame.match_type as "duo" | "squad"),
+      playedAt: new Date(rawGame.played_at),
       stats: (rawGame.game_player_stats || []).map(stat => {
         let playerName = "Unknown";
         if (stat.players) {

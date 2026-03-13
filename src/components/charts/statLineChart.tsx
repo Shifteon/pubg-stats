@@ -68,7 +68,7 @@ export default function StatLineChart(props: StatLineChartProps) {
       <XAxis interval={xAxisInterval} domain={[20, 'auto']} dataKey={GAME_INDEX_KEY} />
       <YAxis interval="preserveEnd" allowDecimals={false} domain={yAxisDomain} startOffset={3} scale="linear" width="auto" type='number' />
       <Tooltip
-        formatter={(value) => new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(Number(value.valueOf()))}
+        formatter={(value) => new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(Number(value?.valueOf()))}
         contentStyle={{
           backgroundColor: 'hsl(var(--heroui-content1))',
           borderColor: 'hsl(var(--heroui-content1-300))'

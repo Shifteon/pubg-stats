@@ -2,6 +2,7 @@
 
 import { Button } from "@heroui/react";
 import React from "react";
+import { useSWRConfig } from "swr";
 
 const RefreshIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -23,7 +24,12 @@ const RefreshIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 export default function CacheRefreshButton() {
+  const { cache } = useSWRConfig();
+
   const handleRefresh = () => {
+    while (cache.keys().next().value) {
+      cache.delete(cache.keys().next().value);
+    }
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key && key.startsWith("cache_")) {

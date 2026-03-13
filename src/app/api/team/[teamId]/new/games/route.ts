@@ -24,6 +24,8 @@ interface RawGame {
   is_win: boolean | null;
   match_type: string;
   game_player_stats: RawGamePlayerStat[] | null;
+  played_at: string | null;
+  created_at: string;
 }
 
 export async function GET(
@@ -47,6 +49,8 @@ export async function GET(
         team_sort_order,
         is_win,
         match_type,
+        played_at,
+        created_at,
         game_player_stats (
           player_id,
           kills,
@@ -60,7 +64,8 @@ export async function GET(
         )
       `)
       .eq("team_id", teamId)
-      .order("team_sort_order", { ascending: true }); // ASC to assign gameNumbers 1, 2, 3...
+      .order("played_at", { ascending: true, nullsFirst: true })
+      .order("team_sort_order", { ascending: true });
 
     if (gamesError) {
       throw new Error("Failed to fetch games: " + gamesError.message);
@@ -74,9 +79,10 @@ export async function GET(
       return {
         id: game.id,
         teamId: game.team_id,
-        gameNumber: index + 1, // 1-indexed, starting from lowest team_sort_order
+        gameNumber: index + 1, // 1-indexed, chronological
         isWin: game.is_win ?? false,
         matchType: game.match_type as "duo" | "squad",
+        playedAt: game.played_at ? new Date(game.played_at) : undefined,
         stats: (game.game_player_stats || []).map(stat => {
           let playerName = "Unknown";
           if (stat.players) {

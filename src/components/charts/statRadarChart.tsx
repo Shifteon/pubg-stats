@@ -10,6 +10,9 @@ import {
   TooltipContentProps
 } from "recharts";
 
+export type RechartsValueType = number | string | readonly (number | string)[];
+export type RechartsNameType = number | string;
+export type RadarTooltipProps = TooltipContentProps<RechartsValueType, RechartsNameType>;
 
 export interface RadarSeries {
   key: string;
@@ -27,7 +30,7 @@ export interface RadarDataPoint {
 interface StatRadarChartProps {
   data: RadarDataPoint[];
   series: RadarSeries[];
-  tooltipContent?: (props: TooltipContentProps<string | number, string>) => React.JSX.Element | null;
+  tooltipContent?: (props: RadarTooltipProps) => React.JSX.Element | null;
   domain?: [number, number];
 }
 

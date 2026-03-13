@@ -25,6 +25,7 @@ interface RawGame {
   is_win: boolean | null;
   match_type: string;
   created_at: string;
+  played_at: string | null;
   game_player_stats: RawGamePlayerStat[] | null;
 }
 
@@ -82,6 +83,7 @@ export async function GET(
           is_win,
           match_type,
           created_at,
+          played_at,
           game_player_stats (
             player_id,
             kills,
@@ -106,16 +108,25 @@ export async function GET(
       }
     }
 
-    // Sort by team_sort_order ascending to determine gameNumber
-    allGames.sort((a, b) => a.team_sort_order - b.team_sort_order);
+    // Sort Newest -> Oldest (Approach 1: played_at DESC NULLS LAST, team_sort_order DESC)
+    allGames.sort((a, b) => {
+      if (a.played_at && b.played_at) {
+        return new Date(b.played_at).getTime() - new Date(a.played_at).getTime();
+      }
+      if (a.played_at && !b.played_at) return -1;
+      if (!a.played_at && b.played_at) return 1;
+      return b.team_sort_order - a.team_sort_order;
+    });
 
+    const totalGames = allGames.length;
     const games: Game[] = allGames.map((game, index) => {
       return {
         id: game.id,
         teamId: game.team_id,
-        gameNumber: index + 1, // Chronological game number for this player & matchType
+        gameNumber: totalGames - index, // Chronological game number for this player & matchType
         isWin: game.is_win ?? false,
         matchType: game.match_type as "duo" | "squad",
+        playedAt: game.played_at ? new Date(game.played_at) : undefined,
         stats: (game.game_player_stats || []).map(stat => {
           let playerName = "Unknown";
           if (stat.players) {
@@ -137,9 +148,6 @@ export async function GET(
         }),
       };
     });
-
-    // Reverse array to return most recent games first
-    games.reverse();
 
     const parsedGames = z.array(gameSchema).parse(games);
 

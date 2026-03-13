@@ -44,7 +44,7 @@ export default function StatBarChart(props: StatBarChartProps) {
       <XAxis dataKey="displayName" />
       <YAxis width="auto" />
       <Tooltip
-        formatter={(value) => new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(Number(value.valueOf()))}
+        formatter={(value) => new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(Number(value?.valueOf()))}
         contentStyle={{
           backgroundColor: 'hsl(var(--heroui-content1))',
         }}

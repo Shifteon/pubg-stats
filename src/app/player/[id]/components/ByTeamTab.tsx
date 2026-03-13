@@ -76,7 +76,7 @@ export default function ByTeamTab({ data }: ByTeamTabProps) {
                     itemStyle={{
                       color: 'hsl(var(--text-primary))',
                     }}
-                    formatter={(value: number) => [formatValue(value, metric.key), metric.label]}
+                    formatter={(value) => [formatValue(value?.valueOf() as number, metric.key), metric.label]}
                   />
                   <Legend />
                   <Bar dataKey={metric.key} name={metric.label}>

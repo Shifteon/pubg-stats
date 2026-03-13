@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import StatRadarChart, { RadarDataPoint, RadarSeries } from "@/components/charts/statRadarChart";
+import StatRadarChart, { RadarDataPoint, RadarSeries, RadarTooltipProps } from "@/components/charts/statRadarChart";
 import { Chip, Spinner } from "@heroui/react";
 import { PLAYER_COLOR_MAP } from "@/constants";
-import { TooltipContentProps } from "recharts";
 import { Player } from "@/types";
 import { usePlayersList, usePlayers } from "@/hooks/usePlayer";
 
@@ -128,7 +127,7 @@ export default function PlayerRadarChart({ player }: PlayerRadarChartProps) {
 
   if (!allPlayersStats || Object.keys(allPlayersStats).length === 0) return null;
 
-  const CustomTooltip = (props: TooltipContentProps<string | number, string>) => {
+  const CustomTooltip = (props: RadarTooltipProps) => {
     const { active, payload } = props;
     if (active && payload && payload.length) {
       const subject = payload[0].payload.subject;

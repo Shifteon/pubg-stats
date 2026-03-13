@@ -3,9 +3,9 @@
 import { Card, CardHeader, CardBody, Input, Button, PressEvent } from '@heroui/react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 
-export default function LoginPage() {
+function LoginContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
 
@@ -88,10 +88,10 @@ export default function LoginPage() {
             />
 
             <div className="flex flex-col gap-2 mt-2">
-              <Button color="primary" onPress={(e) => handleLogin(e as any)} isLoading={isLoading} className="w-full">
+              <Button color="primary" onPress={(e) => handleLogin(e)} isLoading={isLoading} className="w-full">
                 Log in
               </Button>
-              <Button color="default" variant="flat" onPress={(e) => handleSignup(e as any)} isLoading={isLoading} className="w-full">
+              <Button color="default" variant="flat" onPress={(e) => handleSignup(e)} isLoading={isLoading} className="w-full">
                 Sign up
               </Button>
             </div>
@@ -99,5 +99,13 @@ export default function LoginPage() {
         </CardBody>
       </Card>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex h-screen w-full items-center justify-center p-4">Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   )
 }

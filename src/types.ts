@@ -162,6 +162,7 @@ export const gameSchema = z.object({
   gameNumber: z.number(),
   isWin: z.boolean(),
   matchType: z.enum(["duo", "squad"]),
+  playedAt: z.date().optional(),
   stats: z.array(z.object({
     playerId: z.string(),
     playerName: z.string(),
