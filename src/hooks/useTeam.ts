@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { TeamStatTimelinePoint, TeamOverview, Game } from '@/types';
+import { TeamStatTimelinePoint, TeamOverview, Game, Teams } from '@/types';
 
 const fetcher = async (url: string) => {
   const res = await fetch(url);
@@ -55,5 +55,18 @@ export function useTeamGame(teamId: string | undefined, gameId: string | null) {
     isLoading,
     isError: error,
     mutate
+  };
+}
+
+export function useTeamsList() {
+  const { data, error, isLoading } = useSWR<Teams>(
+    '/api/team',
+    fetcher
+  );
+
+  return {
+    teamsList: data,
+    isLoading,
+    isError: error
   };
 }
