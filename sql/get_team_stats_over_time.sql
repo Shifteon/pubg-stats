@@ -1,27 +1,4 @@
-DROP FUNCTION IF EXISTS get_team_stats_over_time;
 
-CREATE OR REPLACE FUNCTION get_team_stats_over_time(p_team_id uuid)
-RETURNS TABLE (
-    game_id uuid,
-    team_sort_order integer,
-    is_win boolean,
-    player_id uuid,
-    player_name varchar,
-    kills integer,
-    damage integer,
-    running_sum_kills bigint,
-    running_avg_kills numeric,
-    running_sum_damage bigint,
-    running_avg_damage numeric,
-    running_team_kills bigint,
-    running_avg_team_kills numeric,
-    running_team_damage bigint,
-    running_avg_team_damage numeric,
-    running_wins bigint,
-    games_played bigint
-) 
-LANGUAGE plpgsql
-AS $$
 BEGIN
     RETURN QUERY
     WITH TeamGameStats AS (
@@ -29,31 +6,34 @@ BEGIN
         SELECT 
             g.id AS game_id,
             g.team_sort_order,
+            g.played_at,
             CAST(SUM(COALESCE(gps.kills, 0)) AS integer) AS team_kills,
             CAST(SUM(COALESCE(gps.damage, 0)) AS integer) AS team_damage
         FROM games g
         LEFT JOIN game_player_stats gps ON g.id = gps.game_id
         WHERE g.team_id = p_team_id
-        GROUP BY g.id, g.team_sort_order
+        GROUP BY g.id, g.team_sort_order, g.played_at
     ),
     TeamRunningStats AS (
         -- Calculate the running totals and averages for the team
         SELECT 
             tgs.game_id,
             tgs.team_sort_order,
+            tgs.played_at,
             SUM(tgs.team_kills) OVER w AS running_team_kills,
             AVG(tgs.team_kills) OVER w AS running_avg_team_kills,
             SUM(tgs.team_damage) OVER w AS running_team_damage,
             AVG(tgs.team_damage) OVER w AS running_avg_team_damage,
             ROW_NUMBER() OVER w AS games_played
         FROM TeamGameStats tgs
-        WINDOW w AS (ORDER BY tgs.team_sort_order ROWS UNBOUNDED PRECEDING)
+        WINDOW w AS (ORDER BY tgs.played_at NULLS FIRST, tgs.team_sort_order ROWS UNBOUNDED PRECEDING)
     ),
     PlayerGameStats AS (
         -- Get individual player stats per game
         SELECT 
             g.id AS game_id,
             g.team_sort_order,
+            g.played_at,
             g.is_win,
             p.id AS player_id,
             p.name AS player_name,
@@ -69,6 +49,7 @@ BEGIN
         SELECT 
             pgs.game_id,
             pgs.team_sort_order,
+            pgs.played_at,
             pgs.is_win,
             pgs.player_id,
             pgs.player_name,
@@ -82,7 +63,7 @@ BEGIN
             -- Note: games_played_by_player is just row_number partitioned by player
             ROW_NUMBER() OVER w AS games_played_by_player
         FROM PlayerGameStats pgs
-        WINDOW w AS (PARTITION BY pgs.player_id ORDER BY pgs.team_sort_order ROWS UNBOUNDED PRECEDING)
+        WINDOW w AS (PARTITION BY pgs.player_id ORDER BY pgs.played_at NULLS FIRST, pgs.team_sort_order ROWS UNBOUNDED PRECEDING)
     ),
     TeamAveragesOfPlayerAverages AS (
         -- Calculate the average of the player running averages for the exact middle
@@ -114,6 +95,5 @@ BEGIN
     FROM PlayerRunningStats prs
     JOIN TeamRunningStats trs ON prs.game_id = trs.game_id
     JOIN TeamAveragesOfPlayerAverages tapa ON prs.game_id = tapa.game_id
-    ORDER BY prs.team_sort_order, prs.player_name;
+    ORDER BY prs.played_at NULLS FIRST, prs.team_sort_order, prs.player_name;
 END;
-$$;
