@@ -46,6 +46,7 @@ async function getGameStats(supabase: SupabaseClient, teamId: string) {
     .from("games")
     .select("id, is_win, team_sort_order")
     .eq("team_id", teamId)
+    .order("played_at", { ascending: true, nullsFirst: true })
     .order("team_sort_order", { ascending: true });
 
   if (gamesError) {
