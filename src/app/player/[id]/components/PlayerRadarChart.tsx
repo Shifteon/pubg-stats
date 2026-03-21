@@ -74,6 +74,7 @@ export default function PlayerRadarChart({ player }: PlayerRadarChartProps) {
     const series: RadarSeries[] = selectedPlayers.map(pName => ({
       key: pName,
       name: pName,
+      // TODO: get the player color elsewhere
       color: PLAYER_COLOR_MAP[pName] || "#8884d8",
       opacity: pName === currentPlayerNameRaw ? 0.6 : 0.2
     }));

@@ -1,12 +1,11 @@
 "use client";
 
-import { GameSummaryData, TeamPersonalBest, PlayerMetadata } from "@/types";
+import { TeamPersonalBest, PlayerMetadata } from "@/types";
 import { useState } from "react";
 import PlayerStatCard from "./PlayerStatCard";
 import { useDisclosure } from "@heroui/react";
 import GameModal from "../../GameModal";
 import { useTeamGame } from "@/hooks/useTeam";
-import { useEffect } from "react";
 
 export interface StatValue {
   value: number;

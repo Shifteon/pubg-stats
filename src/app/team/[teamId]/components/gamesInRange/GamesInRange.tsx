@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import Overview from "../gameSummary/components/overview";
 import PlayerStatCard from "../gameSummary/components/PlayerStatCard";
 import GameByGame from "@/components/GameByGame";
-import { statKeys } from "../gameSummary/utils";
+import { statKeys } from "@/constants";
 import { useTeamGames } from "@/hooks/useTeam";
 import { Game } from "@/types";
 

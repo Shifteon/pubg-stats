@@ -2,7 +2,7 @@
 
 import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/react";
 import { Game } from "@/types";
-import { statKeys } from "./gameSummary/utils";
+import { statKeys } from "@/constants";
 import { capitalize } from "@/utils/stringUtils";
 
 interface GameTableProps {

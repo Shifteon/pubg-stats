@@ -1,7 +1,7 @@
 "use client";
 
 import { GAME_INDEX_KEY } from '@/constants';
-import { StatData } from '@/stats/statBase';
+import { StatData } from '@/types';
 import { useTheme } from 'next-themes';
 import React, { useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';

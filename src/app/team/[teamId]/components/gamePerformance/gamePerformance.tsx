@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import StatLineChart from "@/components/charts/statLineChart";
 import { BAR_CHART, GAME_INDEX_KEY, LINE_CHART, PERCENTAGE_OF_DATA_TO_REMOVE } from "@/constants";
 import StatBarChart from "@/components/charts/statBarChart";
-import { StatData } from "@/stats/statBase";
+import { StatData } from "@/types";
 
 export interface GamePerformanceStatProps {
   statName: StatName;

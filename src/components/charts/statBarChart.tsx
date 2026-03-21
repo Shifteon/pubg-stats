@@ -1,6 +1,6 @@
 "use client";
 
-import { StatData } from "@/stats/statBase";
+import { StatData } from "@/types";
 import React, { useMemo } from "react";
 import { BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar } from "recharts";
 
