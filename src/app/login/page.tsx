@@ -32,8 +32,20 @@ function LoginContent() {
   }
 
   const handleSignup = async (e: PressEvent) => {
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
+
+    const allowedEmails = [
+      'y4cody@gmail.com',
+      'isaacl1698@gmail.com',
+      'bpwyatt04@gmail.com',
+      'britishshrimp@gmail.com',
+    ];
+    if (!allowedEmails.includes(email)) {
+      setError('You are not allowed to sign up')
+      setIsLoading(false)
+      return;
+    }
 
     const { error: authError } = await supabase.auth.signUp({ email, password })
 
