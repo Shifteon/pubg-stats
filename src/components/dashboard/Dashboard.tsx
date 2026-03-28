@@ -5,7 +5,6 @@ import { Player } from '@/types';
 import { useDashboard } from '@/hooks/useDashboard';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Chip, Button, Skeleton } from '@heroui/react';
-import 'react-calendar-heatmap/dist/styles.css';
 import { format, startOfWeek, endOfWeek, subWeeks, addWeeks, parseISO } from 'date-fns';
 
 // Import newly refactored bento components
@@ -96,26 +95,11 @@ export default function Dashboard({ player }: { player: Player }) {
         <WeeklyTrendsCard weekGames={weekGames} playerId={player.id} lifetime={lifetime} />
         <ClutchScoreCard weekGames={weekGames} playerId={player.id} />
         <RivalryCard weekGames={weekGames} playerId={player.id} />
-        <ActivityHeatmapCard heatmapDates={heatmapDates} />
+        <ActivityHeatmapCard weekGames={weekGames} start={start} end={end} />
         <SquadSynergyCard weekGames={weekGames} playerId={player.id} />
         <MatchLogCard weekGames={weekGames} playerId={player.id} />
         <DynamicRoleCard weekGames={weekGames} playerId={player.id} />
       </div>
-
-      {/* react-calendar-heatmap custom CSS overrides can go here or in global.css */}
-      <style dangerouslySetInnerHTML={{
-        __html: `
-        .react-calendar-heatmap .color-empty { fill: rgba(255, 255, 255, 0.05); }
-        .dark .react-calendar-heatmap .color-empty { fill: rgba(255, 255, 255, 0.05); }
-        .react-calendar-heatmap .color-scale-1 { fill: #c6e48b; }
-        .react-calendar-heatmap .color-scale-2 { fill: #7bc96f; }
-        .react-calendar-heatmap .color-scale-3 { fill: #239a3b; }
-        .react-calendar-heatmap .color-scale-4 { fill: #196127; }
-        .dark .react-calendar-heatmap .color-scale-1 { fill: #0e4429; }
-        .dark .react-calendar-heatmap .color-scale-2 { fill: #006d32; }
-        .dark .react-calendar-heatmap .color-scale-3 { fill: #26a641; }
-        .dark .react-calendar-heatmap .color-scale-4 { fill: #39d353; }
-      `}} />
     </div>
   );
 }
