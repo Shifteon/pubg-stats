@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 async function fetchPlayerBase(supabase: SupabaseClient, playerId: string) {
   const { data: player, error } = await supabase
     .from("players")
-    .select("id, name, color, designation")
+    .select("id, name, color, designation, userId")
     .eq("id", playerId)
     .single();
 

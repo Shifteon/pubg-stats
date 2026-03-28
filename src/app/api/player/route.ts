@@ -9,7 +9,8 @@ export async function GET() {
     id,
     name,
     color,
-    designation
+    designation,
+    userId
   `);
 
   if (error) {

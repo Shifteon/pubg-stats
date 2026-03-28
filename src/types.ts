@@ -64,6 +64,7 @@ export const playerMetadataSchema = z.object({
   name: z.string(),
   color: z.string(),
   designation: z.string(),
+  userId: z.string().optional(),
 });
 
 export type PlayerMetadata = z.infer<typeof playerMetadataSchema>;
