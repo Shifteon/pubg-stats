@@ -1,4 +1,4 @@
-import AdminGameList from "./components/AdminGameList";
+import AdminGameList from "@/components/admin/AdminGameList";
 
 type Params = Promise<{ teamId: string }>;
 
@@ -7,7 +7,7 @@ export default async function AdminPage({ params }: { params: Params }) {
 
   return (
     <div className="container mx-auto p-4">
-      <AdminGameList teamId={teamId} />
+      <AdminGameList initialTeamId={teamId} />
     </div>
   );
 }

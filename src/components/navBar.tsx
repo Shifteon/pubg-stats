@@ -81,6 +81,7 @@ export default function NavBar() {
   const [teams, setTeams] = useState<Teams>([]);
   const [players, setPlayers] = useState<Player[]>([]);
   const { user } = useUser();
+  const isAdmin = user?.email === 'bpwyatt04@gmail.com' || user?.email === 'isaacl1698@gmail.com';
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -135,6 +136,13 @@ export default function NavBar() {
         <NavbarItem isActive={isActivePath("/")}>
           <Link href="/" color={isActivePath("/") ? "primary" : "foreground"}>
             Home
+          </Link>
+        </NavbarItem>
+      }
+      {isAdmin &&
+        <NavbarItem isActive={isActivePath("/admin")}>
+          <Link href="/admin" color={isActivePath("/admin") ? "primary" : "foreground"}>
+            Admin
           </Link>
         </NavbarItem>
       }
