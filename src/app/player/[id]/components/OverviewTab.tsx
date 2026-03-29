@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardBody } from "@heroui/react";
-import PlayerRadarChart from "./PlayerRadarChart";
+import PlayerRadarChart from "@/components/PlayerRadarChart";
 import { Player } from "@/types";
 
 interface OverviewTabProps {
