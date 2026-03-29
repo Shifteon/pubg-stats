@@ -3,7 +3,7 @@
 import { useTeamGames, useTeamOverview } from "@/hooks/useTeam";
 import { Button, Spinner, useDisclosure, Skeleton } from "@heroui/react";
 import AdminForm from "./AdminForm";
-import GameByGame from "@/components/GameByGame";
+import GameByGame from "@/components/game/GameByGame";
 import { useEffect, useState } from "react";
 import { Game } from "@/types";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";

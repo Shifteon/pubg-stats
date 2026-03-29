@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardHeader, CardBody, useDisclosure } from '@heroui/react';
 import { format } from 'date-fns';
 import { Game } from '@/types';
-import GameModal from '@/components/GameModal';
+import GameModal from '@/components/game/GameModal';
 
 interface MatchLogCardProps {
   weekGames: Game[];
@@ -29,8 +29,8 @@ export function MatchLogCard({ weekGames, playerId }: MatchLogCardProps) {
             {weekGames.map((game) => {
               const myStats = game.stats.find((s: Game["stats"][0]) => s.playerId === playerId);
               return (
-                <div 
-                  key={game.id} 
+                <div
+                  key={game.id}
                   className="p-4 hover:bg-default-100/50 transition-colors flex justify-between items-center cursor-pointer"
                   onClick={() => handleGameClick(game)}
                 >
