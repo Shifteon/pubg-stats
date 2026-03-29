@@ -168,9 +168,9 @@ export function getDynamicRole(weekGames: Game[], playerId: string) {
   }
 
   // Determine role
-  if (kills > 15 && kills >= damage / 100) return 'The Slayer';
-  if ((rescues + recalls) > 5) return 'The Medic';
-  if (damage > 3000) return 'The Bruiser';
-  if (assists > kills && assists > 10) return 'The Tactician';
-  return 'The Survivor';
+  if (kills > 15 && kills >= damage / 100) return { role: 'The Slayer', statValue: `${kills} Kills` };
+  if ((rescues + recalls) > 5) return { role: 'The Medic', statValue: `${rescues + recalls} Rescues/Recalls` };
+  if (damage > 3000) return { role: 'The Bruiser', statValue: `${Math.round(damage)} Damage` };
+  if (assists > kills && assists > 10) return { role: 'The Tactician', statValue: `${assists} Assists` };
+  return { role: 'The Survivor', statValue: `${weekGames.length} Games Survived` };
 }

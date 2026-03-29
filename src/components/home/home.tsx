@@ -3,13 +3,11 @@
 import { Link, Button } from "@heroui/react";
 import { usePlayersList, usePlayer } from "@/hooks/usePlayer";
 import { useUser } from "@/contexts/UserContext";
-import Dashboard from "@/components/dashboard/Dashboard";
+import Dashboard, { DashboardLoadingSkeleton } from "@/components/dashboard/Dashboard";
 
 export default function HomeComponent() {
   const { playersList, isLoading: playersLoading } = usePlayersList();
   const { user, isLoading: userLoading } = useUser();
-
-  console.log("user", user);
 
   const players = playersList || [];
 
@@ -33,6 +31,10 @@ export default function HomeComponent() {
         </div>
       </div>
     );
+  }
+
+  if (isLoading) {
+    return <DashboardLoadingSkeleton />;
   }
 
   return (

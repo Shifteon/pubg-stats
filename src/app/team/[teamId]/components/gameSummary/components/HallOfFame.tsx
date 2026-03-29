@@ -4,7 +4,7 @@ import { TeamHallOfFame, PlayerMetadata } from "@/types";
 import { Avatar, Card, CardBody, CardFooter, CardHeader, useDisclosure } from "@heroui/react";
 import { useState, useEffect } from "react";
 import { AVATAR_SRC_MAP } from "@/constants";
-import GameModal from "../../GameModal";
+import GameModal from "../../../../../../components/GameModal";
 import { useTeamGame } from "@/hooks/useTeam";
 
 export interface HallOfFameProps {

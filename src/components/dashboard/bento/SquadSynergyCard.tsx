@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardHeader, CardBody } from '@heroui/react';
 import { getSquadSynergy } from '../Dashboard.utils';
 import { Game } from '@/types';
+import { capitalize } from '@/utils/stringUtils';
 
 interface SquadSynergyCardProps {
   weekGames: Game[];
@@ -20,7 +21,7 @@ export function SquadSynergyCard({ weekGames, playerId }: SquadSynergyCardProps)
         ) : (
           <div className="text-center">
             <div className="text-lg text-default-500">Power Combo with</div>
-            <div className="text-3xl font-bold text-secondary mt-1">{synergy.name}</div>
+            <div className="text-3xl font-bold text-secondary mt-1">{capitalize(synergy.name)}</div>
             <div className="text-sm font-medium mt-2">
               <span className="text-success">{synergy.winRate}% Win Rate</span> ({synergy.games} games together)
             </div>

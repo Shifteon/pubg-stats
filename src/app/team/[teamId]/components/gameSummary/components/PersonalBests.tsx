@@ -4,7 +4,7 @@ import { TeamPersonalBest, PlayerMetadata } from "@/types";
 import { useState } from "react";
 import PlayerStatCard from "./PlayerStatCard";
 import { useDisclosure } from "@heroui/react";
-import GameModal from "../../GameModal";
+import GameModal from "../../../../../../components/GameModal";
 import { useTeamGame } from "@/hooks/useTeam";
 
 export interface StatValue {

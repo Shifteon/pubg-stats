@@ -16,7 +16,6 @@ export interface HeatmapDate {
 
 export interface DashboardPayload {
   weekGames: Game[];
-  currentWinStreak: number;
   heatmapDates: HeatmapDate[];
 }
 

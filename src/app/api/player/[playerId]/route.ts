@@ -107,6 +107,30 @@ async function fetchPlayerTeamStats(supabase: SupabaseClient, playerId: string):
   return playerTeamStats;
 }
 
+async function fetchPlayerWinStreak(supabase: SupabaseClient, playerId: string) {
+  // To correctly sort by played_at, we query games and inner join game_player_stats
+  const { data: gamesData, error } = await supabase
+    .from("games")
+    .select("is_win, game_player_stats!inner(player_id)")
+    .eq("game_player_stats.player_id", playerId)
+    .order("played_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching games for win streak:", error);
+    return 0;
+  }
+
+  let streak = 0;
+  for (const game of gamesData) {
+    if (game.is_win) {
+      streak++;
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ playerId: string }> }
@@ -120,10 +144,11 @@ export async function GET(
   try {
     const supabase = await createClient();
 
-    const [player, playerAverages, wins] = await Promise.all([
+    const [player, playerAverages, wins, winStreak] = await Promise.all([
       fetchPlayerBase(supabase, playerId),
       fetchPlayerAverages(supabase, playerId),
       fetchTotalWins(supabase, playerId),
+      fetchPlayerWinStreak(supabase, playerId),
     ]);
 
     if (!player) {
@@ -158,6 +183,7 @@ export async function GET(
       totalWins: wins,
       totalLosses,
       winRate,
+      winStreak,
       mostPlayedTeam,
       playerTeamStats,
     };

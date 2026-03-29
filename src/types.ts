@@ -75,6 +75,7 @@ export const playerSchema = playerMetadataSchema.extend({
   totalWins: z.number(),
   totalLosses: z.number(),
   winRate: z.number(),
+  winStreak: z.number().optional(),
   mostPlayedTeam: z.string(),
   playerTeamStats: z.array(playerTeamStatsSchema),
 });

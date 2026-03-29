@@ -47,11 +47,17 @@ export async function GET(
 
     const supabase = await createClient();
 
-    // Step 1: Find all game IDs this player participated in
+    // TODO: This is porbably the worst way to do this. 
+    // Step 1: Find game IDs this player participated in within the date range
     const { data: pgData, error: pgError } = await supabase
       .from("game_player_stats")
-      .select("game_id")
-      .eq("player_id", playerId);
+      .select(`
+        game_id,
+        games!inner(played_at)
+      `)
+      .eq("player_id", playerId)
+      .gte("games.played_at", startDate)
+      .lte("games.played_at", endDate);
 
     if (pgError) {
       throw new Error("Failed to fetch player games: " + pgError.message);
@@ -100,45 +106,24 @@ export async function GET(
       }
 
       if (gamesChunk) {
-        allGames.push(...(gamesChunk));
+        allGames.push(...gamesChunk);
       }
     }
 
     // Sort Newest -> Oldest
     allGames.sort((a, b) => new Date(b.played_at).getTime() - new Date(a.played_at).getTime());
 
-    // 1. Current Win Streak
-    let currentWinStreak = 0;
-    for (const game of allGames) {
-      if (game.is_win) {
-        currentWinStreak++;
-      } else {
-        break; // Stop at first loss
-      }
-    }
-
-    // 2. Heatmap Dates (last 30 days)
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
+    // 1. Heatmap Dates (only applicable to fetched range)
     const heatmapPoints: Record<string, number> = {};
     for (const game of allGames) {
       const gDate = new Date(game.played_at);
-      if (gDate >= thirtyDaysAgo) {
-        const dateStr = gDate.toISOString().split('T')[0]; // "YYYY-MM-DD"
-        heatmapPoints[dateStr] = (heatmapPoints[dateStr] || 0) + 1;
-      }
+      const dateStr = gDate.toISOString().split('T')[0]; // "YYYY-MM-DD"
+      heatmapPoints[dateStr] = (heatmapPoints[dateStr] || 0) + 1;
     }
     const heatmapDates = Object.entries(heatmapPoints).map(([date, count]) => ({ date, count }));
 
-    // 3. Weekly Games
-    const dStart = new Date(startDate).getTime();
-    const dEnd = new Date(endDate).getTime();
-
-    const weekGames = allGames.filter((g) => {
-      const t = new Date(g.played_at).getTime();
-      return t >= dStart && t <= dEnd;
-    }).map(game => {
+    // 2. Weekly Games formatting
+    const weekGames = allGames.map(game => {
       return {
         id: game.id,
         teamId: game.team_id,
@@ -168,7 +153,6 @@ export async function GET(
 
     return NextResponse.json({
       weekGames,
-      currentWinStreak,
       heatmapDates
     });
 

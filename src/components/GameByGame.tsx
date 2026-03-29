@@ -2,7 +2,7 @@
 
 import { Pagination, Accordion, AccordionItem, Button } from "@heroui/react";
 import { useEffect, useMemo, useState } from "react";
-import GameTable from "../app/team/[teamId]/components/GameTable";
+import GameTable from "./GameTable";
 import GameSort, { SortConfig } from "./GameSort";
 import { statKeys } from "@/constants";
 import GameFilter, { Filter } from "./GameFilter";

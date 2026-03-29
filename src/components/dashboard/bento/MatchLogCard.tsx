@@ -1,7 +1,8 @@
-import React from 'react';
-import { Card, CardHeader, CardBody } from '@heroui/react';
+import React, { useState } from 'react';
+import { Card, CardHeader, CardBody, useDisclosure } from '@heroui/react';
 import { format } from 'date-fns';
 import { Game } from '@/types';
+import GameModal from '@/components/GameModal';
 
 interface MatchLogCardProps {
   weekGames: Game[];
@@ -9,6 +10,14 @@ interface MatchLogCardProps {
 }
 
 export function MatchLogCard({ weekGames, playerId }: MatchLogCardProps) {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [selectedGame, setSelectedGame] = useState<Game | null>(null);
+
+  const handleGameClick = (game: Game) => {
+    setSelectedGame(game);
+    onOpen();
+  };
+
   return (
     <Card isBlurred className="col-span-1 md:col-span-2 md:row-span-2 bg-background/60 dark:bg-default-100/50 flex flex-col h-full">
       <CardHeader className="font-bold text-sm pb-2 border-b border-divider">Match Log</CardHeader>
@@ -20,7 +29,11 @@ export function MatchLogCard({ weekGames, playerId }: MatchLogCardProps) {
             {weekGames.map((game) => {
               const myStats = game.stats.find((s: Game["stats"][0]) => s.playerId === playerId);
               return (
-                <div key={game.id} className="p-4 hover:bg-default-100/50 transition-colors flex justify-between items-center">
+                <div 
+                  key={game.id} 
+                  className="p-4 hover:bg-default-100/50 transition-colors flex justify-between items-center cursor-pointer"
+                  onClick={() => handleGameClick(game)}
+                >
                   <div>
                     <div className="font-semibold text-sm">
                       {game.isWin ? <span className="text-success">VICTORY</span> : <span className="text-danger">DEFEAT</span>}
@@ -39,6 +52,11 @@ export function MatchLogCard({ weekGames, playerId }: MatchLogCardProps) {
           </div>
         )}
       </CardBody>
+      <GameModal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        game={selectedGame}
+      />
     </Card>
   );
 }
