@@ -1,10 +1,10 @@
 import { Game, PlayerAverages } from '@/types';
 
-export function getClutchScore(weekGames: Game[], playerId: string) {
+export function getClutchScore(periodGames: Game[], playerId: string) {
   let rescues = 0;
   let recalls = 0;
 
-  for (const game of weekGames) {
+  for (const game of periodGames) {
     const stat = game.stats.find(s => s.playerId === playerId);
     if (stat) {
       rescues += stat.rescues || 0;
@@ -15,7 +15,7 @@ export function getClutchScore(weekGames: Game[], playerId: string) {
   return (rescues * 2) + recalls;
 }
 
-export function getWeeklyTrends(weekGames: Game[], playerId: string) {
+export function getPeriodTrends(periodGames: Game[], playerId: string) {
   let kills = 0;
   let damage = 0;
   let assists = 0;
@@ -24,7 +24,7 @@ export function getWeeklyTrends(weekGames: Game[], playerId: string) {
   let winRate = 0;
   let gamesPlayed = 0;
 
-  for (const game of weekGames) {
+  for (const game of periodGames) {
     const stat = game.stats.find(s => s.playerId === playerId);
     if (stat) {
       kills += stat.kills || 0;
@@ -48,7 +48,7 @@ export function getWeeklyTrends(weekGames: Game[], playerId: string) {
   };
 }
 
-export function getRivalry(weekGames: Game[], playerId: string) {
+export function getRivalry(periodGames: Game[], playerId: string) {
   // Aggregate stats for other players
   const otherPlayers: Record<string, { kills: number, damage: number, games: number, name: string }> = {};
 
@@ -56,7 +56,7 @@ export function getRivalry(weekGames: Game[], playerId: string) {
   let myDamage = 0;
   let myGames = 0;
 
-  for (const game of weekGames) {
+  for (const game of periodGames) {
     let playedInGame = false;
     for (const stat of game.stats) {
       if (stat.playerId === playerId) {
@@ -109,11 +109,11 @@ export function getRivalry(weekGames: Game[], playerId: string) {
   return closestFriend; // Can be null
 }
 
-export function getSquadSynergy(weekGames: Game[], playerId: string) {
+export function getSquadSynergy(periodGames: Game[], playerId: string) {
   // Find which teammate you have the highest win rate with
   const teammateStats: Record<string, { wins: number, games: number, name: string }> = {};
 
-  for (const game of weekGames) {
+  for (const game of periodGames) {
     let playedInGame = false;
     for (const stat of game.stats) {
       if (stat.playerId === playerId) {
@@ -161,14 +161,14 @@ export function getSquadSynergy(weekGames: Game[], playerId: string) {
   return bestTeammate;
 }
 
-export function getDynamicRole(weekGames: Game[], playerId: string) {
+export function getDynamicRole(periodGames: Game[], playerId: string) {
   let rescues = 0;
   let recalls = 0;
   let kills = 0;
   let damage = 0;
   let assists = 0;
 
-  for (const game of weekGames) {
+  for (const game of periodGames) {
     const stat = game.stats.find(s => s.playerId === playerId);
     if (stat) {
       rescues += stat.rescues || 0;
@@ -184,5 +184,5 @@ export function getDynamicRole(weekGames: Game[], playerId: string) {
   if ((rescues + recalls) > 5) return { role: 'The Medic', statValue: `${rescues + recalls} Rescues/Recalls` };
   if (damage > 3000) return { role: 'The Bruiser', statValue: `${Math.round(damage)} Damage` };
   if (assists > kills && assists > 10) return { role: 'The Tactician', statValue: `${assists} Assists` };
-  return { role: 'The Survivor', statValue: `${weekGames.length} Games Survived` };
+  return { role: 'The Survivor', statValue: `${periodGames.length} Games Survived` };
 }

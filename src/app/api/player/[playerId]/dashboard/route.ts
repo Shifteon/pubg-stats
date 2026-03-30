@@ -65,7 +65,7 @@ export async function GET(
 
     if (!pgData || pgData.length === 0) {
       return NextResponse.json({
-        weekGames: [],
+        periodGames: [],
         currentWinStreak: 0,
         heatmapDates: [],
       });
@@ -122,8 +122,8 @@ export async function GET(
     }
     const heatmapDates = Object.entries(heatmapPoints).map(([date, count]) => ({ date, count }));
 
-    // 2. Weekly Games formatting
-    const weekGames = allGames.map(game => {
+    // 2. Period Games formatting
+    const periodGames = allGames.map(game => {
       return {
         id: game.id,
         teamId: game.team_id,
@@ -152,7 +152,7 @@ export async function GET(
     });
 
     return NextResponse.json({
-      weekGames,
+      periodGames,
       heatmapDates
     });
 

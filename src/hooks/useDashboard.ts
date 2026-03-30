@@ -15,7 +15,7 @@ export interface HeatmapDate {
 }
 
 export interface DashboardPayload {
-  weekGames: Game[];
+  periodGames: Game[];
   heatmapDates: HeatmapDate[];
 }
 

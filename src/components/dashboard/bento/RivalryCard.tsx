@@ -5,15 +5,15 @@ import { Game } from '@/types';
 import { capitalize } from '@/utils/stringUtils';
 
 interface RivalryCardProps {
-  weekGames: Game[];
+  periodGames: Game[];
   playerId: string;
 }
 
-export function RivalryCard({ weekGames, playerId }: RivalryCardProps) {
-  const rivalry = getRivalry(weekGames, playerId);
+export function RivalryCard({ periodGames, playerId }: RivalryCardProps) {
+  const rivalry = getRivalry(periodGames, playerId);
 
   return (
-    <Card isBlurred className="col-span-1 bg-background/60 dark:bg-default-100/50">
+    <Card isBlurred className="w-full h-full bg-background/60 dark:bg-default-100/50">
       <CardHeader className="font-bold text-sm pb-0 text-warning">The Rivalry</CardHeader>
       <CardBody className="flex items-center justify-center flex-col text-center p-2">
         {!rivalry ? (

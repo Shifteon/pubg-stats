@@ -1,12 +1,12 @@
 import React from 'react';
 import { Card, CardHeader, CardBody, Chip, Spinner, ScrollShadow } from '@heroui/react';
-import { getWeeklyTrends } from '../Dashboard.utils';
+import { getPeriodTrends } from '../Dashboard.utils';
 import { Game } from '@/types';
 import PlayerRadarChart from '@/components/PlayerRadarChart';
 import { usePlayer } from '@/hooks/usePlayer';
 
 interface CurrentFormCardProps {
-  weekGames: Game[];
+  periodGames: Game[];
   playerId: string;
   lifetime: {
     kills: number;
@@ -39,8 +39,8 @@ function StatRow({ title, value, delta, precision = 1, isPercent = false }: { ti
   );
 }
 
-export function CurrentFormCard({ weekGames, playerId, lifetime, lifetimeWinRate }: CurrentFormCardProps) {
-  const trends = getWeeklyTrends(weekGames, playerId);
+export function CurrentFormCard({ periodGames, playerId, lifetime, lifetimeWinRate }: CurrentFormCardProps) {
+  const trends = getPeriodTrends(periodGames, playerId);
   const killsDelta = trends.avgKills - lifetime.kills;
   const damageDelta = trends.avgDamage - lifetime.damage;
 
@@ -62,11 +62,11 @@ export function CurrentFormCard({ weekGames, playerId, lifetime, lifetimeWinRate
   };
 
   return (
-    <Card isBlurred className="col-span-1 md:col-span-2 md:row-span-2 bg-background/60 dark:bg-default-100/50">
+    <Card isBlurred className="w-full h-full bg-background/60 dark:bg-default-100/50">
       <CardHeader className="font-bold text-lg pb-0">Current Form</CardHeader>
       <CardBody className="grid grid-cols-3 grid-rows-2 gap-4 justify-center">
-        {weekGames.length === 0 ? (
-          <div className="text-center text-default-400">No games played this week.</div>
+        {periodGames.length === 0 ? (
+          <div className="text-center text-default-400">No games played this period.</div>
         ) : (
           <>
             <ScrollShadow hideScrollBar className="row-span-2 col-span-1 row-start-1 col-start-1 flex flex-col gap-4 pb-6 md:pb-3 max-h-[350px]">

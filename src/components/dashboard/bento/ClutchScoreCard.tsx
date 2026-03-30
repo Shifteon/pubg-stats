@@ -4,15 +4,15 @@ import { getClutchScore } from '../Dashboard.utils';
 import { Game } from '@/types';
 
 interface ClutchScoreCardProps {
-  weekGames: Game[];
+  periodGames: Game[];
   playerId: string;
 }
 
-export function ClutchScoreCard({ weekGames, playerId }: ClutchScoreCardProps) {
-  const clutchScore = getClutchScore(weekGames, playerId);
+export function ClutchScoreCard({ periodGames, playerId }: ClutchScoreCardProps) {
+  const clutchScore = getClutchScore(periodGames, playerId);
 
   return (
-    <Card isBlurred className="col-span-1 bg-background/60 dark:bg-default-100/50">
+    <Card isBlurred className="w-full h-full bg-background/60 dark:bg-default-100/50">
       <CardHeader className="font-bold text-sm pb-0 text-primary">Clutch Score</CardHeader>
       <CardBody className="flex items-center justify-center flex-col">
         <div className="text-5xl font-black">{clutchScore}</div>

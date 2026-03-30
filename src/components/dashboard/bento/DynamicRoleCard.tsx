@@ -4,7 +4,7 @@ import { getDynamicRole } from '../Dashboard.utils';
 import { Game } from '@/types';
 
 interface DynamicRoleCardProps {
-  weekGames: Game[];
+  periodGames: Game[];
   playerId: string;
 }
 
@@ -16,11 +16,11 @@ const ROLE_DESCRIPTIONS: Record<string, string> = {
   'The Survivor': 'Awarded for consistently outlasting the competition.'
 };
 
-export function DynamicRoleCard({ weekGames, playerId }: DynamicRoleCardProps) {
-  const roleData = weekGames.length > 0 ? getDynamicRole(weekGames, playerId) : null;
+export function DynamicRoleCard({ periodGames, playerId }: DynamicRoleCardProps) {
+  const roleData = periodGames.length > 0 ? getDynamicRole(periodGames, playerId) : null;
 
   return (
-    <Card isBlurred className="col-span-1 md:col-span-2 bg-linear-to-br from-indigo-500/20 to-purple-500/20">
+    <Card isBlurred className="w-full h-full bg-linear-to-br from-indigo-500/20 to-purple-500/20">
       <CardHeader className="font-bold text-sm pb-0">Your Role</CardHeader>
       <CardBody className="flex flex-col items-center justify-center gap-2 py-4">
         {!roleData ? (

@@ -5,15 +5,15 @@ import { Game } from '@/types';
 import { capitalize } from '@/utils/stringUtils';
 
 interface SquadSynergyCardProps {
-  weekGames: Game[];
+  periodGames: Game[];
   playerId: string;
 }
 
-export function SquadSynergyCard({ weekGames, playerId }: SquadSynergyCardProps) {
-  const synergy = getSquadSynergy(weekGames, playerId);
+export function SquadSynergyCard({ periodGames, playerId }: SquadSynergyCardProps) {
+  const synergy = getSquadSynergy(periodGames, playerId);
 
   return (
-    <Card isBlurred className="col-span-1 md:col-span-2 bg-background/60 dark:bg-default-100/50">
+    <Card isBlurred className="w-full h-full bg-background/60 dark:bg-default-100/50">
       <CardHeader className="font-bold text-sm pb-0 text-secondary">Squad Synergy</CardHeader>
       <CardBody className="flex items-center justify-center">
         {!synergy ? (
