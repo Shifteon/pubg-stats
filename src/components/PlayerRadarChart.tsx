@@ -6,12 +6,26 @@ import { Chip, Spinner } from "@heroui/react";
 import { PLAYER_COLOR_MAP } from "@/constants";
 import { Player } from "@/types";
 import { usePlayersList, usePlayers } from "@/hooks/usePlayer";
+import { capitalize } from "@/utils/stringUtils";
 
 interface PlayerRadarChartProps {
   player: Player;
+  hideChips?: boolean;
+  fixedOverlay?: {
+    name: string;
+    data: {
+      kills: number;
+      damage: number;
+      winRate: number;
+      assists: number;
+      rescues: number;
+      recalls: number;
+    };
+    color?: string;
+  };
 }
 
-export default function PlayerRadarChart({ player }: PlayerRadarChartProps) {
+export default function PlayerRadarChart({ player, hideChips, fixedOverlay }: PlayerRadarChartProps) {
   const [selectedPlayers, setSelectedPlayers] = useState<string[]>([player.name.toLowerCase()]);
 
   const currentPlayerNameRaw = player.name.toLowerCase();
@@ -21,28 +35,30 @@ export default function PlayerRadarChart({ player }: PlayerRadarChartProps) {
 
   // Determine what IDs we need to fetch (all players except the current one)
   const otherPlayerIds = useMemo(() => {
+    if (hideChips) return [];
     if (!playersList) return [];
     return playersList.filter(p => p.id !== player.id).map(p => p.id);
-  }, [playersList, player.id]);
+  }, [playersList, player.id, hideChips]);
 
   // Fetch full stats for all other players
   const { players: otherPlayers, isLoading: isPlayersLoading } = usePlayers(otherPlayerIds);
 
-  const loading = isListLoading || isPlayersLoading;
+  const loading = (!hideChips && isListLoading) || (!hideChips && isPlayersLoading);
 
   const allPlayersStats = useMemo(() => {
     const stats: Record<string, Player> = {
       [currentPlayerNameRaw]: player
     };
-    if (otherPlayers && otherPlayers.length > 0) {
+    if (!hideChips && otherPlayers && otherPlayers.length > 0) {
       otherPlayers.forEach(p => {
         if (p && p.name) {
           stats[p.name.toLowerCase()] = p;
         }
       });
     }
+
     return stats;
-  }, [currentPlayerNameRaw, player, otherPlayers]);
+  }, [currentPlayerNameRaw, player, otherPlayers, hideChips]);
 
   const togglePlayer = (pName: string) => {
     setSelectedPlayers(prev => {
@@ -73,11 +89,19 @@ export default function PlayerRadarChart({ player }: PlayerRadarChartProps) {
     // Series definition
     const series: RadarSeries[] = selectedPlayers.map(pName => ({
       key: pName,
-      name: pName,
-      // TODO: get the player color elsewhere
+      name: capitalize(pName),
       color: PLAYER_COLOR_MAP[pName] || "#8884d8",
       opacity: pName === currentPlayerNameRaw ? 0.6 : 0.2
     }));
+
+    if (fixedOverlay) {
+      series.push({
+        key: fixedOverlay.name.toLowerCase(),
+        name: capitalize(fixedOverlay.name),
+        color: fixedOverlay.color || "#8884d8",
+        opacity: 0.4
+      });
+    }
 
     // Data Transformation
     const data = subjects.map((subject) => {
@@ -92,6 +116,12 @@ export default function PlayerRadarChart({ player }: PlayerRadarChartProps) {
         }
         if (pVal > maxValue) maxValue = pVal;
       });
+
+      if (fixedOverlay) {
+        const overlayVal = Number(fixedOverlay.data[subject.key as keyof typeof fixedOverlay.data]) || 0;
+        if (overlayVal > maxValue) maxValue = overlayVal;
+      }
+
       if (maxValue === 0) maxValue = 1;
 
       // Construct Data Point
@@ -111,6 +141,13 @@ export default function PlayerRadarChart({ player }: PlayerRadarChartProps) {
         dataPoint[pName] = (rawVal / maxValue) * 100;
         dataPoint[`${pName}_raw`] = rawVal; // Store raw for tooltip
       });
+
+      if (fixedOverlay) {
+        const overlayKey = fixedOverlay.name.toLowerCase();
+        const overlayVal = Number(fixedOverlay.data[subject.key as keyof typeof fixedOverlay.data]) || 0;
+        dataPoint[overlayKey] = (overlayVal / maxValue) * 100;
+        dataPoint[`${overlayKey}_raw`] = overlayVal;
+      }
 
       return dataPoint;
     });
@@ -139,7 +176,8 @@ export default function PlayerRadarChart({ player }: PlayerRadarChartProps) {
           <p className="font-bold text-small mb-2">{subject}</p>
           <div className="flex flex-col gap-1">
             {payload.map((entry, index: number) => {
-              const playerKey = entry.name;
+              const displayName = entry.name;
+              const playerKey = String(displayName).toLowerCase();
               const rawVal = entry.payload[`${playerKey}_raw`];
               const displayVal = subject === "Win Rate"
                 ? `${(typeof rawVal === 'number' ? rawVal.toFixed(1) : rawVal)}%`
@@ -147,7 +185,7 @@ export default function PlayerRadarChart({ player }: PlayerRadarChartProps) {
 
               return (
                 <div key={index} className="flex justify-between items-center gap-4 text-tiny">
-                  <span style={{ color: entry.color }} className="font-semibold capitalize">{playerKey}</span>
+                  <span style={{ color: entry.color }} className="font-semibold capitalize">{displayName}</span>
                   <span>{displayVal}</span>
                 </div>
               );
@@ -171,23 +209,25 @@ export default function PlayerRadarChart({ player }: PlayerRadarChartProps) {
         domain={[0, 120]}
       />
       {/* Player Toggles */}
-      <div className="flex flex-wrap gap-2 justify-center">
-        {Object.keys(allPlayersStats).map(pName => (
-          <Chip
-            key={pName}
-            variant={selectedPlayers.includes(pName) ? "solid" : "bordered"}
-            onClick={() => togglePlayer(pName)}
-            className="cursor-pointer capitalize"
-            style={{
-              backgroundColor: selectedPlayers.includes(pName) ? PLAYER_COLOR_MAP[pName] : undefined,
-              borderColor: PLAYER_COLOR_MAP[pName],
-              color: selectedPlayers.includes(pName) ? "#FFF" : PLAYER_COLOR_MAP[pName]
-            }}
-          >
-            {pName}
-          </Chip>
-        ))}
-      </div>
+      {!hideChips && (
+        <div className="flex flex-wrap gap-2 justify-center">
+          {Object.keys(allPlayersStats).map(pName => (
+            <Chip
+              key={pName}
+              variant={selectedPlayers.includes(pName) ? "solid" : "bordered"}
+              onClick={() => togglePlayer(pName)}
+              className="cursor-pointer capitalize"
+              style={{
+                backgroundColor: selectedPlayers.includes(pName) ? PLAYER_COLOR_MAP[pName] : undefined,
+                borderColor: PLAYER_COLOR_MAP[pName],
+                color: selectedPlayers.includes(pName) ? "#FFF" : PLAYER_COLOR_MAP[pName]
+              }}
+            >
+              {pName}
+            </Chip>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

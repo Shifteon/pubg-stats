@@ -18,6 +18,10 @@ export function getClutchScore(weekGames: Game[], playerId: string) {
 export function getWeeklyTrends(weekGames: Game[], playerId: string) {
   let kills = 0;
   let damage = 0;
+  let assists = 0;
+  let rescues = 0;
+  let recalls = 0;
+  let winRate = 0;
   let gamesPlayed = 0;
 
   for (const game of weekGames) {
@@ -25,6 +29,10 @@ export function getWeeklyTrends(weekGames: Game[], playerId: string) {
     if (stat) {
       kills += stat.kills || 0;
       damage += stat.damage || 0;
+      assists += stat.assists || 0;
+      rescues += stat.rescues || 0;
+      recalls += stat.recalls || 0;
+      winRate += game.isWin ? 1 : 0;
       gamesPlayed++;
     }
   }
@@ -32,6 +40,10 @@ export function getWeeklyTrends(weekGames: Game[], playerId: string) {
   return {
     avgKills: gamesPlayed > 0 ? (kills / gamesPlayed) : 0,
     avgDamage: gamesPlayed > 0 ? (damage / gamesPlayed) : 0,
+    avgAssists: gamesPlayed > 0 ? (assists / gamesPlayed) : 0,
+    avgRescues: gamesPlayed > 0 ? (rescues / gamesPlayed) : 0,
+    avgRecalls: gamesPlayed > 0 ? (recalls / gamesPlayed) : 0,
+    winRate: gamesPlayed > 0 ? (winRate / gamesPlayed) * 100 : 0,
     gamesPlayed
   };
 }
@@ -109,7 +121,7 @@ export function getSquadSynergy(weekGames: Game[], playerId: string) {
         break;
       }
     }
-    
+
     if (playedInGame) {
       for (const stat of game.stats) {
         if (stat.playerId !== playerId) {
@@ -134,7 +146,7 @@ export function getSquadSynergy(weekGames: Game[], playerId: string) {
       const winRate = t.wins / t.games;
       // Heuristic: win rate * log of games played to reward consistency slightly
       const score = winRate * Math.max(1, Math.log10(t.games + 1));
-      
+
       if (score > bestScore) {
         bestScore = score;
         bestTeammate = {

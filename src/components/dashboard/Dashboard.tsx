@@ -8,7 +8,7 @@ import { Chip, Button, Skeleton } from '@heroui/react';
 import { format, startOfWeek, endOfWeek, subWeeks, addWeeks, parseISO } from 'date-fns';
 
 // Import newly refactored bento components
-import { WeeklyTrendsCard } from './bento/WeeklyTrendsCard';
+import { CurrentFormCard } from './bento/CurrentFormCard';
 import { ClutchScoreCard } from './bento/ClutchScoreCard';
 import { RivalryCard } from './bento/RivalryCard';
 import { ActivityHeatmapCard } from './bento/ActivityHeatmapCard';
@@ -97,7 +97,7 @@ export default function Dashboard({ player }: { player: Player }) {
 
       {/* Bento Grid layout */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 auto-rows-min md:auto-rows-[180px]">
-        <WeeklyTrendsCard weekGames={weekGames} playerId={player.id} lifetime={lifetime} />
+        <CurrentFormCard weekGames={weekGames} playerId={player.id} lifetime={lifetime} lifetimeWinRate={player.winRate} />
         <ClutchScoreCard weekGames={weekGames} playerId={player.id} />
         <RivalryCard weekGames={weekGames} playerId={player.id} />
         <ActivityHeatmapCard weekGames={weekGames} start={start} end={end} />

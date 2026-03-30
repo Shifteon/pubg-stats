@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardHeader, CardBody, useDisclosure } from '@heroui/react';
+import { Card, CardHeader, CardBody, useDisclosure, Chip } from '@heroui/react';
 import { format } from 'date-fns';
 import { Game } from '@/types';
 import GameModal from '@/components/game/GameModal';
@@ -20,7 +20,12 @@ export function MatchLogCard({ weekGames, playerId }: MatchLogCardProps) {
 
   return (
     <Card isBlurred className="col-span-1 md:col-span-2 md:row-span-2 bg-background/60 dark:bg-default-100/50 flex flex-col h-full">
-      <CardHeader className="font-bold text-sm pb-2 border-b border-divider">Match Log</CardHeader>
+      <CardHeader className="font-bold text-sm pb-2 border-b border-divider">
+        Match Log
+        <Chip size="sm" color="primary" className="ml-2">
+          {weekGames.length} games
+        </Chip>
+      </CardHeader>
       <CardBody className="p-0 overflow-y-auto max-h-[300px] md:max-h-full">
         {weekGames.length === 0 ? (
           <div className="p-4 text-center text-default-400">No recent matches found.</div>

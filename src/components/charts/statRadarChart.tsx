@@ -7,7 +7,8 @@ import {
   PolarRadiusAxis,
   ResponsiveContainer,
   Tooltip,
-  TooltipContentProps
+  TooltipContentProps,
+  Legend
 } from "recharts";
 
 export type RechartsValueType = number | string | readonly (number | string)[];
