@@ -113,7 +113,8 @@ async function fetchPlayerWinStreak(supabase: SupabaseClient, playerId: string) 
     .from("games")
     .select("is_win, game_player_stats!inner(player_id)")
     .eq("game_player_stats.player_id", playerId)
-    .order("played_at", { ascending: false });
+    .not("played_at", "is", null)
+    .order("played_at");
 
   if (error) {
     console.error("Error fetching games for win streak:", error);
@@ -125,7 +126,7 @@ async function fetchPlayerWinStreak(supabase: SupabaseClient, playerId: string) 
     if (game.is_win) {
       streak++;
     } else {
-      break;
+      streak = 0;
     }
   }
   return streak;
