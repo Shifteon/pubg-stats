@@ -6,6 +6,7 @@ import OverviewTab from "./OverviewTab";
 import ByTeamTab from "./ByTeamTab";
 import { Player } from "@/types";
 import { AVATAR_SRC_MAP } from "@/constants";
+import Dashboard from "@/components/dashboard/Dashboard";
 
 interface PlayerStatsViewProps {
   player: Player;
@@ -85,6 +86,9 @@ export default function PlayerStatsView({ player }: PlayerStatsViewProps) {
           </Tab>
           <Tab key="byteam" title="By Team">
             <ByTeamTab data={player.playerTeamStats} />
+          </Tab>
+          <Tab key="dashboard" title="Dashboard">
+            <Dashboard player={player} />
           </Tab>
         </Tabs>
       </div>
