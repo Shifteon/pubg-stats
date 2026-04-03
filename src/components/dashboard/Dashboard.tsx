@@ -10,7 +10,7 @@ import { format, startOfWeek, endOfWeek, subWeeks, addWeeks, startOfMonth, endOf
 // Import newly refactored bento components
 import { CurrentFormCard } from './bento/CurrentFormCard';
 import { ClutchScoreCard } from './bento/ClutchScoreCard';
-import { RivalryCard } from './bento/RivalryCard';
+import { HeadToHeadCard } from './bento/HeadToHeadCard';
 import { ActivityHeatmapCard } from './bento/ActivityHeatmapCard';
 import { SquadSynergyCard } from './bento/SquadSynergyCard';
 import { MatchLogCard } from './bento/MatchLogCard';
@@ -152,14 +152,14 @@ export default function Dashboard({ player }: { player: Player }) {
         <div className="col-span-1 flex flex-col">
           <ClutchScoreCard periodGames={periodGames} playerId={player.id} />
         </div>
-        <div className="col-span-1 flex flex-col">
-          <RivalryCard periodGames={periodGames} playerId={player.id} />
+        <div className="col-span-1 row-span-1 flex flex-col h-full">
+          <MatchLogCard periodGames={periodGames} playerId={player.id} />
         </div>
         <div className="col-span-1 md:col-span-2 flex flex-col">
           <SquadSynergyCard periodGames={periodGames} playerId={player.id} />
         </div>
-        <div className="col-span-1 md:col-span-2 md:row-span-2 flex flex-col h-full">
-          <MatchLogCard periodGames={periodGames} playerId={player.id} />
+        <div className="col-span-1 md:col-span-2 md:row-span-2 flex flex-col">
+          <HeadToHeadCard periodGames={periodGames} playerId={player.id} />
         </div>
         <div className="col-span-1 md:col-span-2 flex flex-col">
           <DynamicRoleCard periodGames={periodGames} playerId={player.id} />

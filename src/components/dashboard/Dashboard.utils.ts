@@ -48,8 +48,8 @@ export function getPeriodTrends(periodGames: Game[], playerId: string) {
   };
 }
 
-export function getRivalry(periodGames: Game[], playerId: string) {
-  // Aggregate stats for other players
+export function getHeadToHead(periodGames: Game[], playerId: string) {
+  // Aggregate stats for player and other players
   const otherPlayers: Record<string, { kills: number, damage: number, games: number, name: string }> = {};
 
   let myKills = 0;
@@ -82,31 +82,44 @@ export function getRivalry(periodGames: Game[], playerId: string) {
     }
   }
 
-  const myAvgTotal = myGames > 0 ? (myKills / myGames) + ((myDamage / myGames) / 100) : 0;
+  const myAvgKills = myGames > 0 ? (myKills / myGames) : 0;
+  const myAvgDamage = myGames > 0 ? (myDamage / myGames) : 0;
+  const myAvgTotal = myAvgKills + (myAvgDamage / 100);
 
-  let closestFriend = null;
-  let minDiff = Infinity;
+  const teammateResults = Object.entries(otherPlayers).map(([pId, p]) => {
+    const avgKills = p.kills / p.games;
+    const avgDamage = p.damage / p.games;
+    const avgTotal = avgKills + (avgDamage / 100);
+    const diff = Math.abs(myAvgTotal - avgTotal);
 
-  // Find the friend with the closest impact score (kills + damage/100)
-  for (const pId in otherPlayers) {
-    const p = otherPlayers[pId];
-    if (p.games > 0) {
-      const pAvgTotal = (p.kills / p.games) + ((p.damage / p.games) / 100);
-      const diff = Math.abs(myAvgTotal - pAvgTotal);
+    return {
+      id: pId,
+      name: p.name,
+      avgKills,
+      avgDamage,
+      totalKills: p.kills,
+      totalDamage: p.damage,
+      games: p.games,
+      diff
+    };
+  });
 
-      if (diff < minDiff) {
-        minDiff = diff;
-        closestFriend = {
-          name: p.name,
-          avgKills: p.kills / p.games,
-          avgDamage: p.damage / p.games,
-          diff
-        };
-      }
-    }
-  }
+  // Sort by games played (descending) then by proximity in skill (lowest diff)
+  teammateResults.sort((a, b) => {
+    if (b.games !== a.games) return b.games - a.games;
+    return a.diff - b.diff;
+  });
 
-  return closestFriend; // Can be null
+  return {
+    player: {
+      avgKills: myAvgKills,
+      avgDamage: myAvgDamage,
+      totalKills: myKills,
+      totalDamage: Math.round(myDamage),
+      games: myGames
+    },
+    teammates: teammateResults
+  };
 }
 
 export function getSquadSynergy(periodGames: Game[], playerId: string) {
