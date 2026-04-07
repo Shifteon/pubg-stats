@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { TeamStatTimelinePoint } from "@/types";
 import { createClient } from "@/lib/supabase/server";
+import { calculateKillStealing } from "@/utils/statHelpers";
 
 export async function GET(
   request: NextRequest,
@@ -73,13 +74,12 @@ export async function GET(
     point.winRate = (Number(row.running_wins) / Number(row.games_played)) * 100;
 
     // Prevent div by zero for kill stealing calculation
-    if (Number(row.running_team_kills) > 0 && Number(row.running_team_damage) > 0) {
-      const killRatio = Number(row.running_sum_kills) / Number(row.running_team_kills);
-      const damageRatio = Number(row.running_sum_damage) / Number(row.running_team_damage);
-      point.killStealing[playerId] = (killRatio - damageRatio) * 100;
-    } else {
-      point.killStealing[playerId] = 0;
-    }
+    point.killStealing[playerId] = calculateKillStealing(
+      Number(row.running_sum_kills),
+      Number(row.running_sum_damage),
+      Number(row.running_team_kills),
+      Number(row.running_team_damage)
+    );
   }
 
   const result = Object.values(groupedData).sort((a, b) => a.gameIndex - b.gameIndex);

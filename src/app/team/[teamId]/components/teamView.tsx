@@ -4,7 +4,7 @@ import { Tab, Tabs, Button, User, Skeleton } from "@heroui/react";
 import { useCallback, useEffect, useState } from "react";
 import { Key } from '@react-types/shared';
 import React from "react";
-import GameSummary from "@/app/team/[teamId]/components/gameSummary/gameSummary";
+
 import GamesInRange from "@/app/team/[teamId]/components/gamesInRange/GamesInRange";
 import GraphsTab from "@/app/team/[teamId]/components/graphsTab/graphsTab";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -13,6 +13,9 @@ import { useUser } from "@/contexts/UserContext";
 import NextLink from "next/link";
 import { capitalize } from "@/utils/stringUtils";
 import { AVATAR_SRC_MAP } from "@/constants";
+
+import { TeamDashboard } from "@/app/team/[teamId]/components/teamDashboard/TeamDashboard";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 export default function TeamView({ teamId }: { teamId: string }) {
   const searchParams = useSearchParams();
@@ -25,10 +28,10 @@ export default function TeamView({ teamId }: { teamId: string }) {
 
   const [selectedTab, setSelectedTab] = useState<Key>(() => {
     const tabFromParams = searchParams.get('tab') as Key;
-    if (tabFromParams && ['summary', 'graphs', 'games-in-range'].includes(tabFromParams as string)) {
+    if (tabFromParams && ['dashboard', 'graphs', 'games-in-range'].includes(tabFromParams as string)) {
       return tabFromParams;
     }
-    return 'summary' as Key;
+    return 'dashboard' as Key;
   });
 
   const handleTabChange = (newTab: Key) => {
@@ -51,15 +54,17 @@ export default function TeamView({ teamId }: { teamId: string }) {
 
   useEffect(() => {
     const tabFromParams = searchParams.get('tab') as Key;
-    if (tabFromParams && ['summary', 'graphs', 'games-in-range'].includes(tabFromParams as string) && tabFromParams !== selectedTab) {
+    if (tabFromParams && ['dashboard', 'graphs', 'games-in-range'].includes(tabFromParams as string) && tabFromParams !== selectedTab) {
       setSelectedTab(tabFromParams);
     }
   }, [searchParams]);
 
+  const isLargeScreen = useMediaQuery("(min-width: 768px)");
+
   return (
     <>
       <div className="mt-2 mr-2 ml-2 mb-10 xl:m-10 lg:m-5 md:m-3">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 w-full">
           <div>
             {isLoading ? (
               <Skeleton className="h-10 w-64 rounded-lg mb-4 cursor-wait" />
@@ -104,17 +109,23 @@ export default function TeamView({ teamId }: { teamId: string }) {
           color="primary"
           onSelectionChange={handleTabChange}
           selectedKey={selectedTab}
+          isVertical={isLargeScreen}
         >
-          <Tab key="summary" title="Summary">
-            <GameSummary teamId={teamId} />
+          <Tab key="dashboard" title="Dashboard" className="w-full">
+            <div className="mt-4 w-full">
+              {teamOverview && <TeamDashboard teamOverview={teamOverview} teamId={teamId} />}
+            </div>
           </Tab>
-          <Tab key="games-in-range" title="Games in Range">
-            <div className="mt-4">
+
+          <Tab key="games-in-range" title="Games in Range" className="w-full">
+            <div className="mt-4 w-full">
               <GamesInRange teamId={teamId} />
             </div>
           </Tab>
-          <Tab key="graphs" title="Graphs">
-            <GraphsTab teamId={teamId} />
+          <Tab key="graphs" title="Graphs" className="w-full">
+            <div className="mt-4 w-full">
+              <GraphsTab teamId={teamId} />
+            </div>
           </Tab>
         </Tabs>
       </div>

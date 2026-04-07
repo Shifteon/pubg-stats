@@ -39,9 +39,13 @@ export async function GET(
       return NextResponse.json({ error: "Team ID is required" }, { status: 400 });
     }
 
+    const { searchParams } = new URL(request.url);
+    const startDate = searchParams.get('startDate');
+    const endDate = searchParams.get('endDate');
+
     const supabase = await createClient();
 
-    const { data: gamesData, error: gamesError } = await supabase
+    let query = supabase
       .from("games")
       .select(`
         id,
@@ -63,7 +67,17 @@ export async function GET(
           )
         )
       `)
-      .eq("team_id", teamId)
+      .eq("team_id", teamId);
+
+    if (startDate) {
+      query = query.gte("played_at", startDate);
+    }
+    
+    if (endDate) {
+      query = query.lte("played_at", endDate);
+    }
+
+    const { data: gamesData, error: gamesError } = await query
       .order("played_at", { ascending: true, nullsFirst: true })
       .order("team_sort_order", { ascending: true });
 

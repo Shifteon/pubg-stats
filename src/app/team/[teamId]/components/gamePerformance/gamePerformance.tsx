@@ -130,7 +130,12 @@ export default function GamePerformanceStat(props: GamePerformanceStatProps) {
 
     switch (chartType) {
       case LINE_CHART:
-        return <StatLineChart data={filteredStatData} />;
+        return (
+          <StatLineChart 
+            data={filteredStatData} 
+            referenceValue={props.statName === "killStealing" ? 0 : undefined}
+          />
+        );
       case BAR_CHART:
         return <StatBarChart data={filteredStatData} />;
       default:

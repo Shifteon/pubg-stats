@@ -4,14 +4,16 @@ import { GAME_INDEX_KEY } from '@/constants';
 import { StatData } from '@/types';
 import { useTheme } from 'next-themes';
 import React, { useMemo } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine } from 'recharts';
 
 interface StatLineChartProps {
   data: StatData;
+  referenceValue?: number;
 }
 
 export default function StatLineChart(props: StatLineChartProps) {
   const { data = [], chartOptions = [] } = props.data;
+  const { referenceValue } = props;
 
   const xAxisInterval = useMemo(() => {
     if (data.length > 80) {
@@ -32,14 +34,17 @@ export default function StatLineChart(props: StatLineChartProps) {
         .filter(([key]) => key !== GAME_INDEX_KEY) // Exclude the x-axis key
         .map(([, value]) => value)
     );
-    const min = Math.min(...values);
-    const max = Math.max(...values);
+
+    const allValues = referenceValue !== undefined ? [...values, referenceValue] : values;
+
+    const min = Math.min(...allValues);
+    const max = Math.max(...allValues);
     const bufferPercent = 0.05; // 5%
 
     // Handle case where all values are the same
     if (min === max) {
-      const safeMin = Math.max(0, min - 1);
-      const safeMax = max + 1;
+      const safeMin = referenceValue !== undefined ? Math.min(referenceValue, min - 1) : Math.max(0, min - 1);
+      const safeMax = referenceValue !== undefined ? Math.max(referenceValue, max + 1) : max + 1;
       return [safeMin, safeMax];
     }
 
@@ -49,8 +54,10 @@ export default function StatLineChart(props: StatLineChartProps) {
     // Calculate the buffer amount (e.g., 5% of the range)
     const bufferAmount = range * bufferPercent;
 
-    // New Minimum: actual minimum minus the buffer (ensures no negative minimum for counts)
-    const newYMin = Math.max(0, min - bufferAmount);
+    // New Minimum: actual minimum minus the buffer (ensures no negative minimum for counts unless necessary)
+    const newYMin = (min < 0 || (referenceValue !== undefined && referenceValue < 0))
+      ? min - bufferAmount
+      : Math.max(0, min - bufferAmount);
 
     // New Maximum: actual maximum PLUS the buffer
     const newYMax = max + bufferAmount;
@@ -75,6 +82,14 @@ export default function StatLineChart(props: StatLineChartProps) {
         }}
       />
       <Legend />
+
+      {referenceValue !== undefined && (
+        <ReferenceLine
+          y={referenceValue}
+          stroke="hsl(var(--heroui-default-400))"
+          strokeWidth={1}
+        />
+      )}
 
       {chartOptions?.map(options => (
         <React.Fragment key={options.key}>
