@@ -17,6 +17,8 @@ export function TeamMatchLogCard({ periodGames }: TeamMatchLogCardProps) {
     onOpen();
   };
 
+  const reversedGames = [...periodGames].reverse();
+
   return (
     <Card isBlurred className="w-full h-full bg-background/60 dark:bg-default-100/50 flex flex-col">
       <CardHeader className="font-bold text-sm pb-2">
@@ -30,11 +32,11 @@ export function TeamMatchLogCard({ periodGames }: TeamMatchLogCardProps) {
           <div className="p-4 text-center text-default-400">No recent matches found.</div>
         ) : (
           <div className="flex flex-col divide-y divide-divider">
-            {periodGames.map((game) => {
+            {reversedGames.map((game) => {
               const teamKills = game.stats.reduce((acc, s) => acc + (s.kills || 0), 0);
               const teamAssists = game.stats.reduce((acc, s) => acc + (s.assists || 0), 0);
               const teamDamage = game.stats.reduce((acc, s) => acc + (s.damage || 0), 0);
-              
+
               return (
                 <div
                   key={game.id}
@@ -46,7 +48,7 @@ export function TeamMatchLogCard({ periodGames }: TeamMatchLogCardProps) {
                       {game.isWin ? <span className="text-success">VICTORY</span> : <span className="text-danger">DEFEAT</span>}
                     </div>
                     <div className="text-xs text-default-500">
-                      {format(new Date(game.playedAt || new Date()), 'EEE, MMM d • h:mm a')}
+                      {game.playedAt ? format(new Date(game.playedAt), 'EEE, MMM d • h:mm a') : 'Unknown time'}
                     </div>
                   </div>
                   <div className="text-right">
