@@ -73,7 +73,7 @@ export function TeamOverviewCard({ periodGames }: TeamOverviewCardProps) {
             color={winRateColor}
             showValueLabel={true}
             valueLabel={`${stats.winRate.toFixed(0)}%`}
-            strokeWidth={4}
+            strokeWidth={3}
           />
           <span className="text-xs text-default-500 font-semibold uppercase tracking-wider mt-3 text-center">Win Rate</span>
         </div>

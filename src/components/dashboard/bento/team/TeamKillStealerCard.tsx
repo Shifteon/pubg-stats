@@ -45,7 +45,7 @@ export function TeamKillStealerCard({ periodGames, players }: TeamKillStealerCar
 
       <div className="flex flex-col grow my-2 z-10 w-full mt-2">
         {/* Top: Biggest Kill Stealer */}
-        <div className="flex items-center justify-center md:justify-start md:pl-2 mb-3 shrink-0">
+        <div className="flex items-center justify-start md:pl-2 mb-3 shrink-0">
           <User
             name={capitalize(stealerPlayer.name)}
             description={`${biggestStealer.ksPercentage > 0 ? '+' : ''}${biggestStealer.ksPercentage.toFixed(1)}% ks rate`}
