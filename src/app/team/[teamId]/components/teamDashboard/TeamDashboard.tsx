@@ -51,6 +51,18 @@ export function TeamDashboard({ teamOverview, teamId }: { teamOverview: TeamOver
 
   const { periodGames, isLoading, isError } = useTeamDashboardGames(teamId, start, end);
 
+  const { prevStart, prevEnd } = useMemo(() => {
+    if (viewType === 'all-time' || !start) {
+      return { prevStart: undefined, prevEnd: undefined };
+    }
+    const s = new Date(start);
+    const prevS = viewType === 'monthly' ? subMonths(s, 1) : subWeeks(s, 1);
+    const prevE = viewType === 'monthly' ? endOfMonth(prevS) : endOfWeek(prevS, { weekStartsOn: 0 });
+    return { prevStart: prevS.toISOString(), prevEnd: prevE.toISOString() };
+  }, [start, viewType]);
+
+  const { periodGames: previousPeriodGames } = useTeamDashboardGames(teamId, prevStart, prevEnd);
+
   const handlePrevPeriod = () => {
     if (!start || viewType === 'all-time') return;
     const prev = viewType === 'monthly'
@@ -127,8 +139,13 @@ export function TeamDashboard({ teamOverview, teamId }: { teamOverview: TeamOver
         <div className="col-span-1 md:col-span-2 md:row-span-2 flex flex-col">
           <TeamOverviewCard periodGames={periodGames} />
         </div>
-        <div className="col-span-1 md:col-span-2 flex flex-col">
-          <TeamCurrentFormCard periodGames={periodGames} teamOverview={teamOverview} />
+        <div className="col-span-1 md:col-span-2 md:row-span-2 flex flex-col">
+          <TeamCurrentFormCard 
+            periodGames={periodGames} 
+            previousPeriodGames={previousPeriodGames}
+            teamOverview={teamOverview} 
+            viewType={viewType}
+          />
         </div>
 
         {/* Dynamic Space depending on view */}
