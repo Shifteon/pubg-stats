@@ -1,5 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
+import { GameService } from "@/services/gameService";
 import { z } from "zod";
 
 export const editGamePayloadSchema = z.object({
@@ -30,51 +30,10 @@ export async function PUT(
     const body = await request.json();
     const parsedBody = editGamePayloadSchema.parse(body);
 
-    const supabase = await createClient();
+    const gameService = new GameService();
+    const result = await gameService.updateGame(gameId, parsedBody);
 
-    // 1. Update the games table
-    const updateData = {
-      is_win: parsedBody.isWin,
-      match_type: parsedBody.matchType,
-      played_at: parsedBody.playedAt,
-    };
-
-    const { error: gameError } = await supabase
-      .from("games")
-      .update(updateData)
-      .eq("id", gameId);
-
-    if (gameError) {
-      console.error("Error updating game:", gameError);
-      return NextResponse.json({ error: "Failed to update game" }, { status: 500 });
-    }
-
-    // 2. Update individual player stats
-    if (parsedBody.stats && parsedBody.stats.length > 0) {
-      const updatePromises = parsedBody.stats.map(stat =>
-        supabase
-          .from("game_player_stats")
-          .update({
-            kills: stat.kills,
-            assists: stat.assists,
-            damage: stat.damage,
-            rescues: stat.rescues,
-            recalls: stat.recalls,
-          })
-          .eq("game_id", gameId)
-          .eq("player_id", stat.playerId)
-      );
-
-      const results = await Promise.all(updatePromises);
-
-      const errorResult = results.find(r => r.error);
-      if (errorResult) {
-        console.error("Error updating player stats:", errorResult.error);
-        return NextResponse.json({ error: "Failed to update player stats" }, { status: 500 });
-      }
-    }
-
-    return NextResponse.json({ success: true, id: gameId }, { status: 200 });
+    return NextResponse.json(result, { status: 200 });
 
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -100,19 +59,10 @@ export async function DELETE(
       return NextResponse.json({ error: "Game ID is required" }, { status: 400 });
     }
 
-    const supabase = await createClient();
+    const gameService = new GameService();
+    const result = await gameService.deleteGame(gameId);
 
-    const { error: gameError } = await supabase
-      .from("games")
-      .delete()
-      .eq("id", gameId);
-
-    if (gameError) {
-      console.error("Error deleting game:", gameError);
-      return NextResponse.json({ error: "Failed to delete game" }, { status: 500 });
-    }
-
-    return NextResponse.json({ success: true, id: gameId }, { status: 200 });
+    return NextResponse.json(result, { status: 200 });
 
   } catch (error) {
     console.error("Error in Game DELETE API:", error);
