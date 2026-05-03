@@ -2,18 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardBody, Avatar, Tooltip } from '@heroui/react';
-import { Game, TeamOverview } from '@/types';
 import { capitalize } from '@/utils/stringUtils';
 import { AVATAR_SRC_MAP } from '@/constants';
 import { getHeadToHead } from '../../Dashboard.utils';
 import { HeadToHeadChart } from '../HeadToHeadChart';
+import { useTeamDashboard } from '@/contexts/TeamDashboardContext';
 
-interface TeamHeadToHeadCardProps {
-  periodGames: Game[];
-  players: TeamOverview['players'];
-}
-
-export function TeamHeadToHeadCard({ periodGames, players }: TeamHeadToHeadCardProps) {
+export function TeamHeadToHeadCard() {
+  const { periodGames, teamOverview } = useTeamDashboard();
+  const players = teamOverview.players;
   const [focusedPlayerId, setFocusedPlayerId] = useState<string>(players[0]?.id || '');
 
   useEffect(() => {

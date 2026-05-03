@@ -1,19 +1,14 @@
 "use client";
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Card, CardHeader, CardBody, User, Tooltip } from '@heroui/react';
-import { Game, TeamOverview } from '@/types';
 import { capitalize } from '@/utils/stringUtils';
 import { AVATAR_SRC_MAP } from '@/constants';
-import { getTeamKillStealStats } from './TeamDashboard.utils';
+import { useTeamDashboard } from '@/contexts/TeamDashboardContext';
 
-interface TeamKillStealerCardProps {
-  periodGames: Game[];
-  players: TeamOverview['players'];
-}
-
-export function TeamKillStealerCard({ periodGames, players }: TeamKillStealerCardProps) {
-  const killStealStats = useMemo(() => getTeamKillStealStats(periodGames, players), [periodGames, players]);
+export function TeamKillStealerCard() {
+  const { killStealStats, teamOverview, periodGames } = useTeamDashboard();
+  const players = teamOverview.players;
 
   if (periodGames.length === 0 || killStealStats.length === 0) {
     return (

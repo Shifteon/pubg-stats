@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
 import { Card, CardHeader, CardBody, Avatar, useDisclosure } from '@heroui/react';
 import { Game, TeamOverview, TeamHallOfFame } from '@/types';
-import { getTeamHallOfFame } from './TeamDashboard.utils';
 import { capitalize } from '@/utils/stringUtils';
 import { AVATAR_SRC_MAP } from '@/constants';
 import GameModal from '@/components/game/GameModal';
-
-interface TeamHallOfFameCardProps {
-  periodGames: Game[];
-  players: TeamOverview['players'];
-}
+import { useTeamDashboard } from '@/contexts/TeamDashboardContext';
 
 // Icons
 const TargetIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -92,8 +87,8 @@ function HallOfFameBlock({ statKey, label, icon, hallOfFame, players, compact = 
   );
 }
 
-export function TeamHallOfFameCard({ periodGames, players }: TeamHallOfFameCardProps) {
-  const hallOfFame = getTeamHallOfFame(periodGames, players);
+export function TeamHallOfFameCard() {
+  const { hallOfFame, teamOverview, periodGames } = useTeamDashboard();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
 
@@ -124,15 +119,15 @@ export function TeamHallOfFameCard({ periodGames, players }: TeamHallOfFameCardP
       <CardBody className="p-4 flex flex-col gap-3">
         {/* Top Row: Primary Stats */}
         <div className="grid grid-cols-2 gap-3">
-          <HallOfFameBlock statKey="kills" label="Most Kills" icon={<TargetIcon className="w-4 h-4 text-danger" />} hallOfFame={hallOfFame} players={players} onGameClick={handleGameClick} />
-          <HallOfFameBlock statKey="damage" label="Highest Dmg" icon={<ZapIcon className="w-4 h-4 text-warning" />} hallOfFame={hallOfFame} players={players} onGameClick={handleGameClick} />
+          <HallOfFameBlock statKey="kills" label="Most Kills" icon={<TargetIcon className="w-4 h-4 text-danger" />} hallOfFame={hallOfFame} players={teamOverview.players} onGameClick={handleGameClick} />
+          <HallOfFameBlock statKey="damage" label="Highest Dmg" icon={<ZapIcon className="w-4 h-4 text-warning" />} hallOfFame={hallOfFame} players={teamOverview.players} onGameClick={handleGameClick} />
         </div>
 
         {/* Bottom Row: Secondary Stats */}
         <div className="grid grid-cols-3 gap-3">
-          <HallOfFameBlock statKey="assists" label="Assists" icon={<UsersIcon className="w-3.5 h-3.5 text-primary" />} hallOfFame={hallOfFame} players={players} compact onGameClick={handleGameClick} />
-          <HallOfFameBlock statKey="rescues" label="Rescues" icon={<LifeBuoyIcon className="w-3.5 h-3.5 text-success" />} hallOfFame={hallOfFame} players={players} compact onGameClick={handleGameClick} />
-          <HallOfFameBlock statKey="recalls" label="Recalls" icon={<RefreshCwIcon className="w-3.5 h-3.5 text-secondary" />} hallOfFame={hallOfFame} players={players} compact onGameClick={handleGameClick} />
+          <HallOfFameBlock statKey="assists" label="Assists" icon={<UsersIcon className="w-3.5 h-3.5 text-primary" />} hallOfFame={hallOfFame} players={teamOverview.players} compact onGameClick={handleGameClick} />
+          <HallOfFameBlock statKey="rescues" label="Rescues" icon={<LifeBuoyIcon className="w-3.5 h-3.5 text-success" />} hallOfFame={hallOfFame} players={teamOverview.players} compact onGameClick={handleGameClick} />
+          <HallOfFameBlock statKey="recalls" label="Recalls" icon={<RefreshCwIcon className="w-3.5 h-3.5 text-secondary" />} hallOfFame={hallOfFame} players={teamOverview.players} compact onGameClick={handleGameClick} />
         </div>
       </CardBody>
       <GameModal 
@@ -143,4 +138,3 @@ export function TeamHallOfFameCard({ periodGames, players }: TeamHallOfFameCardP
     </Card>
   );
 }
-

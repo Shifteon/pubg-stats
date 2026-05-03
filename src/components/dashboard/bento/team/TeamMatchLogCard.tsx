@@ -3,12 +3,10 @@ import { Card, CardHeader, CardBody, useDisclosure, Chip } from '@heroui/react';
 import { format } from 'date-fns';
 import { Game } from '@/types';
 import GameModal from '@/components/game/GameModal';
+import { useTeamDashboard } from '@/contexts/TeamDashboardContext';
 
-interface TeamMatchLogCardProps {
-  periodGames: Game[];
-}
-
-export function TeamMatchLogCard({ periodGames }: TeamMatchLogCardProps) {
+export function TeamMatchLogCard() {
+  const { periodGames } = useTeamDashboard();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
 

@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useMemo } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import React from 'react';
 import { Button, Skeleton, Tabs, Tab } from '@heroui/react';
-import { format, startOfWeek, endOfWeek, subWeeks, addWeeks, startOfMonth, endOfMonth, subMonths, addMonths, parseISO } from 'date-fns';
 import { TeamOverview } from '@/types';
-import { useTeamDashboardGames } from '@/hooks/useTeamDashboard';
+import { TeamDashboardProvider, useTeamDashboard } from '@/contexts/TeamDashboardContext';
 
 import { TeamOverviewCard } from '@/components/dashboard/bento/team/TeamOverviewCard';
 import { TeamCurrentFormCard } from '@/components/dashboard/bento/team/TeamCurrentFormCard';
@@ -17,80 +15,27 @@ import { TeamHeadToHeadCard } from '@/components/dashboard/bento/team/TeamHeadTo
 import { TeamKillStealerCard } from '@/components/dashboard/bento/team/TeamKillStealerCard';
 
 export function TeamDashboard({ teamOverview, teamId }: { teamOverview: TeamOverview; teamId: string }) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const dateParam = searchParams.get('date');
-  const viewType = searchParams.get('view') || 'all-time';
+  return (
+    <TeamDashboardProvider teamId={teamId} teamOverview={teamOverview}>
+      <TeamDashboardContent />
+    </TeamDashboardProvider>
+  );
+}
 
-  const { start, end, periodRangeStr, isCurrentOrFuturePeriod } = useMemo(() => {
-    if (viewType === 'all-time') {
-      return { start: undefined, end: undefined, periodRangeStr: 'All Time', isCurrentOrFuturePeriod: true };
-    }
-
-    let baseDate = new Date();
-    if (dateParam) {
-      const parsed = parseISO(dateParam);
-      if (!isNaN(parsed.getTime())) {
-        baseDate = parsed;
-      }
-    }
-
-    const s = viewType === 'monthly' ? startOfMonth(baseDate) : startOfWeek(baseDate, { weekStartsOn: 0 });
-    const e = viewType === 'monthly' ? endOfMonth(baseDate) : endOfWeek(baseDate, { weekStartsOn: 0 });
-    const currentPeriodStart = viewType === 'monthly' ? startOfMonth(new Date()) : startOfWeek(new Date(), { weekStartsOn: 0 });
-
-    return {
-      start: s.toISOString(),
-      end: e.toISOString(),
-      periodRangeStr: viewType === 'monthly'
-        ? format(s, 'MMMM yyyy')
-        : `${format(s, 'MMM d')} - ${format(e, 'MMM d, yyyy')}`,
-      isCurrentOrFuturePeriod: s.getTime() >= currentPeriodStart.getTime()
-    };
-  }, [dateParam, viewType]);
-
-  const { periodGames, isLoading, isError } = useTeamDashboardGames(teamId, start, end);
-
-  const { prevStart, prevEnd } = useMemo(() => {
-    if (viewType === 'all-time' || !start) {
-      return { prevStart: undefined, prevEnd: undefined };
-    }
-    const s = new Date(start);
-    const prevS = viewType === 'monthly' ? subMonths(s, 1) : subWeeks(s, 1);
-    const prevE = viewType === 'monthly' ? endOfMonth(prevS) : endOfWeek(prevS, { weekStartsOn: 0 });
-    return { prevStart: prevS.toISOString(), prevEnd: prevE.toISOString() };
-  }, [start, viewType]);
-
-  const { periodGames: previousPeriodGames } = useTeamDashboardGames(teamId, prevStart, prevEnd);
-
-  const handlePrevPeriod = () => {
-    if (!start || viewType === 'all-time') return;
-    const prev = viewType === 'monthly'
-      ? subMonths(startOfMonth(new Date(start)), 1)
-      : subWeeks(startOfWeek(new Date(start), { weekStartsOn: 0 }), 1);
-
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('date', format(prev, 'yyyy-MM-dd'));
-    router.push(`?${params.toString()}`);
-  };
-
-  const handleNextPeriod = () => {
-    if (!start || viewType === 'all-time') return;
-    const next = viewType === 'monthly'
-      ? addMonths(startOfMonth(new Date(start)), 1)
-      : addWeeks(startOfWeek(new Date(start), { weekStartsOn: 0 }), 1);
-
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('date', format(next, 'yyyy-MM-dd'));
-    router.push(`?${params.toString()}`);
-  };
-
-  const handleViewChange = (key: React.Key) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('view', key.toString());
-    params.delete('date'); // Reset date when switching views
-    router.push(`?${params.toString()}`);
-  };
+function TeamDashboardContent() {
+  const {
+    viewType,
+    periodRangeStr,
+    isCurrentOrFuturePeriod,
+    start,
+    end,
+    periodGames,
+    isLoading,
+    isError,
+    handlePrevPeriod,
+    handleNextPeriod,
+    handleViewChange
+  } = useTeamDashboard();
 
   if (isLoading) {
     return <TeamDashboardSkeleton />;
@@ -137,25 +82,20 @@ export function TeamDashboard({ teamOverview, teamId }: { teamOverview: TeamOver
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 auto-rows-min md:auto-rows-[180px]">
         {/* Row 1 & 2 */}
         <div className="col-span-1 md:col-span-2 md:row-span-2 flex flex-col">
-          <TeamOverviewCard periodGames={periodGames} />
+          <TeamOverviewCard />
         </div>
         <div className="col-span-1 md:col-span-2 md:row-span-2 flex flex-col">
-          <TeamCurrentFormCard 
-            periodGames={periodGames} 
-            previousPeriodGames={previousPeriodGames}
-            teamOverview={teamOverview} 
-            viewType={viewType}
-          />
+          <TeamCurrentFormCard />
         </div>
 
         {/* Dynamic Space depending on view */}
         {viewType !== 'all-time' ? (
           <>
             <div className="col-span-1 md:col-span-2 flex flex-col">
-              <TeamKillStealerCard periodGames={periodGames} players={teamOverview.players} />
+              <TeamKillStealerCard />
             </div>
             <div className="col-span-1 md:row-span-2 flex flex-col h-full">
-              <TeamMatchLogCard periodGames={periodGames} />
+              <TeamMatchLogCard />
             </div>
             <div className="col-span-1 md:row-span-2 flex flex-col">
               <ActivityHeatmapCard periodGames={periodGames} start={start as string} end={end as string} />
@@ -164,23 +104,23 @@ export function TeamDashboard({ teamOverview, teamId }: { teamOverview: TeamOver
         ) : (
           <>
             <div className="col-span-1 flex flex-col">
-              <TeamKillStealerCard periodGames={periodGames} players={teamOverview.players} />
+              <TeamKillStealerCard />
             </div>
             <div className="col-span-1 flex flex-col h-full">
-              <TeamMatchLogCard periodGames={periodGames} />
+              <TeamMatchLogCard />
             </div>
           </>
         )}
 
         {/* Row 3/4 */}
         <div className="col-span-1 md:col-span-2 md:row-span-2 flex flex-col">
-          <TeamHeadToHeadCard periodGames={periodGames} players={teamOverview.players} />
+          <TeamHeadToHeadCard />
         </div>
         <div className="col-span-1 md:col-span-2 md:row-span-2 flex flex-col">
-          <TeamHallOfFameCard periodGames={periodGames} players={teamOverview.players} />
+          <TeamHallOfFameCard />
         </div>
         <div className="col-span-1 md:col-span-2 md:row-span-2 flex flex-col">
-          <TeamPersonalBestsCard periodGames={periodGames} players={teamOverview.players} />
+          <TeamPersonalBestsCard />
         </div>
       </div>
     </div>

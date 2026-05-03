@@ -1,27 +1,23 @@
 import React from 'react';
 import { Card, CardHeader, CardBody, Avatar, Divider } from '@heroui/react';
-import { Game, TeamOverview } from '@/types';
-import { getTeamCurrentForm, getTeamOverviewStats } from './TeamDashboard.utils';
-import { getPeriodTrends } from '../../Dashboard.utils';
 import { AVATAR_SRC_MAP } from '@/constants';
 import { capitalize } from '@/utils/stringUtils';
+import { useTeamDashboard } from '@/contexts/TeamDashboardContext';
 
-interface TeamCurrentFormCardProps {
-  periodGames: Game[];
-  previousPeriodGames?: Game[];
-  teamOverview: TeamOverview;
-  viewType?: string;
-}
+export function TeamCurrentFormCard() {
+  const { 
+    currentForm: current, 
+    pastForm: past, 
+    currentOverview, 
+    pastOverview, 
+    playerTrends, 
+    viewType,
+    previousPeriodGames 
+  } = useTeamDashboard();
 
-export function TeamCurrentFormCard({ periodGames, previousPeriodGames = [], teamOverview, viewType = 'all-time' }: TeamCurrentFormCardProps) {
-  const current = getTeamCurrentForm(periodGames);
-  const currentOverview = getTeamOverviewStats(periodGames);
   const currentWinRate = currentOverview.winRate;
   const currentTeamKills = current.avgKills;
   const currentTeamDamage = current.avgDamage;
-
-  const past = previousPeriodGames.length ? getTeamCurrentForm(previousPeriodGames) : null;
-  const pastOverview = previousPeriodGames.length ? getTeamOverviewStats(previousPeriodGames) : null;
 
   const pastWinRate = pastOverview?.winRate;
   const pastTeamKills = past?.avgKills;
@@ -44,16 +40,6 @@ export function TeamCurrentFormCard({ periodGames, previousPeriodGames = [], tea
       </div>
     );
   };
-
-  const playerStats = teamOverview.players.map(player => {
-    const currentStats = getPeriodTrends(periodGames, player.id);
-    const pastStats = previousPeriodGames.length ? getPeriodTrends(previousPeriodGames, player.id) : null;
-    return {
-      player,
-      current: currentStats,
-      past: pastStats
-    };
-  });
 
   return (
     <Card isBlurred className="w-full h-full bg-background/60 dark:bg-default-100/50 flex flex-col">
@@ -92,7 +78,7 @@ export function TeamCurrentFormCard({ periodGames, previousPeriodGames = [], tea
 
         {/* Player Detailed Averages */}
         <div className="flex flex-col gap-3 overflow-y-auto pr-1 custom-scrollbar">
-          {playerStats.map(({ player, current: pCurrent, past: pPast }) => (
+          {playerTrends.map(({ player, current: pCurrent, past: pPast }) => (
             <div key={player.id} className="flex items-center gap-3 bg-default-50/50 p-2 rounded-lg border border-divider/20 hover:bg-default-100/50 transition-colors">
               <div className="flex flex-col items-center min-w-[50px]">
                 <Avatar

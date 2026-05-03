@@ -1,12 +1,7 @@
 import React from 'react';
 import { Card, CardHeader, CardBody, CircularProgress } from '@heroui/react';
-import { Game } from '@/types';
-import { getTeamOverviewStats } from './TeamDashboard.utils';
 import ButterflyBarChart from '@/components/charts/butterflyBarChart';
-
-interface TeamOverviewCardProps {
-  periodGames: Game[];
-}
+import { useTeamDashboard } from '@/contexts/TeamDashboardContext';
 
 // Custom icons
 const GameIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -27,8 +22,8 @@ const TrophyIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-export function TeamOverviewCard({ periodGames }: TeamOverviewCardProps) {
-  const stats = getTeamOverviewStats(periodGames);
+export function TeamOverviewCard() {
+  const { currentOverview: stats, periodGames } = useTeamDashboard();
 
   // Extract up to 10 most recent games for the sparkline
   const recentGames = periodGames.slice(-10);

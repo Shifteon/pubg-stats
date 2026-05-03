@@ -1,18 +1,13 @@
 import React, { useState } from 'react';
 import { Card, CardHeader, CardBody, User, useDisclosure } from '@heroui/react';
-import { Game, TeamOverview } from '@/types';
-import { getTeamPersonalBests } from './TeamDashboard.utils';
+import { Game } from '@/types';
 import { capitalize } from '@/utils/stringUtils';
 import { AVATAR_SRC_MAP } from '@/constants';
 import GameModal from '@/components/game/GameModal';
+import { useTeamDashboard } from '@/contexts/TeamDashboardContext';
 
-interface TeamPersonalBestsCardProps {
-  periodGames: Game[];
-  players: TeamOverview['players'];
-}
-
-export function TeamPersonalBestsCard({ periodGames, players }: TeamPersonalBestsCardProps) {
-  const personalBests = getTeamPersonalBests(periodGames, players);
+export function TeamPersonalBestsCard() {
+  const { personalBests, teamOverview, periodGames } = useTeamDashboard();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
 
@@ -54,7 +49,7 @@ export function TeamPersonalBestsCard({ periodGames, players }: TeamPersonalBest
             </tr>
           </thead>
           <tbody className="divide-y divide-divider/50">
-            {players.map(player => {
+            {teamOverview.players.map(player => {
               const pb = personalBests[player.id];
               if (!pb) return null;
               
@@ -126,4 +121,3 @@ export function TeamPersonalBestsCard({ periodGames, players }: TeamPersonalBest
     </Card>
   );
 }
-
