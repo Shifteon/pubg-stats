@@ -6,6 +6,7 @@ import GameTable from "./GameTable";
 import GameSort, { SortConfig } from "./GameSort";
 import { statKeys } from "@/constants";
 import GameFilter, { Filter } from "./GameFilter";
+import GameAiSearch from "./GameAiSearch";
 import { Game } from "@/types";
 
 export interface GameByGameProps {
@@ -20,6 +21,14 @@ export default function GameByGame({ gameData, hideFilters, onEditGame, onDelete
   const [filters, setFilters] = useState<Filter[]>([]);
   const [filterResult, setFilterResult] = useState<string>("all");
   const [sortConfig, setSortConfig] = useState<SortConfig | null>(null);
+  const [isAiLoading, setIsAiLoading] = useState(false);
+
+  const handleAiSearchComplete = (newFilters: Filter[], newSortConfig: SortConfig | null, newResultFilter: string) => {
+    setFilters(newFilters);
+    setSortConfig(newSortConfig);
+    setFilterResult(newResultFilter);
+    setGameByGamePage(1);
+  };
 
   // Extract players dynamically from the first game
   const players = useMemo(() => {
@@ -159,7 +168,13 @@ export default function GameByGame({ gameData, hideFilters, onEditGame, onDelete
   return (
     <>
       {!hideFilters && (
-        <Accordion variant="bordered">
+        <div className="w-full">
+          <GameAiSearch 
+            onSearchComplete={handleAiSearchComplete} 
+            isLoading={isAiLoading} 
+            setIsLoading={setIsAiLoading} 
+          />
+          <Accordion variant="bordered">
           <AccordionItem key="1" aria-label="Filter and Sort" title="Filter and Sort">
             <GameFilter
               players={players}
@@ -184,8 +199,9 @@ export default function GameByGame({ gameData, hideFilters, onEditGame, onDelete
             />
           </AccordionItem>
         </Accordion>
+        </div>
       )}
-      <div className="w-full grid grid-cols-1 lg:grid-cols-2 items-start gap-8 mt-4">
+      <div className={`w-full grid grid-cols-1 lg:grid-cols-2 items-start gap-8 mt-4 ${isAiLoading ? 'opacity-50' : ''}`}>
         {paginatedGameTables.map((game, index) => (
           <div key={index} className="w-full">
             <div className="flex justify-between items-center mb-2">
