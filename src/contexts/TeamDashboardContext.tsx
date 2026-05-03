@@ -2,9 +2,9 @@
 
 import React, { createContext, useContext, useMemo, ReactNode } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { format, startOfWeek, endOfWeek, subWeeks, addWeeks, startOfMonth, endOfMonth, subMonths, addMonths, parseISO } from 'date-fns';
+import { format, startOfWeek, endOfWeek, subWeeks, addWeeks, startOfMonth, endOfMonth, subMonths, addMonths, parseISO, startOfDay, endOfDay } from 'date-fns';
 import { Game, TeamOverview, TeamHallOfFame, TeamPersonalBest } from '@/types';
-import { useTeamDashboardGames } from '@/hooks/useTeamDashboard';
+import { useTeamDashboardGames, useTeamSessions } from '@/hooks/useTeamDashboard';
 import { 
   getTeamOverviewStats, 
   getTeamCurrentForm, 
@@ -69,10 +69,32 @@ export function TeamDashboardProvider({
   const dateParam = searchParams.get('date');
   const viewType = searchParams.get('view') || 'all-time';
 
+  // --- Data Fetching ---
+  const { sessions, isLoading: isSessionsLoading } = useTeamSessions(teamId);
+
   // --- Date Logic ---
   const { start, end, periodRangeStr, isCurrentOrFuturePeriod } = useMemo(() => {
     if (viewType === 'all-time') {
       return { start: undefined, end: undefined, periodRangeStr: 'All Time', isCurrentOrFuturePeriod: true };
+    }
+
+    if (viewType === 'session') {
+      const defaultSession = sessions.length > 0 ? sessions[0] : format(new Date(), 'yyyy-MM-dd');
+      const currentSessionDate = dateParam || defaultSession;
+      
+      const parsed = parseISO(currentSessionDate);
+      const s = isNaN(parsed.getTime()) ? new Date() : parsed;
+      const currentSessionStart = startOfDay(s);
+      const currentSessionEnd = endOfDay(s);
+      
+      const isCurrent = sessions.length > 0 ? currentSessionDate >= sessions[0] : true;
+
+      return {
+        start: currentSessionStart.toISOString(),
+        end: currentSessionEnd.toISOString(),
+        periodRangeStr: format(currentSessionStart, 'MMMM d, yyyy'),
+        isCurrentOrFuturePeriod: isCurrent
+      };
     }
 
     let baseDate = new Date();
@@ -95,25 +117,44 @@ export function TeamDashboardProvider({
         : `${format(s, 'MMM d')} - ${format(e, 'MMM d, yyyy')}`,
       isCurrentOrFuturePeriod: s.getTime() >= currentPeriodStart.getTime()
     };
-  }, [dateParam, viewType]);
+  }, [dateParam, viewType, sessions]);
 
   const { prevStart, prevEnd } = useMemo(() => {
     if (viewType === 'all-time' || !start) {
       return { prevStart: undefined, prevEnd: undefined };
     }
+
+    if (viewType === 'session') {
+      const defaultSession = sessions.length > 0 ? sessions[0] : format(new Date(), 'yyyy-MM-dd');
+      const currentSessionDate = dateParam || defaultSession;
+      const currentIndex = sessions.indexOf(currentSessionDate);
+      
+      if (currentIndex !== -1 && currentIndex + 1 < sessions.length) {
+        const prevSessionDate = sessions[currentIndex + 1];
+        const s = parseISO(prevSessionDate);
+        return {
+          prevStart: startOfDay(s).toISOString(),
+          prevEnd: endOfDay(s).toISOString()
+        };
+      }
+      return { prevStart: undefined, prevEnd: undefined };
+    }
+
     const s = new Date(start);
     const prevS = viewType === 'monthly' ? subMonths(s, 1) : subWeeks(s, 1);
     const prevE = viewType === 'monthly' ? endOfMonth(prevS) : endOfWeek(prevS, { weekStartsOn: 0 });
     return { prevStart: prevS.toISOString(), prevEnd: prevE.toISOString() };
-  }, [start, viewType]);
+  }, [start, viewType, dateParam, sessions]);
 
-  // --- Data Fetching ---
-  const { periodGames, isLoading, isError } = useTeamDashboardGames(teamId, start, end);
+  const { periodGames, isLoading: isGamesLoading, isError: isGamesError } = useTeamDashboardGames(teamId, start, end);
   const { periodGames: previousPeriodGames } = useTeamDashboardGames(teamId, prevStart, prevEnd);
 
+  const isLoading = isSessionsLoading || isGamesLoading;
+  const isError = isGamesError;
+
   // --- Derived Stats (Memoized) ---
-  const safePeriodGames = periodGames || [];
-  const safePrevGames = previousPeriodGames || [];
+  const safePeriodGames = useMemo(() => periodGames || [], [periodGames]);
+  const safePrevGames = useMemo(() => previousPeriodGames || [], [previousPeriodGames]);
 
   const currentOverview = useMemo(() => getTeamOverviewStats(safePeriodGames), [safePeriodGames]);
   const pastOverview = useMemo(() => safePrevGames.length ? getTeamOverviewStats(safePrevGames) : null, [safePrevGames]);
@@ -146,6 +187,16 @@ export function TeamDashboardProvider({
 
   const handlePrevPeriod = () => {
     if (!start || viewType === 'all-time') return;
+    
+    if (viewType === 'session') {
+      const currentSessionDate = dateParam || (sessions.length > 0 ? sessions[0] : format(new Date(), 'yyyy-MM-dd'));
+      const currentIndex = sessions.indexOf(currentSessionDate);
+      if (currentIndex !== -1 && currentIndex + 1 < sessions.length) {
+        router.push(`${pathname}?${createQueryString('date', sessions[currentIndex + 1])}`);
+      }
+      return;
+    }
+
     const prev = viewType === 'monthly'
       ? subMonths(startOfMonth(new Date(start)), 1)
       : subWeeks(startOfWeek(new Date(start), { weekStartsOn: 0 }), 1);
@@ -155,6 +206,16 @@ export function TeamDashboardProvider({
 
   const handleNextPeriod = () => {
     if (!start || viewType === 'all-time') return;
+    
+    if (viewType === 'session') {
+      const currentSessionDate = dateParam || (sessions.length > 0 ? sessions[0] : format(new Date(), 'yyyy-MM-dd'));
+      const currentIndex = sessions.indexOf(currentSessionDate);
+      if (currentIndex > 0) {
+        router.push(`${pathname}?${createQueryString('date', sessions[currentIndex - 1])}`);
+      }
+      return;
+    }
+
     const next = viewType === 'monthly'
       ? addMonths(startOfMonth(new Date(start)), 1)
       : addWeeks(startOfWeek(new Date(start), { weekStartsOn: 0 }), 1);

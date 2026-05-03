@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { teamOverviewSchema, TeamHallOfFame, TeamPersonalBest, PlayerMetadata, playerMetadataSchema, TeamOverview, TeamStatTimelinePoint } from "@/types";
 import { calculateKillStealing } from "@/utils/statHelpers";
+import { format } from "date-fns";
 
 export class TeamService {
   async getTeamOverview(teamId: string): Promise<TeamOverview> {
@@ -91,6 +92,31 @@ export class TeamService {
     }
 
     return result;
+  }
+
+  async getTeamSessions(teamId: string): Promise<string[]> {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("games")
+      .select("played_at")
+      .eq("team_id", teamId)
+      .not("played_at", "is", null)
+      .order("played_at", { ascending: false });
+
+    if (error) {
+      throw new Error("Failed to fetch team sessions: " + error.message);
+    }
+
+    if (!data) return [];
+
+    const dates = new Set<string>();
+    data.forEach(game => {
+      if (game.played_at) {
+        dates.add(format(new Date(game.played_at), 'yyyy-MM-dd'));
+      }
+    });
+
+    return Array.from(dates);
   }
 
   private async getTeamAndPlayers(teamId: string) {

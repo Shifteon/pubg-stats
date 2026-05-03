@@ -60,6 +60,7 @@ function TeamDashboardContent() {
             <Tab key="all-time" title="All-Time" />
             <Tab key="monthly" title="Monthly" />
             <Tab key="weekly" title="Weekly" />
+            <Tab key="session" title="Session" />
           </Tabs>
         </div>
 
@@ -94,12 +95,14 @@ function TeamDashboardContent() {
             <div className="col-span-1 md:col-span-2 flex flex-col">
               <TeamKillStealerCard />
             </div>
-            <div className="col-span-1 md:row-span-2 flex flex-col h-full">
+            <div className={`col-span-1 ${viewType === 'session' ? 'md:col-span-2' : ''} md:row-span-2 flex flex-col h-full`}>
               <TeamMatchLogCard />
             </div>
-            <div className="col-span-1 md:row-span-2 flex flex-col">
-              <ActivityHeatmapCard periodGames={periodGames} start={start as string} end={end as string} />
-            </div>
+            {viewType !== 'session' && (
+              <div className="col-span-1 md:row-span-2 flex flex-col">
+                <ActivityHeatmapCard periodGames={periodGames} start={start as string} end={end as string} />
+              </div>
+            )}
           </>
         ) : (
           <>

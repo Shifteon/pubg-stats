@@ -24,3 +24,14 @@ export function useTeamDashboardGames(teamId: string | null, startDate?: string,
     isError: error
   };
 }
+
+export function useTeamSessions(teamId: string | null) {
+  const url = teamId ? `/api/team/${teamId}/sessions` : null;
+  const { data, error, isLoading } = useSWR<string[]>(url, fetcher);
+
+  return {
+    sessions: data || [],
+    isLoading,
+    isError: error
+  };
+}
