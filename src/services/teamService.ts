@@ -109,14 +109,7 @@ export class TeamService {
 
     if (!data) return [];
 
-    const dates = new Set<string>();
-    data.forEach(game => {
-      if (game.played_at) {
-        dates.add(format(new Date(game.played_at), 'yyyy-MM-dd'));
-      }
-    });
-
-    return Array.from(dates);
+    return data.map(game => game.played_at).filter((d): d is string => d !== null);
   }
 
   private async getTeamAndPlayers(teamId: string) {

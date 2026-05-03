@@ -1,5 +1,7 @@
 import useSWR from 'swr';
 import { Game } from '@/types';
+import { useMemo } from 'react';
+import { format } from 'date-fns';
 
 const fetcher = async (url: string) => {
   const res = await fetch(url);
@@ -29,8 +31,17 @@ export function useTeamSessions(teamId: string | null) {
   const url = teamId ? `/api/team/${teamId}/sessions` : null;
   const { data, error, isLoading } = useSWR<string[]>(url, fetcher);
 
+  const sessions = useMemo(() => {
+    if (!data) return [];
+    const dates = new Set<string>();
+    data.forEach(timestamp => {
+      dates.add(format(new Date(timestamp), 'yyyy-MM-dd'));
+    });
+    return Array.from(dates);
+  }, [data]);
+
   return {
-    sessions: data || [],
+    sessions,
     isLoading,
     isError: error
   };
