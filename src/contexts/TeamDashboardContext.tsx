@@ -34,6 +34,7 @@ interface TeamDashboardContextValue {
   previousPeriodGames: Game[];
   isLoading: boolean;
   isError: boolean;
+  sessions: string[]; // Added sessions
 
   // Memoized Derived Stats
   currentOverview: ReturnType<typeof getTeamOverviewStats>;
@@ -252,6 +253,7 @@ export function TeamDashboardProvider({
     hallOfFame,
     personalBests,
     killStealStats,
+    sessions,
 
     handlePrevPeriod,
     handleNextPeriod,

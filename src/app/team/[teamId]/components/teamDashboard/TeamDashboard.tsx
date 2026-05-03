@@ -14,6 +14,8 @@ import { TeamPersonalBestsCard } from '@/components/dashboard/bento/team/TeamPer
 import { TeamHeadToHeadCard } from '@/components/dashboard/bento/team/TeamHeadToHeadCard';
 import { TeamKillStealerCard } from '@/components/dashboard/bento/team/TeamKillStealerCard';
 
+import { PeriodSelector } from './PeriodSelector';
+
 export function TeamDashboard({ teamOverview, teamId }: { teamOverview: TeamOverview; teamId: string }) {
   return (
     <TeamDashboardProvider teamId={teamId} teamOverview={teamOverview}>
@@ -25,7 +27,6 @@ export function TeamDashboard({ teamOverview, teamId }: { teamOverview: TeamOver
 function TeamDashboardContent() {
   const {
     viewType,
-    periodRangeStr,
     isCurrentOrFuturePeriod,
     start,
     end,
@@ -70,7 +71,7 @@ function TeamDashboardContent() {
               <Button isIconOnly variant="flat" onPress={handlePrevPeriod}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
               </Button>
-              <div className="font-medium min-w-[150px] text-center">{periodRangeStr}</div>
+              <PeriodSelector />
               <Button isIconOnly variant="flat" onPress={handleNextPeriod} isDisabled={isCurrentOrFuturePeriod}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
               </Button>
