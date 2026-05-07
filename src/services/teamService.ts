@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { teamOverviewSchema, TeamHallOfFame, TeamPersonalBest, PlayerMetadata, playerMetadataSchema, TeamOverview, TeamStatTimelinePoint } from "@/types";
 import { calculateKillStealing } from "@/utils/statHelpers";
-import { format } from "date-fns";
 
 export class TeamService {
   async getTeamOverview(teamId: string): Promise<TeamOverview> {

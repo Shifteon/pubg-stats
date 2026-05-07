@@ -4,20 +4,20 @@ import { AVATAR_SRC_MAP } from '@/constants';
 import { capitalize } from '@/utils/stringUtils';
 import { useTeamDashboard } from '@/contexts/TeamDashboardContext';
 
-const StatWithTooltip = ({ 
-  currentVal, 
-  pastVal, 
-  decimals = 1, 
-  viewType, 
-  label, 
+const StatWithTooltip = ({
+  currentVal,
+  pastVal,
+  decimals = 1,
+  viewType,
+  label,
   valueClassName = "text-xl font-black",
   hasPreviousGames,
   children
-}: { 
-  currentVal: number; 
-  pastVal?: number; 
-  decimals?: number; 
-  viewType: string; 
+}: {
+  currentVal: number;
+  pastVal?: number;
+  decimals?: number;
+  viewType: string;
   label: string;
   valueClassName?: string;
   hasPreviousGames: boolean;
@@ -34,10 +34,10 @@ const StatWithTooltip = ({
   const diff = currentVal - pastVal;
   const isUp = diff > 0;
   const color = isUp ? "text-success" : "text-danger";
-  const comparisonLabel = viewType === 'monthly' ? 'vs last month' 
-                        : viewType === 'weekly' ? 'vs last week' 
-                        : viewType === 'session' ? 'vs last session' 
-                        : 'vs previous period';
+  const comparisonLabel = viewType === 'monthly' ? 'vs last month'
+    : viewType === 'weekly' ? 'vs last week'
+      : viewType === 'session' ? 'vs last session'
+        : 'vs previous period';
 
   const tooltipContent = (
     <div className="flex flex-col gap-1 p-1">
@@ -47,10 +47,10 @@ const StatWithTooltip = ({
       <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-small">
         <span className="text-default-500">Current:</span>
         <span className="font-medium text-right">{currentVal.toFixed(decimals)}</span>
-        
+
         <span className="text-default-500">Previous:</span>
         <span className="font-medium text-right">{pastVal.toFixed(decimals)}</span>
-        
+
         <span className="text-default-500">Change:</span>
         <span className={`font-bold text-right ${isUp ? 'text-success' : diff < 0 ? 'text-danger' : 'text-default-500'}`}>
           {isUp ? '+' : ''}{diff.toFixed(decimals)}
@@ -61,7 +61,7 @@ const StatWithTooltip = ({
 
   return (
     <Tooltip content={tooltipContent} placement="top" className="bg-content1 border border-default-200" delay={0} closeDelay={0}>
-      <div className="flex items-center gap-2 cursor-help transition-opacity hover:opacity-80">
+      <div className="flex items-center md:gap-2 cursor-help transition-opacity hover:opacity-80 overflow-x-scroll">
         <span className={valueClassName}>{children}</span>
         {Math.abs(diff) >= 0.01 && (
           <div className={`flex items-center text-[10px] ${color} ml-1 font-bold whitespace-nowrap`}>
@@ -79,14 +79,14 @@ const StatWithTooltip = ({
 };
 
 export function TeamCurrentFormCard() {
-  const { 
-    currentForm: current, 
-    pastForm: past, 
-    currentOverview, 
-    pastOverview, 
-    playerTrends, 
+  const {
+    currentForm: current,
+    pastForm: past,
+    currentOverview,
+    pastOverview,
+    playerTrends,
     viewType,
-    previousPeriodGames 
+    previousPeriodGames
   } = useTeamDashboard();
 
   const currentWinRate = currentOverview.winRate;
@@ -132,7 +132,7 @@ export function TeamCurrentFormCard() {
         <Divider className="opacity-50" />
 
         {/* Player Detailed Averages */}
-        <div className="flex flex-col gap-3 overflow-y-auto pr-1 custom-scrollbar">
+        <div className="flex flex-col gap-3 overflow-y-auto w-full pr-1 custom-scrollbar">
           {playerTrends.map(({ player, current: pCurrent, past: pPast }) => (
             <div key={player.id} className="flex items-center gap-3 bg-default-50/50 p-2 rounded-lg border border-divider/20 hover:bg-default-100/50 transition-colors">
               <div className="flex flex-col items-center min-w-[50px]">
@@ -145,7 +145,7 @@ export function TeamCurrentFormCard() {
                 <span className="text-[10px] font-bold text-default-600 leading-tight">{capitalize(player.name)}</span>
               </div>
 
-              <div className="grid grid-cols-5 gap-1 grow">
+              <div className="grid grid-cols-5 gap-1 grow min-w-[400px] overflow-x-auto">
                 <div className="flex flex-col items-center">
                   <span className="text-[9px] text-default-400 uppercase font-bold">Kills</span>
                   <StatWithTooltip currentVal={pCurrent.avgKills} pastVal={pPast?.avgKills} viewType={viewType} hasPreviousGames={hasPastGames} label="Kills" decimals={1} valueClassName="text-sm font-black">
