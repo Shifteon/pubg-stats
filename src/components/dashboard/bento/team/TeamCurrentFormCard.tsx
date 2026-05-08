@@ -61,7 +61,7 @@ const StatWithTooltip = ({
 
   return (
     <Tooltip content={tooltipContent} placement="top" className="bg-content1 border border-default-200" delay={0} closeDelay={0}>
-      <div className="flex items-center md:gap-2 cursor-help transition-opacity hover:opacity-80 overflow-x-scroll">
+      <div className="flex items-center md:gap-2 cursor-help transition-opacity hover:opacity-80">
         <span className={valueClassName}>{children}</span>
         {Math.abs(diff) >= 0.01 && (
           <div className={`flex items-center text-[10px] ${color} ml-1 font-bold whitespace-nowrap`}>
@@ -134,7 +134,7 @@ export function TeamCurrentFormCard() {
         {/* Player Detailed Averages */}
         <div className="flex flex-col gap-3 overflow-y-auto w-full pr-1 custom-scrollbar">
           {playerTrends.map(({ player, current: pCurrent, past: pPast }) => (
-            <div key={player.id} className="flex items-center gap-3 bg-default-50/50 p-2 rounded-lg border border-divider/20 hover:bg-default-100/50 transition-colors">
+            <div key={player.id} className="flex items-center gap-3 min-w-fit bg-default-50/50 p-2 rounded-lg border border-divider/20 hover:bg-default-100/50 transition-colors">
               <div className="flex flex-col items-center min-w-[50px]">
                 <Avatar
                   src={AVATAR_SRC_MAP[player.name.toLowerCase()]?.src}
@@ -146,31 +146,31 @@ export function TeamCurrentFormCard() {
               </div>
 
               <div className="grid grid-cols-5 gap-1 grow min-w-[400px] overflow-x-auto">
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col">
                   <span className="text-[9px] text-default-400 uppercase font-bold">Kills</span>
                   <StatWithTooltip currentVal={pCurrent.avgKills} pastVal={pPast?.avgKills} viewType={viewType} hasPreviousGames={hasPastGames} label="Kills" decimals={1} valueClassName="text-sm font-black">
                     {pCurrent.avgKills.toFixed(1)}
                   </StatWithTooltip>
                 </div>
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col">
                   <span className="text-[9px] text-default-400 uppercase font-bold">DMG</span>
                   <StatWithTooltip currentVal={pCurrent.avgDamage} pastVal={pPast?.avgDamage} viewType={viewType} hasPreviousGames={hasPastGames} label="Damage" decimals={0} valueClassName="text-sm font-black">
                     {Math.round(pCurrent.avgDamage)}
                   </StatWithTooltip>
                 </div>
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col">
                   <span className="text-[9px] text-default-400 uppercase font-bold">AST</span>
                   <StatWithTooltip currentVal={pCurrent.avgAssists} pastVal={pPast?.avgAssists} viewType={viewType} hasPreviousGames={hasPastGames} label="Assists" decimals={1} valueClassName="text-sm font-black">
                     {pCurrent.avgAssists.toFixed(1)}
                   </StatWithTooltip>
                 </div>
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col">
                   <span className="text-[9px] text-default-400 uppercase font-bold">Res</span>
                   <StatWithTooltip currentVal={pCurrent.avgRescues} pastVal={pPast?.avgRescues} viewType={viewType} hasPreviousGames={hasPastGames} label="Rescues" decimals={1} valueClassName="text-sm font-black">
                     {pCurrent.avgRescues.toFixed(1)}
                   </StatWithTooltip>
                 </div>
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col">
                   <span className="text-[9px] text-default-400 uppercase font-bold">Rec</span>
                   <StatWithTooltip currentVal={pCurrent.avgRecalls} pastVal={pPast?.avgRecalls} viewType={viewType} hasPreviousGames={hasPastGames} label="Recalls" decimals={1} valueClassName="text-sm font-black">
                     {pCurrent.avgRecalls.toFixed(1)}
