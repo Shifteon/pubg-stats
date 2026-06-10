@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardBody, Avatar, Tooltip } from '@heroui/react';
 import { capitalize } from '@/utils/stringUtils';
 import { AVATAR_SRC_MAP } from '@/constants';
-import { getHeadToHead } from '../../Dashboard.utils';
-import { HeadToHeadChart } from '../HeadToHeadChart';
+import { getHeadToHead } from '@/components/dashboard/Dashboard.utils';
+import { HeadToHeadChart } from '@/components/dashboard/bento/HeadToHeadChart';
 import { useTeamDashboard } from '@/contexts/TeamDashboardContext';
 
 export function TeamHeadToHeadCard() {

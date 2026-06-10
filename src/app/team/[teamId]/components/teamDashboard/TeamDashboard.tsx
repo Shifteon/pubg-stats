@@ -5,14 +5,14 @@ import { Button, Skeleton, Tabs, Tab } from '@heroui/react';
 import { TeamOverview } from '@/types';
 import { TeamDashboardProvider, useTeamDashboard } from '@/contexts/TeamDashboardContext';
 
-import { TeamOverviewCard } from '@/components/dashboard/bento/team/TeamOverviewCard';
-import { TeamCurrentFormCard } from '@/components/dashboard/bento/team/TeamCurrentFormCard';
-import { TeamMatchLogCard } from '@/components/dashboard/bento/team/TeamMatchLogCard';
+import { TeamOverviewCard } from './TeamOverviewCard';
+import { TeamCurrentFormCard } from './TeamCurrentFormCard';
+import { TeamMatchLogCard } from './TeamMatchLogCard';
 import { ActivityHeatmapCard } from '@/components/dashboard/bento/ActivityHeatmapCard';
-import { TeamHallOfFameCard } from '@/components/dashboard/bento/team/TeamHallOfFameCard';
-import { TeamPersonalBestsCard } from '@/components/dashboard/bento/team/TeamPersonalBestsCard';
-import { TeamHeadToHeadCard } from '@/components/dashboard/bento/team/TeamHeadToHeadCard';
-import { TeamKillStealerCard } from '@/components/dashboard/bento/team/TeamKillStealerCard';
+import { TeamHallOfFameCard } from './TeamHallOfFameCard';
+import { TeamPersonalBestsCard } from './TeamPersonalBestsCard';
+import { TeamHeadToHeadCard } from './TeamHeadToHeadCard';
+import { TeamKillStealerCard } from './TeamKillStealerCard';
 
 import { PeriodSelector } from './PeriodSelector';
 
