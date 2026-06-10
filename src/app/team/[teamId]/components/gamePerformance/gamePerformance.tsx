@@ -6,6 +6,7 @@ import StatLineChart from "@/components/charts/statLineChart";
 import { BAR_CHART, GAME_INDEX_KEY, LINE_CHART, PERCENTAGE_OF_DATA_TO_REMOVE } from "@/constants";
 import StatBarChart from "@/components/charts/statBarChart";
 import { StatData } from "@/types";
+import StatScatterChart from "@/components/charts/statScatterChart";
 
 export interface GamePerformanceStatProps {
   statName: StatName;
@@ -127,6 +128,16 @@ export default function GamePerformanceStat(props: GamePerformanceStatProps) {
   }, [props.teamStatsTimeline, props.statName, props.selectedMembers, hasMembers, props.players]);
 
   const getChart = () => {
+    if (props.statName === "damagePerKill") {
+      return (
+        <StatScatterChart
+          teamStatsTimeline={props.teamStatsTimeline}
+          selectedMembers={props.selectedMembers}
+          players={props.players}
+        />
+      );
+    }
+
     if (filteredStatData.data.length === 0) {
       return <div>No Data Available</div>;
     }
