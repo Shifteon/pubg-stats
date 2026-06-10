@@ -11,7 +11,7 @@ import {
   getTeamHallOfFame, 
   getTeamPersonalBests, 
   getTeamKillStealStats 
-} from '@/components/dashboard/bento/team/TeamDashboard.utils';
+} from '@/app/team/[teamId]/components/teamDashboard/TeamDashboard.utils';
 import { getPeriodTrends } from '@/components/dashboard/Dashboard.utils';
 
 interface PlayerTrend {
