@@ -7,7 +7,8 @@ import {
   DAMAGE_STAT_NAME,
   WIN_RATE_STAT_NAME,
   GAME_SUMMARY_STAT_NAME,
-  KILL_STEALING_STAT_NAME
+  KILL_STEALING_STAT_NAME,
+  DAMAGE_PER_KILL_STAT_NAME
 } from "./constants";
 
 export type StatName = typeof AVERAGE_KILLS_STAT_NAME
@@ -16,7 +17,8 @@ export type StatName = typeof AVERAGE_KILLS_STAT_NAME
   | typeof DAMAGE_STAT_NAME
   | typeof WIN_RATE_STAT_NAME
   | typeof GAME_SUMMARY_STAT_NAME
-  | typeof KILL_STEALING_STAT_NAME;
+  | typeof KILL_STEALING_STAT_NAME
+  | typeof DAMAGE_PER_KILL_STAT_NAME;
 
 export interface ChartOptions {
   color: string;
@@ -181,6 +183,7 @@ export const teamStatTimelinePointSchema = z.object({
   damage: z.record(z.string(), z.number()),
   winRate: z.number(),
   killStealing: z.record(z.string(), z.number()),
+  damagePerKill: z.record(z.string(), z.number()),
 });
 
 export type TeamStatTimelinePoint = z.infer<typeof teamStatTimelinePointSchema>;

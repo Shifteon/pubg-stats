@@ -20,6 +20,7 @@ export const DAMAGE_STAT_NAME = "damage";
 export const WIN_RATE_STAT_NAME = "winRate";
 export const GAME_SUMMARY_STAT_NAME = "gameSummary";
 export const KILL_STEALING_STAT_NAME = "killStealing";
+export const DAMAGE_PER_KILL_STAT_NAME = "damagePerKill";
 
 // lowercase names
 export const ISAAC_LOWERCASE = "isaac";
@@ -35,6 +36,7 @@ export const SUPPORTED_STATS: StatName[] = [
   AVERAGE_KILLS_STAT_NAME,
   AVERAGE_DAMAGE_STAT_NAME,
   KILL_STEALING_STAT_NAME,
+  DAMAGE_PER_KILL_STAT_NAME,
   KILLS_STAT_NAME,
   DAMAGE_STAT_NAME,
   GAME_SUMMARY_STAT_NAME,

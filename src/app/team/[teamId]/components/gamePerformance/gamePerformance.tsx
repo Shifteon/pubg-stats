@@ -6,6 +6,7 @@ import StatLineChart from "@/components/charts/statLineChart";
 import { BAR_CHART, GAME_INDEX_KEY, LINE_CHART, PERCENTAGE_OF_DATA_TO_REMOVE } from "@/constants";
 import StatBarChart from "@/components/charts/statBarChart";
 import { StatData } from "@/types";
+import StatScatterChart from "@/components/charts/statScatterChart";
 
 export interface GamePerformanceStatProps {
   statName: StatName;
@@ -20,6 +21,7 @@ const STAT_DISPLAY_NAMES: Record<string, string> = {
   avgDamage: "Average Damage",
   winRate: "Win Rate",
   killStealing: "Kill Stealing",
+  damagePerKill: "Damage Per Kill",
   kills: "Total Kills",
   damage: "Total Damage",
 };
@@ -30,6 +32,7 @@ const STAT_CHART_TYPES: Record<string, string> = {
   avgDamage: LINE_CHART,
   winRate: LINE_CHART,
   killStealing: LINE_CHART,
+  damagePerKill: LINE_CHART,
   kills: BAR_CHART,
   damage: BAR_CHART,
 };
@@ -67,6 +70,7 @@ export default function GamePerformanceStat(props: GamePerformanceStatProps) {
         case "damage": statObject = point.damage || {}; break;
         case "killStealing": statObject = point.killStealing || {}; break;
         case "winRate": statObject = point.winRate || 0; break;
+        case "damagePerKill": statObject = point.damagePerKill || {}; break;
         default: break;
       }
 
@@ -124,6 +128,16 @@ export default function GamePerformanceStat(props: GamePerformanceStatProps) {
   }, [props.teamStatsTimeline, props.statName, props.selectedMembers, hasMembers, props.players]);
 
   const getChart = () => {
+    if (props.statName === "damagePerKill") {
+      return (
+        <StatScatterChart
+          teamStatsTimeline={props.teamStatsTimeline}
+          selectedMembers={props.selectedMembers}
+          players={props.players}
+        />
+      );
+    }
+
     if (filteredStatData.data.length === 0) {
       return <div>No Data Available</div>;
     }

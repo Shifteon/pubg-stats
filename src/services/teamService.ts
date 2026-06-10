@@ -56,6 +56,7 @@ export class TeamService {
           damage: {},
           winRate: 0,
           killStealing: {},
+          damagePerKill: {},
         };
       }
 
@@ -82,6 +83,14 @@ export class TeamService {
         Number(row.running_team_kills),
         Number(row.running_team_damage)
       );
+
+      const playerAvgKills = Number(row.running_avg_kills);
+      const playerAvgDamage = Number(row.running_avg_damage);
+      point.damagePerKill[playerId] = playerAvgKills > 0 ? playerAvgDamage / playerAvgKills : 0;
+
+      const teamAvgKills = Number(row.running_avg_team_kills);
+      const teamAvgDamage = Number(row.running_avg_team_damage);
+      point.damagePerKill["team"] = teamAvgKills > 0 ? teamAvgDamage / teamAvgKills : 0;
     }
 
     let result = Object.values(groupedData).sort((a, b) => a.gameIndex - b.gameIndex);
