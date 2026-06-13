@@ -2,6 +2,7 @@
 
 import { Avatar, Chip, Spinner } from "@heroui/react";
 import GamePerformanceStat from "@/app/team/[teamId]/components/gamePerformance/gamePerformance";
+import KillsVsDamageScatterChart from "./killsVsDamageScatterChart";
 import { AVATAR_SRC_MAP, GAME_SUMMARY_STAT_NAME, KILL_STEALING_STAT_NAME, SUPPORTED_STATS } from "@/constants";
 import { useState, useEffect } from "react";
 import { StatName, PlayerMetadata } from "@/types";
@@ -111,6 +112,15 @@ export default function GraphsTab({ teamId }: { teamId: string }) {
             />
           </React.Fragment>
         ))}
+        {teamOverview && (
+          <div className="lg:col-span-2 lg:row-span-2 mt-4">
+            <KillsVsDamageScatterChart
+              selectedMembers={selectedMembers}
+              teamStatsTimeline={teamStatsTimeline || []}
+              players={teamOverview.players}
+            />
+          </div>
+        )}
       </div>
     </>
   );

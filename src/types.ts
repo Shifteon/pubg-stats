@@ -181,6 +181,8 @@ export const teamStatTimelinePointSchema = z.object({
   damage: z.record(z.string(), z.number()),
   winRate: z.number(),
   killStealing: z.record(z.string(), z.number()),
+  rawKills: z.record(z.string(), z.number()),
+  rawDamage: z.record(z.string(), z.number()),
 });
 
 export type TeamStatTimelinePoint = z.infer<typeof teamStatTimelinePointSchema>;

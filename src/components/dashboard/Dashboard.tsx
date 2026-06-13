@@ -156,7 +156,12 @@ export default function Dashboard({ player }: { player: Player }) {
           <MatchLogCard periodGames={periodGames} playerId={player.id} />
         </div>
         <div className="col-span-1 md:col-span-2 flex flex-col">
-          <SquadSynergyCard periodGames={periodGames} playerId={player.id} />
+          <SquadSynergyCard
+            periodGames={periodGames}
+            playerTeamStats={player.playerTeamStats}
+            viewType={viewType}
+            dateParam={dateParam}
+          />
         </div>
         <div className="col-span-1 md:col-span-2 md:row-span-2 flex flex-col">
           <HeadToHeadCard periodGames={periodGames} playerId={player.id} />

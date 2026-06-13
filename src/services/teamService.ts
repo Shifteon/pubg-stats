@@ -56,6 +56,8 @@ export class TeamService {
           damage: {},
           winRate: 0,
           killStealing: {},
+          rawKills: {},
+          rawDamage: {},
         };
       }
 
@@ -73,6 +75,9 @@ export class TeamService {
 
       point.damage[playerId] = Number(row.running_sum_damage);
       point.damage["team"] = Number(row.running_team_damage);
+
+      point.rawKills[playerId] = Number(row.kills);
+      point.rawDamage[playerId] = Number(row.damage);
 
       point.winRate = (Number(row.running_wins) / Number(row.games_played)) * 100;
 

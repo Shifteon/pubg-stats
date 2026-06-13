@@ -42,6 +42,7 @@ export const SUPPORTED_STATS: StatName[] = [
 
 export const LINE_CHART = "line";
 export const BAR_CHART = "bar";
+export const SCATTER_CHART = "scatter";
 
 export const AVERAGE_DAMAGE_DISPLAY_NAME = "Average Damage";
 export const AVERAGE_KILLS_DISPLAY_NAME = "Average Kills";

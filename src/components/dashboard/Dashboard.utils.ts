@@ -1,4 +1,4 @@
-import { Game, PlayerAverages } from '@/types';
+import { Game, PlayerAverages, PlayerTeamStats } from '@/types';
 
 export function getClutchScore(periodGames: Game[], playerId: string) {
   let rescues = 0;
@@ -172,6 +172,32 @@ export function getSquadSynergy(periodGames: Game[], playerId: string) {
   }
 
   return bestTeammate;
+}
+
+export function getTeamsPlayedWith(periodGames: Game[], playerTeamStats: PlayerTeamStats[]) {
+  const teamStatsMap: Record<string, { wins: number, games: number, name: string }> = {};
+
+  for (const game of periodGames) {
+    if (!teamStatsMap[game.teamId]) {
+      const teamMeta = playerTeamStats.find(t => t.teamId === game.teamId);
+      teamStatsMap[game.teamId] = { 
+        wins: 0, 
+        games: 0, 
+        name: teamMeta ? teamMeta.teamName : 'Unknown Team' 
+      };
+    }
+    teamStatsMap[game.teamId].games++;
+    if (game.isWin) {
+      teamStatsMap[game.teamId].wins++;
+    }
+  }
+
+  return Object.entries(teamStatsMap).map(([teamId, stats]) => ({
+    teamId,
+    name: stats.name,
+    games: stats.games,
+    winRate: Math.round((stats.wins / stats.games) * 100)
+  })).sort((a, b) => b.games - a.games);
 }
 
 export function getDynamicRole(periodGames: Game[], playerId: string) {
