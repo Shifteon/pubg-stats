@@ -3,9 +3,8 @@
 import { StatName, TeamStatTimelinePoint, PlayerMetadata } from "@/types";
 import { useMemo } from "react";
 import StatLineChart from "@/components/charts/statLineChart";
-import { BAR_CHART, GAME_INDEX_KEY, LINE_CHART, SCATTER_CHART, PERCENTAGE_OF_DATA_TO_REMOVE } from "@/constants";
+import { BAR_CHART, GAME_INDEX_KEY, LINE_CHART, PERCENTAGE_OF_DATA_TO_REMOVE } from "@/constants";
 import StatBarChart from "@/components/charts/statBarChart";
-import StatScatterChart from "@/components/charts/statScatterChart";
 import { StatData } from "@/types";
 
 export interface GamePerformanceStatProps {
@@ -115,7 +114,7 @@ export default function GamePerformanceStat(props: GamePerformanceStatProps) {
         color: color
       };
     });
-    if (chartType === LINE_CHART || chartType === SCATTER_CHART) {
+    if (chartType === LINE_CHART) {
       // remove some of the data to nomralize it
       const startIndex = Math.ceil(data.length * PERCENTAGE_OF_DATA_TO_REMOVE);
       data = data.slice(startIndex);
@@ -139,13 +138,6 @@ export default function GamePerformanceStat(props: GamePerformanceStatProps) {
         );
       case BAR_CHART:
         return <StatBarChart data={filteredStatData} />;
-      case SCATTER_CHART:
-        return (
-          <StatScatterChart
-            data={filteredStatData}
-            referenceValue={props.statName === "killStealing" ? 0 : undefined}
-          />
-        );
       default:
         return <div>View Not Found</div>;
     }

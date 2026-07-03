@@ -10,7 +10,8 @@ import {
   Tooltip,
   Legend,
   ReferenceLine,
-  TooltipContentProps
+  TooltipContentProps,
+  ReferenceLineSegment
 } from "recharts";
 import { GAME_INDEX_KEY } from "@/constants";
 import { StatData } from "@/types";
@@ -32,7 +33,7 @@ export interface StatScatterChartProps {
   yAxisKey?: string | ((optionKey: string) => string);
   xDisplayName?: string;
   yDisplayName?: string;
-  referenceValue?: number;
+  referenceSegment?: ReferenceLineSegment;
   xAllowDecimals?: boolean;
   yAllowDecimals?: boolean;
   maximumFractionDigits?: number;
@@ -45,7 +46,7 @@ export default function StatScatterChart({
   yAxisKey,
   xDisplayName = "Game Index",
   yDisplayName = "Value",
-  referenceValue,
+  referenceSegment,
   xAllowDecimals = false,
   yAllowDecimals = false,
   maximumFractionDigits = 2,
@@ -105,10 +106,9 @@ export default function StatScatterChart({
 
   const yAxisDomain = useMemo(() => {
     const allYValues = scatterSeries.flatMap((series) => series.points.map((p) => p.y));
-    const valuesWithRef = referenceValue !== undefined ? [...allYValues, referenceValue] : allYValues;
-    if (!valuesWithRef.length) return ["auto", "auto"];
-    const min = Math.min(...valuesWithRef);
-    const max = Math.max(...valuesWithRef);
+    if (!allYValues.length) return ["auto", "auto"];
+    const min = Math.min(...allYValues);
+    const max = Math.max(...allYValues);
     if (min === max) {
       return [Math.max(0, min - 1), max + 1];
     }
@@ -116,7 +116,7 @@ export default function StatScatterChart({
     const buffer = range * 0.05;
     const resolvedMin = min < 0 ? min - buffer : Math.max(0, min - buffer);
     return [resolvedMin, max + buffer];
-  }, [scatterSeries, referenceValue]);
+  }, [scatterSeries]);
 
   const CustomTooltip = ({ active, payload }: Partial<ScatterTooltipProps>) => {
     if (active && payload && payload.length) {
@@ -181,11 +181,11 @@ export default function StatScatterChart({
       <Tooltip cursor={{ strokeDasharray: "3 3" }} content={<CustomTooltip />} />
       <Legend />
       
-      {referenceValue !== undefined && (
+      {referenceSegment !== undefined && (
         <ReferenceLine
-          y={referenceValue}
+          segment={referenceSegment}
           stroke="hsl(var(--heroui-default-400))"
-          strokeWidth={1}
+          strokeWidth={2}
         />
       )}
 

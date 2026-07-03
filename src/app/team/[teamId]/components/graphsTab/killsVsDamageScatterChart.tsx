@@ -27,7 +27,9 @@ export default function KillsVsDamageScatterChart({
     const data: Record<string, number>[] = [];
 
     teamStatsTimeline.forEach((point) => {
-      const dataObj: Record<string, number> = { [GAME_INDEX_KEY]: point.gameIndex };
+      const dataObj: Record<string, number> = {
+        [GAME_INDEX_KEY]: point.gameIndex,
+      };
 
       selectedMembers.forEach((playerId) => {
         const kill = point.rawKills?.[playerId];
@@ -62,11 +64,29 @@ export default function KillsVsDamageScatterChart({
     return { data, chartOptions };
   }, [teamStatsTimeline, selectedMembers, players]);
 
+  // console.log(filteredStatData.data);
+
+  const maxKills = useMemo(() => {
+    const data = filteredStatData.data;
+    let maxKills = 0;
+    for (const record of data) {
+      Object.entries(record)
+        .filter(([key, value]) => key.includes("kills"))
+        .forEach((d) => {
+          if (d[1] > maxKills) maxKills = d[1];
+        });
+    }
+
+    return maxKills;
+  }, [filteredStatData]);
+
   if (filteredStatData.data.length === 0) {
     return (
       <div className="relative mt-2">
         <div className="w-full flex flex-col items-center">
-          <h2 className="p-2 self-start font-medium text-lg">Kills vs. Damage</h2>
+          <h2 className="p-2 self-start font-medium text-lg">
+            Kills vs. Damage
+          </h2>
           <div className="w-full flex items-center justify-center p-8 text-default-400 text-sm">
             No Data Available
           </div>
@@ -88,6 +108,10 @@ export default function KillsVsDamageScatterChart({
           xAllowDecimals={false}
           yAllowDecimals={false}
           aspectRatio={aspectRatio}
+          referenceSegment={[
+            { x: 0, y: 0 },
+            { x: maxKills + 1, y: (maxKills + 1) * 100 },
+          ]}
         />
       </div>
     </div>
