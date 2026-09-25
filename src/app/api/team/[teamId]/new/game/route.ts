@@ -41,7 +41,7 @@ export async function POST(
         team_id: teamId,
         is_win: parsedBody.isWin,
         match_type: parsedBody.matchType,
-        played_at: parsedBody.playedAt,
+        played_at: parsedBody.playedAt.toString(),
       })
       .select("id")
       .single();

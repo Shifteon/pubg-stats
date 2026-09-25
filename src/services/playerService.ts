@@ -180,9 +180,10 @@ export class PlayerService {
         `)
         .in("id", chunkIds)
         .not("played_at", "is", null);
-
+        
       if (gamesError) throw new Error("Failed to fetch game details: " + gamesError.message);
-      if (gamesChunk) allGames.push(...gamesChunk);
+      // TODO: Ew
+      if (gamesChunk) allGames.push(...gamesChunk as unknown as DashboardRawGame[]);
     }
 
     allGames.sort((a, b) => new Date(b.played_at).getTime() - new Date(a.played_at).getTime());
@@ -253,21 +254,23 @@ export class PlayerService {
     if (statsError) throw statsError;
     if (winsError) throw winsError;
 
-    const sortedWins = winsData.sort((a, b) => a.teamId.localeCompare(b.teamId));
-    const sortedStats = statsData.sort((a, b) => a.teamId.localeCompare(b.teamId));
+    // TODO: Get rid of all of these non null assertions and ||
+    const sortedWins = winsData.sort((a, b) => a.teamId!.localeCompare(b.teamId || ""));
+    const sortedStats = statsData.sort((a, b) => a.teamId!.localeCompare(b.teamId || ""));
 
+    // TODO: Get rid of the ||
     if (sortedWins && sortedStats) {
       for (let i = 0; i < sortedWins.length; i++) {
         const win = sortedWins[i];
         const stat = sortedStats[i];
         if (win.teamId === stat.teamId) {
           playerTeamStats.push({
-            teamId: stat.teamId,
-            teamName: stat.teamName,
-            gamesPlayed: stat.gamesPlayed,
-            winRate: (win.wins / stat.gamesPlayed) * 100,
-            averageKills: stat.avgKills,
-            averageDamage: stat.avgDamage,
+            teamId: stat.teamId || "",
+            teamName: stat.teamName || "",
+            gamesPlayed: stat.gamesPlayed || 0,
+            winRate: (win.wins || 0 / (stat.gamesPlayed || 0)) * 100,
+            averageKills: stat.avgKills || 0,
+            averageDamage: stat.avgDamage || 0,
           });
         }
       }
