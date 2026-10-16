@@ -40,6 +40,14 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# supabase
+supabase/.temp
+supabase/.branches
+supabase/seed.sql
+supabase/snippets
+
+drizzle
+
 migration-scripts
 json
 csv
