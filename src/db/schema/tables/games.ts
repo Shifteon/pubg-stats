@@ -4,7 +4,7 @@ import { teams } from "./teams";
 
 export const games = pgTable.withRLS("games", {
   id: uuid().defaultRandom().primaryKey(),
-  teamId: uuid("team_id").notNull().references(() => teams.id, { onDelete: "cascade" }),
+  teamId: uuid("team_id").notNull().references(() => teams.id, { onDelete: "cascade", name: "games_team_id_fkey" }),
   teamSortOrder: integer("team_sort_order"),
   isWin: boolean("is_win"),
   matchType: varchar("match_type", { length: 50 }).notNull(),
@@ -21,4 +21,3 @@ export const games = pgTable.withRLS("games", {
 
   pgPolicy("update", { for: "update", to: ["authenticated"], using: sql`true`, withCheck: sql`true` }),
 ]);
-

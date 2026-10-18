@@ -13,11 +13,10 @@ export const teams = pgTable.withRLS("teams", {
 ]);
 
 export const teamPlayers = pgTable.withRLS("team_players", {
-  teamId: uuid("team_id").notNull().references(() => teams.id, { onDelete: "cascade" }),
-  playerId: uuid("player_id").notNull().references(() => players.id, { onDelete: "cascade" }),
+  teamId: uuid("team_id").notNull().references(() => teams.id, { onDelete: "cascade", name: "team_players_team_id_fkey" }),
+  playerId: uuid("player_id").notNull().references(() => players.id, { onDelete: "cascade", name: "team_players_player_id_fkey" }),
 }, (table) => [
   primaryKey({ columns: [table.teamId, table.playerId], name: "team_players_pkey" }),
 
   pgPolicy("Enable read access for all users", { for: "select", to: ["authenticated"], using: sql`true` }),
 ]);
-

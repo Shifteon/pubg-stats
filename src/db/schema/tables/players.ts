@@ -8,9 +8,8 @@ export const players = pgTable.withRLS("players", {
 	createdAt: timestamp("created_at", { withTimezone: true }).default(sql`timezone('utc'::text, now())`).notNull(),
 	color: varchar(),
 	designation: text(),
-	userId: uuid().references(() => authUsers.id, { onDelete: "set null", onUpdate: "cascade" } ),
+	userId: uuid().references(() => authUsers.id, { onDelete: "set null", onUpdate: "cascade", name: "players_userId_fkey" } ),
 }, (table) => [
 	unique("players_name_key").on(table.name),
 	pgPolicy("Enable read access for all users", { for: "select", to: ["authenticated"], using: sql`true` }),
 ]);
-

@@ -10,11 +10,12 @@
     "db:start": "npx supabase start",
     "db:reset": "npx supabase db reset --local",
     "db:stop": "npx supabase stop",
-    "db:push": "npx drizzle-kit push",
+    "db:generate": "npx drizzle-kit generate",
+    "db:migrate": "npx drizzle-kit migrate",
     "db:dump": "node --env-file .env scripts/dumpDb.js",
     "db:seed": "docker cp supabase/seed.sql supabase_db_pubg-stats:/tmp/seed.sql && docker exec -it supabase_db_pubg-stats psql -U postgres -d postgres -f /tmp/seed.sql",
     "db:enable_aggr": "docker cp supabase/aggr.sql supabase_db_pubg-stats:/tmp/aggr.sql && docker exec -it supabase_db_pubg-stats psql -U postgres -d postgres -f /tmp/aggr.sql",
-    "db:dev": "npm run db:start && npm run db:reset && npm run db:push && npm run db:seed && npm run db:enable_aggr",
+    "db:dev": "npm run db:start && npm run db:reset && npm run db:migrate && npm run db:seed && npm run db:enable_aggr",
     "db:status": "npx supabase status"
   },
   "dependencies": {

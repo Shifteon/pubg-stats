@@ -5,8 +5,8 @@ import { players } from "./players";
 
 export const gamePlayerStats = pgTable.withRLS("game_player_stats", {
 	id: uuid().defaultRandom().primaryKey(),
-	gameId: uuid("game_id").notNull().references(() => games.id, { onDelete: "cascade" } ),
-	playerId: uuid("player_id").notNull().references(() => players.id, { onDelete: "cascade" } ),
+	gameId: uuid("game_id").notNull().references(() => games.id, { onDelete: "cascade", name: "game_player_stats_game_id_fkey" } ),
+	playerId: uuid("player_id").notNull().references(() => players.id, { onDelete: "cascade", name: "game_player_stats_player_id_fkey" } ),
 	kills: integer().default(0),
 	assists: integer().default(0),
 	damage: integer().default(0),

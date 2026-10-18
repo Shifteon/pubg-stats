@@ -1,0 +1,1102 @@
+{
+  "dialect": "postgres",
+  "id": "6e3c1d74-1715-4ef7-ac2d-c73444636d3f",
+  "prevIds": [
+    "00000000-0000-0000-0000-000000000000"
+  ],
+  "version": "8",
+  "ddl": [
+    {
+      "isRlsEnabled": true,
+      "name": "achievements",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": true,
+      "name": "game_player_stats",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": true,
+      "name": "games",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": true,
+      "name": "player_team_achievements",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": true,
+      "name": "players",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": true,
+      "name": "team_players",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": true,
+      "name": "teams",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "teams"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "team_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "team_players"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "games"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "players"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "player_team_achievements"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_player_stats"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "achievements"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "player_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "team_players"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "game_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_player_stats"
+    },
+    {
+      "type": "varchar(255)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "name",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "players"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "achievements"
+    },
+    {
+      "type": "varchar(255)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "name",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "teams"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "team_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "games"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "player_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "player_team_achievements"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "category",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "achievements"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "player_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_player_stats"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "team_sort_order",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "games"
+    },
+    {
+      "type": "varchar(50)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "team_type",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "teams"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "timezone('utc'::text, now())",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "players"
+    },
+    {
+      "type": "varchar",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "color",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "players"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": "0",
+      "generated": null,
+      "identity": null,
+      "name": "kills",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_player_stats"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "timezone('utc'::text, now())",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "teams"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "is_win",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "games"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "team_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "player_team_achievements"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "display_name",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "achievements"
+    },
+    {
+      "type": "varchar(50)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "match_type",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "games"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "designation",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "players"
+    },
+    {
+      "type": "jsonb",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "criteria",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "achievements"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "achieved_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "player_team_achievements"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": "0",
+      "generated": null,
+      "identity": null,
+      "name": "assists",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_player_stats"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "achievement_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "player_team_achievements"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": "0",
+      "generated": null,
+      "identity": null,
+      "name": "damage",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_player_stats"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "timezone('utc'::text, now())",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "games"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "userId",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "players"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "played_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "games"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "game_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "player_team_achievements"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": "0",
+      "generated": null,
+      "identity": null,
+      "name": "rescues",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_player_stats"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": "0",
+      "generated": null,
+      "identity": null,
+      "name": "recalls",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_player_stats"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null,
+          "isExpression": false,
+          "value": "game_id"
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "idx_game_player_stats_game",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "game_player_stats"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null,
+          "isExpression": false,
+          "value": "player_id"
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "idx_game_player_stats_player",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "game_player_stats"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null,
+          "isExpression": false,
+          "value": "team_id"
+        },
+        {
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null,
+          "isExpression": false,
+          "value": "team_sort_order"
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "idx_games_team_sort",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "games"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "userId"
+      ],
+      "schemaTo": "auth",
+      "tableTo": "users",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "CASCADE",
+      "onDelete": "SET NULL",
+      "name": "players_userId_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "players"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "player_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "players",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "team_players_player_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "team_players"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "team_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "teams",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "team_players_team_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "team_players"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "team_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "teams",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "games_team_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "games"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "game_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "games",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "game_player_stats_game_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "game_player_stats"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "player_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "players",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "game_player_stats_player_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "game_player_stats"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "achievement_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "achievements",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "CASCADE",
+      "onDelete": "CASCADE",
+      "name": "player_team_achievements_achievement_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "player_team_achievements"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "game_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "games",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "CASCADE",
+      "onDelete": "CASCADE",
+      "name": "player_team_achievements_game_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "player_team_achievements"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "player_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "players",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "CASCADE",
+      "onDelete": "CASCADE",
+      "name": "player_team_achievements_player_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "player_team_achievements"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "team_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "teams",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "CASCADE",
+      "onDelete": "CASCADE",
+      "name": "player_team_achievements_team_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "player_team_achievements"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": true,
+      "name": "players_pkey",
+      "entityType": "pks",
+      "schema": "public",
+      "table": "players"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": true,
+      "name": "teams_pkey",
+      "entityType": "pks",
+      "schema": "public",
+      "table": "teams"
+    },
+    {
+      "columns": [
+        "team_id",
+        "player_id"
+      ],
+      "nameExplicit": true,
+      "name": "team_players_pkey",
+      "entityType": "pks",
+      "schema": "public",
+      "table": "team_players"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": true,
+      "name": "games_pkey",
+      "entityType": "pks",
+      "schema": "public",
+      "table": "games"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": true,
+      "name": "game_player_stats_pkey",
+      "entityType": "pks",
+      "schema": "public",
+      "table": "game_player_stats"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": true,
+      "name": "achievements_pkey",
+      "entityType": "pks",
+      "schema": "public",
+      "table": "achievements"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": true,
+      "name": "player_team_achievements_pkey",
+      "entityType": "pks",
+      "schema": "public",
+      "table": "player_team_achievements"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "name"
+      ],
+      "nullsNotDistinct": false,
+      "name": "players_name_key",
+      "entityType": "uniques",
+      "schema": "public",
+      "table": "players"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "name"
+      ],
+      "nullsNotDistinct": false,
+      "name": "teams_name_key",
+      "entityType": "uniques",
+      "schema": "public",
+      "table": "teams"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "player_id",
+        "team_id",
+        "achievement_id"
+      ],
+      "nullsNotDistinct": false,
+      "name": "unique_player_team_achievement",
+      "entityType": "uniques",
+      "schema": "public",
+      "table": "player_team_achievements"
+    },
+    {
+      "as": "PERMISSIVE",
+      "for": "DELETE",
+      "roles": [
+        "authenticated"
+      ],
+      "using": "true",
+      "withCheck": null,
+      "name": "Authenticated can delete",
+      "entityType": "policies",
+      "schema": "public",
+      "table": "game_player_stats"
+    },
+    {
+      "as": "PERMISSIVE",
+      "for": "INSERT",
+      "roles": [
+        "authenticated"
+      ],
+      "using": null,
+      "withCheck": "true",
+      "name": "Enable insert for authenticated users only",
+      "entityType": "policies",
+      "schema": "public",
+      "table": "game_player_stats"
+    },
+    {
+      "as": "PERMISSIVE",
+      "for": "SELECT",
+      "roles": [
+        "authenticated"
+      ],
+      "using": "true",
+      "withCheck": null,
+      "name": "Enable read access for all users",
+      "entityType": "policies",
+      "schema": "public",
+      "table": "game_player_stats"
+    },
+    {
+      "as": "PERMISSIVE",
+      "for": "UPDATE",
+      "roles": [
+        "authenticated"
+      ],
+      "using": "true",
+      "withCheck": "true",
+      "name": "update",
+      "entityType": "policies",
+      "schema": "public",
+      "table": "game_player_stats"
+    },
+    {
+      "as": "PERMISSIVE",
+      "for": "DELETE",
+      "roles": [
+        "authenticated"
+      ],
+      "using": "true",
+      "withCheck": null,
+      "name": "Authenticated can delete",
+      "entityType": "policies",
+      "schema": "public",
+      "table": "games"
+    },
+    {
+      "as": "PERMISSIVE",
+      "for": "INSERT",
+      "roles": [
+        "authenticated"
+      ],
+      "using": null,
+      "withCheck": "true",
+      "name": "Enable insert for authenticated users only",
+      "entityType": "policies",
+      "schema": "public",
+      "table": "games"
+    },
+    {
+      "as": "PERMISSIVE",
+      "for": "SELECT",
+      "roles": [
+        "authenticated"
+      ],
+      "using": "true",
+      "withCheck": null,
+      "name": "Enable read access for all users",
+      "entityType": "policies",
+      "schema": "public",
+      "table": "games"
+    },
+    {
+      "as": "PERMISSIVE",
+      "for": "UPDATE",
+      "roles": [
+        "authenticated"
+      ],
+      "using": "true",
+      "withCheck": "true",
+      "name": "update",
+      "entityType": "policies",
+      "schema": "public",
+      "table": "games"
+    },
+    {
+      "as": "PERMISSIVE",
+      "for": "SELECT",
+      "roles": [
+        "authenticated"
+      ],
+      "using": "true",
+      "withCheck": null,
+      "name": "Enable read access for all users",
+      "entityType": "policies",
+      "schema": "public",
+      "table": "players"
+    },
+    {
+      "as": "PERMISSIVE",
+      "for": "SELECT",
+      "roles": [
+        "authenticated"
+      ],
+      "using": "true",
+      "withCheck": null,
+      "name": "Enable read access for all users",
+      "entityType": "policies",
+      "schema": "public",
+      "table": "team_players"
+    },
+    {
+      "as": "PERMISSIVE",
+      "for": "SELECT",
+      "roles": [
+        "authenticated"
+      ],
+      "using": "true",
+      "withCheck": null,
+      "name": "Enable read access for all users",
+      "entityType": "policies",
+      "schema": "public",
+      "table": "teams"
+    },
+    {
+      "definition": "SELECT tp.player_id, t.id AS team_id, t.name AS team_name, avg(gps.kills) AS average_kills, avg(gps.damage) AS average_damage, avg(gps.assists) AS average_assists, avg(gps.rescues) AS average_rescues, avg(gps.recalls) AS average_recalls, count(g.id) AS games_played FROM team_players tp JOIN teams t ON tp.team_id = t.id JOIN games g ON t.id = g.team_id JOIN game_player_stats gps ON g.id = gps.game_id AND tp.player_id = gps.player_id GROUP BY tp.player_id, t.id, t.name",
+      "with": {
+        "checkOption": null,
+        "securityBarrier": null,
+        "securityInvoker": true,
+        "fillfactor": null,
+        "toastTupleTarget": null,
+        "parallelWorkers": null,
+        "autovacuumEnabled": null,
+        "vacuumIndexCleanup": null,
+        "vacuumTruncate": null,
+        "autovacuumVacuumThreshold": null,
+        "autovacuumVacuumScaleFactor": null,
+        "autovacuumVacuumCostDelay": null,
+        "autovacuumVacuumCostLimit": null,
+        "autovacuumFreezeMinAge": null,
+        "autovacuumFreezeMaxAge": null,
+        "autovacuumFreezeTableAge": null,
+        "autovacuumMultixactFreezeMinAge": null,
+        "autovacuumMultixactFreezeMaxAge": null,
+        "autovacuumMultixactFreezeTableAge": null,
+        "logAutovacuumMinDuration": null,
+        "userCatalogTable": null
+      },
+      "withNoData": null,
+      "using": null,
+      "tablespace": null,
+      "materialized": false,
+      "name": "player_team_avgs",
+      "entityType": "views",
+      "schema": "public"
+    },
+    {
+      "definition": "SELECT tp.player_id, t.id AS team_id, t.name AS team_name, count(g.id) AS wins FROM team_players tp JOIN teams t ON tp.team_id = t.id JOIN games g ON t.id = g.team_id WHERE g.is_win = true GROUP BY tp.player_id, t.id, t.name",
+      "with": {
+        "checkOption": null,
+        "securityBarrier": null,
+        "securityInvoker": true,
+        "fillfactor": null,
+        "toastTupleTarget": null,
+        "parallelWorkers": null,
+        "autovacuumEnabled": null,
+        "vacuumIndexCleanup": null,
+        "vacuumTruncate": null,
+        "autovacuumVacuumThreshold": null,
+        "autovacuumVacuumScaleFactor": null,
+        "autovacuumVacuumCostDelay": null,
+        "autovacuumVacuumCostLimit": null,
+        "autovacuumFreezeMinAge": null,
+        "autovacuumFreezeMaxAge": null,
+        "autovacuumFreezeTableAge": null,
+        "autovacuumMultixactFreezeMinAge": null,
+        "autovacuumMultixactFreezeMaxAge": null,
+        "autovacuumMultixactFreezeTableAge": null,
+        "logAutovacuumMinDuration": null,
+        "userCatalogTable": null
+      },
+      "withNoData": null,
+      "using": null,
+      "tablespace": null,
+      "materialized": false,
+      "name": "player_team_wins",
+      "entityType": "views",
+      "schema": "public"
+    }
+  ],
+  "renames": []
+}
