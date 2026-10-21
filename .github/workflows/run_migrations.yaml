@@ -1,0 +1,33 @@
+name: Run Migrations Against Remote
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'drizzle/**/migration.sql'
+jobs:
+  migrate:
+    name: Dump Database and Migrate
+    runs-on: ubuntu-latest
+    env: ${{ secrets.DATABASE_URL }}
+    steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Install dependencies
+        run: npm install
+      - name: Dump db data
+        run: npx supabase db dump --data-only --db-url ${{ secrets.DATABASE_URL }} --file temp/db_dump/data_dump.sql
+      - name: Dump db schema
+        run: npx supabase db dump --db-url ${{ secrets.DATABASE_URL }} --file temp/db_dump/schema_dump.sql
+      - name: Archive dumps
+        uses: actions/upload-artifact@v7
+        with:
+          name: db_dumps
+          path: temp/db_dump
+  
