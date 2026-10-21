@@ -29,10 +29,13 @@ jobs:
         run: npx supabase db dump --data-only --db-url $DATABASE_URL --file temp/db_dump/data_dump.sql
       - name: Dump db schema
         run: npx supabase db dump --db-url $DATABASE_URL --file temp/db_dump/schema_dump.sql
-        
+
       - name: Archive dumps
         uses: actions/upload-artifact@v7
         with:
           name: db_dumps
           path: temp/db_dump
+
+      - name: Run migration
+        run: npx drizzle-kit migrate
   
